@@ -15,7 +15,7 @@ và toàn bộ pipeline vẫn chạy bình thường với 3 tính năng còn l�
 
 import os
 from ultralytics import YOLO
-from ai_engine import config
+import config
 
 
 class HelmetChecker:

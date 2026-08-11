@@ -24,7 +24,7 @@ https://universe.roboflow.com/search?q=helmet+detection+yolov8
 
 Sau khi tải về, đặt file vào đây:
 ```
-ai-engine/models/helmet_yolov8.pt
+ai_engine/models/helmet_yolov8.pt
 ```
 
 ### Cách 2: Train từ đầu
@@ -46,7 +46,7 @@ pip install roboflow
 # https://www.kaggle.com/datasets/meowmeowmeowmeowmeow/gtsrb-german-traffic-sign
 
 # Train
-cd ai-engine
+cd ai_engine
 python train.py --task sign --epochs 100 --imgsz 640
 
 # Copy model output
@@ -59,6 +59,6 @@ python train.py --task sign --epochs 100 --imgsz 640
 
 File `.gitignore` tại project root nên có dòng:
 ```
-ai-engine/models/*.pt
+ai_engine/models/*.pt
 ```
 để tránh commit model nặng lên repository.

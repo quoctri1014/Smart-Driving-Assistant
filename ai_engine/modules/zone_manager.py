@@ -5,7 +5,7 @@ Quản lý các vùng đếm (Zone 1, Zone 2, Zone 3 ...) giống clip mẫu.
 Mỗi track chỉ được đếm 1 lần cho mỗi zone (dựa vào zones_visited trong Track).
 """
 
-from ai_engine import config
+import config
 from .utils import polygon_percent_to_pixels, point_in_polygon, draw_polygon, box_bottom_center
 
 # Bảng màu cho từng zone (BGR)

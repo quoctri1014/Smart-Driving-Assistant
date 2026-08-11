@@ -73,7 +73,7 @@
 ```
 traffic_ai_project/
 │
-├── ai-engine/                  # AI modules & standalone runner
+├── ai_engine/                  # AI modules & standalone runner
 │   ├── modules/
 │   │   ├── detector.py         # YOLOv8 vehicle/person detection
 │   │   ├── tracker.py          # SimpleTracker (IoU-based)

@@ -12,7 +12,7 @@ gần với tốc độ cao (hoặc mình đang lại gần nó nhanh) => cảnh
 không thay thế được radar/lidar cho hệ thống ADAS thực tế.
 """
 
-from ai_engine import config
+import config
 from .utils import polygon_percent_to_pixels, point_in_polygon, draw_polygon, box_bottom_center
 
 

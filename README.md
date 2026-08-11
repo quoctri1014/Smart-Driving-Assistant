@@ -8,7 +8,7 @@ Hệ thống ADAS (Advanced Driver Assistance System) thời gian thực, gồm 
 backend/         FastAPI + WebSocket AI pipeline (uvicorn)
 web-app/         Next.js dashboard + Simulator + Live Monitor
 mobile-app/      React Native (Expo) mobile driving mode
-ai-engine/       YOLOv8 + EasyOCR + MediaPipe AI modules
+ai_engine/       YOLOv8 + EasyOCR + MediaPipe AI modules
 docs/            API specification and demo checklist
 docker-compose.yml  PostgreSQL database setup
 ```

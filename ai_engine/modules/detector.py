@@ -7,7 +7,7 @@ thay vì chạy nhiều model riêng lẻ cho từng tính năng.
 """
 
 from ultralytics import YOLO
-from ai_engine import config
+import config
 
 
 class VehicleDetector:

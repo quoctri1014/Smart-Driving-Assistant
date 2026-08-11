@@ -22,14 +22,14 @@ import argparse
 import time
 import cv2
 
-from ai_engine import config
-from ai_engine.modules.detector import VehicleDetector
-from ai_engine.modules.tracker import SimpleTracker
-from ai_engine.modules.zone_manager import ZoneManager
-from ai_engine.modules.plate_reader import PlateReader
-from ai_engine.modules.helmet_checker import HelmetChecker
-from ai_engine.modules.collision_warning import CollisionWarning
-from ai_engine.modules.utils import draw_box, box_center
+import config
+from modules.detector import VehicleDetector
+from modules.tracker import SimpleTracker
+from modules.zone_manager import ZoneManager
+from modules.plate_reader import PlateReader
+from modules.helmet_checker import HelmetChecker
+from modules.collision_warning import CollisionWarning
+from modules.utils import draw_box, box_center
 
 
 def parse_args():

@@ -9,10 +9,10 @@ RUN apt-get update && apt-get install -y \
     && rm -rf /var/lib/apt/lists/*
 
 COPY backend/requirements.txt /app/backend/
-COPY ai-engine/requirements.txt /app/ai-engine/
+COPY ai_engine/requirements.txt /app/ai_engine/
 
 RUN pip install --no-cache-dir -r backend/requirements.txt
-RUN pip install --no-cache-dir -r ai-engine/requirements.txt
+RUN pip install --no-cache-dir -r ai_engine/requirements.txt
 
 COPY . /app
 

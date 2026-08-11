@@ -36,11 +36,11 @@
 | **Biển cấm** | 200 ảnh biển cấm phổ biến VN |
 | **Biển hiệu lệnh** | 150 ảnh |
 | **Phương pháp** | Script crawl Google Images + annotation bằng LabelImg |
-| **Script** | `ai-engine/train.py` |
+| **Script** | `ai_engine/train.py` |
 
 ### Hướng dẫn train Sign Recognition
 ```bash
-cd ai-engine
+cd ai_engine
 
 # 1. Chuẩn bị dataset theo cấu trúc YOLOv8
 #    datasets/signs/images/train/  &  datasets/signs/labels/train/
@@ -56,7 +56,7 @@ python train.py --task sign --epochs 100 --imgsz 640
 #    → copy vào models/sign_yolov8.pt
 ```
 
-**Model path**: `ai-engine/models/sign_yolov8.pt`  
+**Model path**: `ai_engine/models/sign_yolov8.pt`  
 **Trạng thái**: ⚠️ Chưa có — cần thu thập dataset và train
 
 ---
@@ -80,7 +80,7 @@ python train.py --task sign --epochs 100 --imgsz 640
 
 ### Hướng dẫn train Helmet Detection
 ```bash
-cd ai-engine
+cd ai_engine
 
 # 1. Download dataset từ Roboflow (format YOLOv8)
 #    Hoặc dùng Roboflow Python API:
@@ -94,7 +94,7 @@ python train.py --task helmet --epochs 80 --imgsz 416
 #    models/helmet_yolov8.pt
 ```
 
-**Model path**: `ai-engine/models/helmet_yolov8.pt`  
+**Model path**: `ai_engine/models/helmet_yolov8.pt`  
 **Trạng thái**: ⚠️ Chưa có — module tự động tắt khi thiếu model
 
 ---
@@ -108,7 +108,7 @@ python train.py --task helmet --epochs 80 --imgsz 416
 | **Số lượng** | ~3,000 ảnh |
 | **Lớp** | 2 lớp: `seatbelt` (0), `no-seatbelt` (1) |
 
-**Model path**: `ai-engine/models/seatbelt_yolov8.pt`  
+**Model path**: `ai_engine/models/seatbelt_yolov8.pt`  
 **Trạng thái**: ⚠️ Chưa có — fallback: giả định `seatbelt_on = True`
 
 ---

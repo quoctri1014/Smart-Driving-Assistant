@@ -15,7 +15,7 @@ biển số trước khi đưa vào EasyOCR. Xem README phần "Nâng cấp".
 import re
 import cv2
 import easyocr
-from ai_engine import config
+import config
 
 # Mẫu biển số VN phổ biến: 2 số + 1-2 chữ + (dấu - hoặc khoảng trắng) + 4-5 số
 PLATE_REGEX = re.compile(r"^[0-9]{2}[A-Z]{1,2}[0-9]?[\-\. ]?[0-9]{3,5}$")

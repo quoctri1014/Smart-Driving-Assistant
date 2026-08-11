@@ -33,7 +33,7 @@ Hệ thống AI xử lý **2 luồng camera độc lập** theo thời gian th�
 ## 2. Luồng Road-Facing Camera
 
 ### 2.1 Module: Vehicle Detection & Tracking
-- **Model**: YOLOv8n (COCO pretrained) — `ai-engine/yolov8n.pt`
+- **Model**: YOLOv8n (COCO pretrained) — `ai_engine/yolov8n.pt`
 - **Framework**: `ultralytics`
 - **Các lớp quan tâm**: car (2), motorcycle (3), bus (5), truck (7), person (0)
 - **Ngưỡng confidence**: 0.35
