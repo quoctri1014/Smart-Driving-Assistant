@@ -1,0 +1,47 @@
+@import "tailwindcss";
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-geist-sans), Arial, Helvetica, sans-serif;
+  --font-mono: var(--font-geist-mono), monospace;
+
+  /* ADAS Custom Colors */
+  --color-adas-bg: #080B12;
+  --color-adas-surface: #111620;
+  --color-adas-card: #171D29;
+  --color-adas-elevated: #1D2533;
+  --color-adas-primary: #5B8CFF;
+  --color-adas-success: #22C55E;
+  --color-adas-warning: #F59E0B;
+  --color-adas-danger: #EF4444;
+  --color-adas-text-primary: #F8FAFC;
+  --color-adas-text-secondary: #94A3B8;
+  --color-adas-text-muted: #64748B;
+  --color-adas-border: rgba(255, 255, 255, 0.08);
+}
+
+:root {
+  /* Enforce Dark First */
+  --background: #080B12;
+  --foreground: #F8FAFC;
+}
+
+body {
+  background-color: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Custom utilities */
+@utility text-balance {
+  text-wrap: balance;
+}
+
+@utility glass-panel {
+  background: rgba(17, 22, 32, 0.6);
+  backdrop-filter: blur(12px);
+  border: 1px solid var(--color-adas-border);
+}
