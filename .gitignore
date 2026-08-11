@@ -1,0 +1,97 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.Python
+*.egg
+*.egg-info/
+dist/
+build/
+.eggs/
+*.so
+
+# Virtual Environment
+venv/
+.venv/
+env/
+ENV/
+
+# AI Model files (too large for git)
+*.pt
+*.pth
+*.onnx
+*.tflite
+*.bin
+# Exception: allow pretrained base model
+!ai-engine/yolov8n.pt
+!ai_engine/yolov8n.pt
+
+# Dataset directories
+datasets/
+data/
+*.csv
+!docs/*.csv
+
+# Output / generated files
+ai-engine/output/
+ai_engine/output/
+storage/
+*.mp4
+!ai-engine/sample_videos/traffic.mp4
+!ai_engine/sample_videos/traffic.mp4
+
+# Environment variables
+.env
+.env.local
+.env.*.local
+
+# Node.js
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnp
+.pnp.js
+
+# Next.js
+web-app/.next/
+web-app/out/
+web-app/build/
+
+# Expo / React Native
+mobile-app/.expo/
+mobile-app/dist/
+mobile-app/expo-env.d.ts
+*.jks
+*.p8
+*.p12
+*.key
+*.mobileprovision
+*.orig.*
+
+# Testing
+.pytest_cache/
+.coverage
+coverage/
+htmlcov/
+.nyc_output/
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Docker volumes data
+pgdata/
+
+# Logs
+*.log
+logs/
