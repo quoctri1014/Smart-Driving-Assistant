@@ -45,8 +45,7 @@ async def lifespan(app: FastAPI):
         import backend.app.models_db  # Ensure all models are loaded
         async with engine.begin() as conn:
             await conn.run_sync(Base.metadata.create_all)
-        async with AsyncSessionLocal() as db:
-            await db.execute(text("SELECT 1"))
+        await initialize_database()
     except Exception as e:
         logger.error(f"Error initializing database & RBAC: {e}")
 

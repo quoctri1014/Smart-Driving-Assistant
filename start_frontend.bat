@@ -10,6 +10,11 @@ echo   - Simulator: http://localhost:3000/simulator
 echo   - AI Status: http://localhost:3000/ai-status
 echo ========================================================
 echo.
+if not exist "node_modules" (
+    echo Thu muc node_modules chua ton tai. Dang tu dong cai dat thu vien npm...
+    call npm install
+)
+
 npm run dev
 echo.
 echo Frontend da dung lai.

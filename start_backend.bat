@@ -10,7 +10,13 @@ echo   - Swagger API Docs: http://localhost:8000/docs
 echo   - WebSocket Stream: ws://localhost:8000/ws/v1/stream
 echo ========================================================
 echo.
-.\venv\Scripts\python.exe -m uvicorn backend.app.main:app --host 0.0.0.0 --port 8000 --reload
+if exist ".\venv\Scripts\python.exe" (
+    echo Dang khoi dong bang moi truong Python venv...
+    .\venv\Scripts\python.exe -m uvicorn backend.app.main:app --host 0.0.0.0 --port 8000 --reload
+) else (
+    echo Khong tim thay venv, dung python mac dinh cua he thong...
+    python -m uvicorn backend.app.main:app --host 0.0.0.0 --port 8000 --reload
+)
 echo.
 echo Server da dung lai.
 pause
