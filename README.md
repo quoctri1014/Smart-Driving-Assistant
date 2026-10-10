@@ -1,148 +1,205 @@
 # Smart Driving Assistant System
 
-Hệ thống ADAS (Advanced Driver Assistance System) thời gian thực, gồm AI nhận diện biển báo, cảnh báo va chạm, giám sát tài xế và giải trợ lý lái xe thông minh.
+Hệ thống ADAS (Advanced Driver Assistance System) thời gian thực, gồm AI nhận diện biển báo, cảnh báo va chạm, giám sát tài xế và trợ lý lái xe thông minh.
 
 ## Architecture
 
 ```
-backend/         FastAPI + WebSocket AI pipeline (uvicorn)
-web-app/         Next.js dashboard + Simulator + Live Monitor
-mobile-app/      React Native (Expo) mobile driving mode
-ai_engine/       YOLOv8 + EasyOCR + MediaPipe AI modules
-docs/            API specification and demo checklist
+backend/            FastAPI + WebSocket AI pipeline (uvicorn)
+web-app/            Next.js dashboard + Simulator + Live Monitor
+mobile-app/         React Native (Expo) mobile driving mode
+ai_engine/          YOLOv8 + EasyOCR + MediaPipe AI modules
+docs/               API specification and demo checklist
 docker-compose.yml  PostgreSQL database setup
 ```
 
-## Prerequisites
+---
 
-| Requirement | Version |
+## WebSocket Endpoints
+
+| Mục đích | Địa chỉ kết nối |
 |---|---|
-| Python venv | `venv/` inside project root |
-| Node.js | >= 18 |
-| PostgreSQL | Required for REST (Auth/Sessions/Violations) — optional for WebSocket-only demo |
-| Expo CLI | Installed via `mobile-app/` |
-
-> **WebSocket-only demo** (Simulator, Live Monitor) works **without** PostgreSQL.  
-> Login, Sessions, Violations pages require PostgreSQL running.
+| Road AI (phát hiện xe, tốc độ, va chạm) | `ws://localhost:8000/ws/v1/stream` |
+| Driver Monitor (buồn ngủ, dây an toàn) | `ws://localhost:8000/ws/v1/driver-stream` |
 
 ---
 
-## DEMO QUICK START
+## REST Endpoints (cần PostgreSQL)
 
-Run these in separate terminals **from the project root** (`Smart Driving Assistant`):
-> **Mẹo nhanh**: Bạn có thể chạy `.\start_project.bat` để tự động khởi động đồng thời cả Backend và Frontend!
+| Method | Path | Mô tả |
+|---|---|---|
+| GET | `/health` | Kiểm tra server (không cần DB) |
+| POST | `/api/v1/auth/register` | Đăng ký tài khoản |
+| POST | `/api/v1/auth/login` | Đăng nhập → nhận JWT token |
+| GET | `/api/v1/violations` | Danh sách vi phạm (cần token) |
+| GET | `/api/v1/sessions` | Danh sách phiên lái (cần token) |
 
-### TERMINAL 1 — Backend (AI + WebSocket + REST)
+---
+
+# HƯỚNG DẪN CHẠY DỰ ÁN
+
+## ✅ Yêu cầu cài đặt trước
+
+| Phần mềm | Phiên bản | Kiểm tra |
+|---|---|---|
+| **Python** | >= 3.10 | `python --version` |
+| **Node.js** | >= 18 | `node --version` |
+| **npm** | >= 9 | `npm --version` |
+| **Docker Desktop** | Mới nhất | Chỉ cần nếu dùng PostgreSQL |
+
+---
+
+## BƯỚC 0 — Chuẩn bị (Chỉ làm 1 lần đầu tiên)
+
+### 0.1. Tạo file cấu hình môi trường
 
 ```powershell
-# Activate virtualenv and start FastAPI
-.\venv\Scripts\uvicorn.exe backend.app.main:app --host 0.0.0.0 --port 8000
-```
-
-Wait for: `Application startup complete. Uvicorn running on http://0.0.0.0:8000`
-
-AI model load output (expected on first run):
-- `Loading Shared AI Models...`
-- `Shared AI Models loaded successfully.`
-- `[HelmetChecker] model not found` → helmet detection disabled (non-blocker for demo)
-
-**Health check**: `curl http://localhost:8000/health` → `{"status":"ok"}`
-
-#### Optional: Start PostgreSQL for REST features
-
-```powershell
-# If Docker Desktop is installed:
-docker compose up -d postgres
-
-# Then create .env from template:
 copy .env.example .env
-# Edit .env if needed (default creds already match docker-compose.yml)
 ```
 
-### TERMINAL 2 — Web App
+> Nội dung mặc định của `.env` đã khớp với `docker-compose.yml`, không cần sửa gì thêm.
+> Nếu chỉ muốn chạy demo WebSocket (không cần đăng nhập/lưu dữ liệu), **bỏ qua bước này**.
+
+### 0.2. Khởi động PostgreSQL (nếu cần đăng nhập / lưu lịch sử)
+
+```powershell
+# Yêu cầu Docker Desktop đang chạy
+docker compose up -d postgres
+```
+
+> Kết nối thành công khi `localhost:5432` phản hồi với user `smartuser`, pass `smartpassword`, db `traffic_db`.
+
+### 0.3. Cài thư viện Web App (chỉ làm 1 lần nếu chưa có `node_modules`)
+
+```powershell
+cd web-app
+npm install
+cd ..
+```
+
+---
+
+## 🚀 CÁCH 1 — CHẠY TỰ ĐỘNG (Khuyên dùng, chỉ 1 click)
+
+> Dành cho người muốn khởi động hệ thống nhanh nhất mà không cần mở nhiều Terminal thủ công.
+
+**Nhấp đúp chuột vào file trong thư mục dự án:**
+
+```
+📁 Smart Driving Assistant\
+└── 🖱️ start_project.bat   ← Nhấp đúp vào đây
+```
+
+File này **tự động mở 2 cửa sổ Terminal** riêng biệt:
+
+| Cửa sổ | Vai trò | Địa chỉ |
+|---|---|---|
+| Terminal 1 (nền xanh) | Backend FastAPI + AI Engine | http://localhost:8000 |
+| Terminal 2 | Web Dashboard Next.js | http://localhost:3000 |
+
+**Sau khi cả 2 terminal báo chạy xong**, mở trình duyệt:
+
+```
+🌐 http://localhost:3000
+```
+
+> ⚠️ Chờ Terminal 1 hiển thị `Application startup complete` trước khi dùng Web App.
+
+---
+
+## 🛠️ CÁCH 2 — CHẠY THỦ CÔNG TỪNG BƯỚC (Qua Terminal)
+
+> Dành cho người muốn kiểm soát từng bước hoặc debug lỗi.
+
+### TERMINAL 1 — Khởi động Backend (FastAPI + AI Engine)
+
+Mở **PowerShell** tại thư mục gốc dự án, chạy:
+
+```powershell
+.\venv\Scripts\python.exe -m uvicorn backend.app.main:app --host 0.0.0.0 --port 8000 --reload
+```
+
+**Đợi đến khi thấy:**
+
+```
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://0.0.0.0:8000
+```
+
+> ⏳ Lần đầu mất khoảng **30–60 giây** để load các mô hình AI (YOLOv8, MediaPipe, EasyOCR).
+> ℹ️ Thông báo `[HelmetChecker] model not found` là **bình thường**, không ảnh hưởng tới demo.
+
+**Kiểm tra nhanh:**
+
+```powershell
+curl http://localhost:8000/health
+# Kết quả mong muốn: {"status":"ok"}
+```
+
+Xem tài liệu API tự động (Swagger UI): **http://localhost:8000/docs**
+
+---
+
+### TERMINAL 2 — Khởi động Web Dashboard (Next.js)
+
+Mở một cửa sổ **PowerShell mới**, chạy:
 
 ```powershell
 cd web-app
 npm run dev
 ```
 
-Open: **http://localhost:3000**
+**Đợi đến khi thấy:**
 
-#### Environment Variables (web-app/.env.local)
-
-```env
-NEXT_PUBLIC_API_URL=http://localhost:8000/api/v1
-NEXT_PUBLIC_WS_URL=ws://localhost:8000
+```
+✓ Ready - started server on http://localhost:3000
 ```
 
-### TERMINAL 3 — Mobile App (Optional)
+Mở trình duyệt và vào: **http://localhost:3000**
+
+---
+
+### TERMINAL 3 — Khởi động Mobile App Expo (Tùy chọn, không bắt buộc)
+
+Mở thêm một cửa sổ **PowerShell mới**, chạy:
 
 ```powershell
 cd mobile-app
 npx expo start
 ```
 
-#### Environment Variables for Physical Device (mobile-app/.env.local)
+- **Điện thoại thật:** Quét mã QR bằng app **Expo Go** (Android/iOS).
+- **Máy ảo Android:** Nhấn phím `a` trong Terminal sau khi Expo khởi động.
 
-```env
-# Replace 192.168.x.x with your PC's LAN IP (must be on same Wi-Fi)
-EXPO_PUBLIC_API_URL=http://192.168.x.x:8000/api/v1
-EXPO_PUBLIC_WS_URL=ws://192.168.x.x:8000
-```
-
-> **Android Emulator**: Leave `EXPO_PUBLIC_WS_URL` unset — fallback is `ws://10.0.2.2:8000` automatically.
-> **iOS Simulator**: Leave unset — fallback is `ws://localhost:8000` automatically.
-
-**Expo Go compatibility**: Scan QR code with Expo Go app (v50+). Camera + WebSocket streaming works in Expo Go on physical device.
+> ⚠️ Khi dùng điện thoại thật trên cùng mạng Wi-Fi, sửa `mobile-app/.env.local`:
+>
+> ```env
+> EXPO_PUBLIC_API_URL=http://192.168.x.x:8000/api/v1
+> EXPO_PUBLIC_WS_URL=ws://192.168.x.x:8000
+> ```
+>
+> Thay `192.168.x.x` bằng **địa chỉ IP LAN của máy tính** (xem bằng lệnh `ipconfig`).
 
 ---
 
-## WebSocket Endpoints
+## 📋 Bảng địa chỉ truy cập hệ thống
 
-| Purpose | Endpoint |
+| Chức năng | Địa chỉ |
 |---|---|
-| Road AI (vehicle detection, speed, collision) | `ws://host:8000/ws/v1/stream` |
-| Driver Monitor (drowsiness, seatbelt) | `ws://host:8000/ws/v1/driver-stream` |
+| 🌐 Web Dashboard (Trang chủ) | http://localhost:3000 |
+| 🤖 Trợ lý Lái xe Live (AI Camera) | http://localhost:3000/live |
+| 📊 Bảng điều khiển cá nhân | http://localhost:3000/dashboard |
+| 🗺️ Nhật ký hành trình | http://localhost:3000/journeys |
+| ⚠️ Cảnh báo an toàn & Vi phạm | http://localhost:3000/violations |
+| 🔧 Trạng thái 12 Module AI | http://localhost:3000/ai-status |
+| 📡 Swagger API Docs (tài liệu API) | http://localhost:8000/docs |
+| ❤️ Health Check (kiểm tra backend) | http://localhost:8000/health |
 
 ---
 
-## REST Endpoints (requires PostgreSQL)
-
-| Method | Path | Description |
-|---|---|---|
-| GET | `/health` | Server health (no DB required) |
-| POST | `/api/v1/auth/register` | Register driver account |
-| POST | `/api/v1/auth/login` | Login → returns JWT token |
-| GET | `/api/v1/violations` | List violations (Bearer token) |
-| GET | `/api/v1/sessions` | List sessions (Bearer token) |
-
----
-
-## Mobile Camera Streaming — Architecture Note
-
-The mobile app streams Road Camera frames to `/ws/v1/stream` using:
-1. `expo-camera` `takePictureAsync` at ~2 FPS (prototype rate)
-2. `base64-js` decodes JPEG base64 → binary `Uint8Array`
-3. WebSocket sends binary `ArrayBuffer` directly to FastAPI backend
-4. FastAPI uses `cv2.imdecode()` to decode and run the AI pipeline
-
-**Limitation**: Standard `expo-camera` does not support continuous frame extraction at high FPS without native modules (e.g. `react-native-vision-camera`). This is a prototype implementation.
-
-**DMS (Driver Monitoring)**: Mobile single-device DMS is not supported. Most smartphones cannot simultaneously stream both front and rear cameras via standard APIs. An external device or dedicated hardware is required for DMS in production.
-
----
-
-## Project Status: DEMO READY
-
-See `docs/demo-checklist.md` for full validation checklist.
 ## Đối chiếu chức năng & Tài liệu hệ thống
 
-- **Đối chiếu 12 tính năng**: [Báo cáo 12 chức năng, kiến trúc đã chỉnh](docs/feature-alignment-review.md)
-- **Hướng dẫn chạy dự án**: [HUONG_DAN_CHAY_DU_AN.md](docs/HUONG_DAN_CHAY_DU_AN.md)
+- **Đối chiếu 12 tính năng**: [feature-alignment-review.md](docs/feature-alignment-review.md)
+- **Hướng dẫn chạy dự án chi tiết**: [HUONG_DAN_CHAY_DU_AN.md](docs/HUONG_DAN_CHAY_DU_AN.md)
 - **Quyền và chức năng hệ thống**: [DOCS_QUYEN_VA_CHUC_NANG_HE_THONG.md](docs/DOCS_QUYEN_VA_CHUC_NANG_HE_THONG.md)
 - **Kiến trúc hệ thống**: [architecture.md](docs/architecture.md)
-- **Thư mục báo cáo & sổ tay hình ảnh**: [docs/reports/](docs/reports/)
-  - `BAO_CAO_DO_AN_TRAFFICGUARD_90_TRANG.docx`
-  - `SO_TAY_TAT_CA_HINH_ANH_VA_SO_DO_DO_AN.docx`
-  - `SO_TAY_HINH_ANH_VA_SO_DO_TRAFFICGUARD_CLEAN.docx`
-- **Tài liệu tham khảo**: [docs/references/](docs/references/)
