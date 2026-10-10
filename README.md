@@ -194,6 +194,6 @@ Smart Driving Assistant/
 
 ## 📚 Tài liệu thêm
 
-- [Đối chiếu 12 tính năng](docs/feature-alignment-review.md)
-- [Quyền và chức năng hệ thống](docs/DOCS_QUYEN_VA_CHUC_NANG_HE_THONG.md)
+- [Đối chiếu 12 tính năng AI](docs/feature-alignment-review.md)
 - [Kiến trúc hệ thống](docs/architecture.md)
+- [Đặc tả API](docs/api-spec.md)
