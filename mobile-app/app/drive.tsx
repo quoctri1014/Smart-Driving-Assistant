@@ -1,262 +1,300 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import {
+  View, Text, StyleSheet, TouchableOpacity, Animated, Easing,
+} from 'react-native';
 import { CameraView, useCameraPermissions } from 'expo-camera';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { router } from 'expo-router';
 import { theme } from '../lib/theme';
-import { ShieldAlert, LogOut, Info } from 'lucide-react-native';
+import {
+  ShieldAlert, X, Wifi, WifiOff, ChevronDown, Navigation,
+} from 'lucide-react-native';
 import { useDrivingSocket } from '../lib/useDrivingSocket';
 import { deriveDrivingUIState } from '../lib/driving/alert-engine';
 
-type DriveSessionState = 'IDLE' | 'PREPARING' | 'CONNECTING' | 'STREAMING' | 'STOPPING' | 'ENDED' | 'ERROR';
+type SessionState = 'IDLE' | 'PREPARING' | 'CONNECTING' | 'STREAMING' | 'STOPPING' | 'ENDED' | 'ERROR';
+
+const ALERT_STYLE: Record<string, { bg: string; border: string; text: string }> = {
+  normal:   { bg: 'rgba(16,185,129,0.15)', border: 'rgba(16,185,129,0.3)', text: '#34D399' },
+  warning:  { bg: 'rgba(245,158,11,0.15)', border: 'rgba(245,158,11,0.3)', text: '#FCD34D' },
+  danger:   { bg: 'rgba(239,68,68,0.15)',  border: 'rgba(239,68,68,0.3)',  text: '#FCA5A5' },
+};
 
 export default function DriveMode() {
   const [permission, requestPermission] = useCameraPermissions();
-  const [sessionState, setSessionState] = useState<DriveSessionState>('IDLE');
-  
-  // Phase H - Simulated speed for demo
+  const [sessionState, setSessionState] = useState<SessionState>('IDLE');
   const [simulatedSpeed, setSimulatedSpeed] = useState(55);
 
-  const cameraRef = useRef<CameraView>(null);
-  const isProcessingFrame = useRef(false);
-  const captureIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
-  const sessionStartTime = useRef<number | null>(null);
-  
-  // State from socket
-  const { status: socketStatus, result: roadResult, isStale, connect, disconnect, sendFrame, sendMetadata } = useDrivingSocket();
+  const cameraRef       = useRef<CameraView>(null);
+  const isProcessing    = useRef(false);
+  const captureInterval = useRef<ReturnType<typeof setInterval> | null>(null);
+  const pulseAnim       = useRef(new Animated.Value(1)).current;
 
-  // Derive UI state based on web-app's alert engine (Phase K)
-  // For Mobile, driver DMS is NOT SUPPORTED ON SINGLE PHONE (Phase L) -> pass null and driverStale=true
+  const {
+    status: socketStatus, result: roadResult, isStale,
+    connect, disconnect, sendFrame, sendMetadata,
+  } = useDrivingSocket();
+
   const uiState = deriveDrivingUIState(roadResult, null, isStale, true);
+  const isStreaming = sessionState === 'STREAMING';
+  const isDanger    = uiState.priority === 'COLLISION_DANGER';
 
-  if (!permission) {
-    return <View />;
-  }
+  /* Pulse animation for live dot */
+  useEffect(() => {
+    if (!isStreaming) return;
+    Animated.loop(
+      Animated.sequence([
+        Animated.timing(pulseAnim, { toValue: 0.4, duration: 900, useNativeDriver: true, easing: Easing.ease }),
+        Animated.timing(pulseAnim, { toValue: 1, duration: 900, useNativeDriver: true, easing: Easing.ease }),
+      ])
+    ).start();
+    return () => pulseAnim.setValue(1);
+  }, [isStreaming]);
 
-  if (!permission.granted) {
-    return (
-      <View style={styles.permissionContainer}>
-        <Text style={styles.permissionText}>Camera permission required.</Text>
-        <TouchableOpacity style={styles.button} onPress={requestPermission}>
-          <Text style={styles.buttonText}>Grant Permission</Text>
-        </TouchableOpacity>
-      </View>
-    );
-  }
-
-  // Handle capture loop (Phase D)
-  const startCaptureLoop = useCallback(() => {
-    // 2 FPS for prototype -> 500ms
-    captureIntervalRef.current = setInterval(async () => {
-      if (isProcessingFrame.current || !cameraRef.current) return;
-      isProcessingFrame.current = true;
+  const startCapture = useCallback(() => {
+    captureInterval.current = setInterval(async () => {
+      if (isProcessing.current || !cameraRef.current) return;
+      isProcessing.current = true;
       try {
-        const photo = await cameraRef.current.takePictureAsync({
-          quality: 0.5,
-          base64: true,
-          // Low res if supported, wait Expo Camera doesn't let us define width/height in takePictureAsync directly 
-          // in modern sdk, but quality 0.5 reduces size.
-        });
+        const photo = await cameraRef.current.takePictureAsync({ quality: 0.5, base64: true });
         if (photo?.base64) {
           await sendFrame(photo.base64);
           sendMetadata({ vehicle_speed: simulatedSpeed });
         }
-      } catch (err) {
-        console.error("Frame capture failed:", err);
-      } finally {
-        isProcessingFrame.current = false;
-      }
-    }, 500); // Low FPS prototype
+      } catch { /* silent */ }
+      finally { isProcessing.current = false; }
+    }, 500);
   }, [sendFrame, sendMetadata, simulatedSpeed]);
 
-  const stopCaptureLoop = useCallback(() => {
-    if (captureIntervalRef.current) {
-      clearInterval(captureIntervalRef.current);
-      captureIntervalRef.current = null;
-    }
+  const stopCapture = useCallback(() => {
+    if (captureInterval.current) { clearInterval(captureInterval.current); captureInterval.current = null; }
   }, []);
 
-  // Sync WS status -> Session State
   useEffect(() => {
     if (sessionState === 'CONNECTING' && socketStatus === 'CONNECTED') {
       setSessionState('STREAMING');
-      startCaptureLoop();
+      startCapture();
     }
-    if (socketStatus === 'ERROR' || socketStatus === 'DISCONNECTED') {
-      if (sessionState === 'STREAMING') {
-        stopCaptureLoop();
-        setSessionState('ERROR');
-      }
+    if ((socketStatus === 'ERROR' || socketStatus === 'DISCONNECTED') && sessionState === 'STREAMING') {
+      stopCapture();
+      setSessionState('ERROR');
     }
-  }, [socketStatus, sessionState, startCaptureLoop, stopCaptureLoop]);
+  }, [socketStatus, sessionState, startCapture, stopCapture]);
 
-  const handleStartDrive = () => {
-    setSessionState('CONNECTING');
-    sessionStartTime.current = Date.now();
-    connect();
-  };
-
-  const handleEndDrive = () => {
+  const handleStart = () => { setSessionState('CONNECTING'); connect(); };
+  const handleEnd   = () => {
     setSessionState('STOPPING');
-    stopCaptureLoop();
-    disconnect();
+    stopCapture(); disconnect();
     setSessionState('ENDED');
-    // Navigate to Trip Summary (Phase M)
     router.replace('/trip-summary' as any);
   };
 
-  const isDanger = uiState.priority === 'COLLISION_DANGER';
+  /* ── Permission screens ── */
+  if (!permission) return <View style={{ flex: 1, backgroundColor: theme.colors.bg }} />;
+  if (!permission.granted) {
+    return (
+      <SafeAreaView style={styles.permWrap}>
+        <View style={styles.permCard}>
+          <ShieldAlert size={40} color={theme.colors.warning} style={{ marginBottom: 16 }} />
+          <Text style={styles.permTitle}>Yêu cầu quyền Camera</Text>
+          <Text style={styles.permDesc}>Cần quyền truy cập camera để phân tích AI và phát hiện nguy hiểm theo thời gian thực.</Text>
+          <TouchableOpacity style={styles.permBtn} onPress={requestPermission}>
+            <Text style={styles.permBtnText}>Cấp quyền truy cập</Text>
+          </TouchableOpacity>
+        </View>
+      </SafeAreaView>
+    );
+  }
+
+  const alertStyle = isDanger ? ALERT_STYLE.danger
+    : (uiState.priority !== 'NORMAL' && uiState.priority !== 'UNAVAILABLE') ? ALERT_STYLE.warning
+    : ALERT_STYLE.normal;
 
   return (
-    <View style={styles.container}>
-      <CameraView 
-        ref={cameraRef}
-        style={styles.camera} 
-        facing="back"
-      >
-        {/* Full screen takeover for danger (Phase T) */}
-        {isDanger && (
-          <View style={[styles.dangerOverlay]}>
-            <ShieldAlert size={80} color="white" />
-            <Text style={styles.dangerText}>{uiState.message}</Text>
-            <Text style={styles.dangerSubText}>BRAKE NOW!</Text>
+    <View style={styles.root}>
+      <CameraView ref={cameraRef} style={StyleSheet.absoluteFill} facing="back" />
+
+      {/* ── Danger full-screen overlay ── */}
+      {isDanger && (
+        <View style={styles.dangerOverlay}>
+          <ShieldAlert size={64} color="white" />
+          <Text style={styles.dangerTitle}>{uiState.message}</Text>
+          <Text style={styles.dangerSub}>GIẢM TỐC NGAY!</Text>
+        </View>
+      )}
+
+      {/* ── Main HUD ── */}
+      <View style={styles.hud}>
+        {/* Top bar */}
+        <SafeAreaView edges={['top']}>
+          <View style={styles.topBar}>
+            <TouchableOpacity
+              style={styles.iconBtn}
+              onPress={() => { stopCapture(); disconnect(); router.back(); }}
+            >
+              <X size={18} color={theme.colors.text.primary} />
+            </TouchableOpacity>
+
+            {/* Status indicator */}
+            <View style={styles.statusPill}>
+              <Animated.View style={[styles.statusDot, {
+                backgroundColor: isStreaming ? theme.colors.success
+                  : sessionState === 'ERROR' ? theme.colors.danger : '#475569',
+                opacity: isStreaming ? pulseAnim : 1,
+              }]} />
+              {socketStatus === 'CONNECTED' || isStreaming
+                ? <Wifi size={11} color={theme.colors.success} />
+                : <WifiOff size={11} color={theme.colors.text.muted} />
+              }
+              <Text style={styles.statusText}>
+                {isStreaming ? 'AI LIVE'
+                  : sessionState === 'CONNECTING' ? 'KẾT NỐI...'
+                  : sessionState === 'ERROR' ? 'LỖI KẾT NỐI'
+                  : 'CHỜ BẮT ĐẦU'}
+              </Text>
+            </View>
+
+            {/* Speed adjust */}
+            <View style={styles.speedAdj}>
+              <TouchableOpacity onPress={() => setSimulatedSpeed(s => Math.max(0, s - 5))} style={styles.adjBtn}>
+                <Text style={styles.adjBtnText}>−</Text>
+              </TouchableOpacity>
+              <Text style={styles.adjLabel}>SPD</Text>
+              <TouchableOpacity onPress={() => setSimulatedSpeed(s => Math.min(200, s + 5))} style={styles.adjBtn}>
+                <Text style={styles.adjBtnText}>+</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </SafeAreaView>
+
+        {/* Alert banner */}
+        {!isDanger && uiState.priority !== 'NORMAL' && uiState.priority !== 'UNAVAILABLE' && isStreaming && (
+          <View style={[styles.alertBanner, { backgroundColor: alertStyle.bg, borderColor: alertStyle.border }]}>
+            <ChevronDown size={14} color={alertStyle.text} style={{ marginRight: 6 }} />
+            <Text style={[styles.alertText, { color: alertStyle.text }]}>{uiState.message}</Text>
           </View>
         )}
 
-        <View style={styles.uiContainer}>
-          {/* Top Bar */}
-          <View style={styles.topBar}>
-            <TouchableOpacity 
-              style={styles.backButton}
-              onPress={() => {
-                stopCaptureLoop();
-                disconnect();
-                router.back();
-              }}
-            >
-              <LogOut size={24} color={theme.colors.text.primary} />
-            </TouchableOpacity>
-
-            <View style={[
-              styles.statusBadge, 
-              { backgroundColor: sessionState === 'STREAMING' ? theme.colors.success + '40' : theme.colors.surface }
-            ]}>
-              <View style={[
-                styles.statusDot, 
-                { backgroundColor: sessionState === 'STREAMING' ? theme.colors.success : theme.colors.text.muted }
-              ]} />
-              <Text style={styles.statusText}>
-                {sessionState === 'STREAMING' ? 'AI ACTIVE' : sessionState}
-              </Text>
-            </View>
-          </View>
-
-          {/* Banner Alert */}
-          {uiState.priority === 'UNAVAILABLE' && !isDanger && sessionState === 'STREAMING' && (
-             <View style={styles.warningBanner}>
-               <Info size={20} color="white" style={{ marginRight: 8 }} />
-               <Text style={styles.warningText}>AI Connection Lost / Reconnecting...</Text>
-             </View>
-          )}
-
-          {uiState.priority !== 'NORMAL' && uiState.priority !== 'UNAVAILABLE' && !isDanger && sessionState === 'STREAMING' && (
-            <View style={styles.warningBanner}>
-              <Info size={20} color="white" style={{ marginRight: 8 }} />
-              <Text style={styles.warningText}>{uiState.message}</Text>
-            </View>
-          )}
-
-          {/* Bottom HUD */}
+        {/* Bottom HUD */}
+        <SafeAreaView edges={['bottom']} style={styles.bottomWrap}>
           <View style={styles.bottomHud}>
-            <View style={styles.hudPanel}>
-              <Text style={styles.hudLabel}>SPEED (SIM)</Text>
-              <View style={{ flexDirection: 'row', alignItems: 'baseline' }}>
-                <Text style={styles.speedText}>{simulatedSpeed}</Text>
-                <Text style={styles.unitText}> km/h</Text>
+            {/* Speed panel */}
+            <View style={styles.speedPanel}>
+              <Text style={styles.speedLabel}>TỐCKM/H (GIẢ LẬP)</Text>
+              <View style={{ flexDirection: 'row', alignItems: 'flex-end', gap: 4 }}>
+                <Text style={styles.speedValue}>{simulatedSpeed}</Text>
+                <Text style={styles.speedUnit}>km/h</Text>
               </View>
-              {uiState.recommendedSpeed && (
-                <Text style={styles.recommendedText}>Rec: {uiState.recommendedSpeed} km/h</Text>
+              {uiState.recommendedSpeed != null && (
+                <View style={styles.recRow}>
+                  <Navigation size={11} color={theme.colors.success} />
+                  <Text style={styles.recText}>Đề xuất: {uiState.recommendedSpeed} km/h</Text>
+                </View>
               )}
             </View>
 
-            <TouchableOpacity 
+            {/* Start / Stop button */}
+            <TouchableOpacity
               style={[
-                styles.actionButton,
-                { backgroundColor: sessionState === 'STREAMING' ? theme.colors.danger : theme.colors.primary }
+                styles.actionBtn,
+                {
+                  backgroundColor: isStreaming ? theme.colors.danger
+                    : sessionState === 'CONNECTING' ? '#1E3A8A'
+                    : theme.colors.primary,
+                  opacity: (sessionState === 'CONNECTING' || sessionState === 'STOPPING') ? 0.7 : 1,
+                },
               ]}
-              onPress={sessionState === 'STREAMING' ? handleEndDrive : handleStartDrive}
+              onPress={isStreaming ? handleEnd : handleStart}
               disabled={sessionState === 'CONNECTING' || sessionState === 'STOPPING'}
+              activeOpacity={0.85}
             >
-              <Text style={styles.actionButtonText}>
-                {sessionState === 'STREAMING' ? 'END TRIP' : (sessionState === 'CONNECTING' ? 'CONNECTING...' : 'START DRIVE')}
+              <Text style={styles.actionBtnText}>
+                {isStreaming ? 'KẾT THÚC' : sessionState === 'CONNECTING' ? 'ĐANG KẾT NỐI' : 'BẮT ĐẦU LÁI'}
               </Text>
             </TouchableOpacity>
           </View>
-        </View>
-      </CameraView>
+        </SafeAreaView>
+      </View>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: 'black' },
-  camera: { flex: 1 },
-  uiContainer: {
-    flex: 1,
-    justifyContent: 'space-between',
-    padding: 20,
-    paddingTop: 60, // Safe area approx
-  },
+  root: { flex: 1, backgroundColor: 'black' },
+  hud:  { position: 'absolute', top: 0, bottom: 0, left: 0, right: 0, justifyContent: 'space-between' },
+
   dangerOverlay: {
-    ...StyleSheet.absoluteFill as any,
-    backgroundColor: 'rgba(239, 68, 68, 0.7)',
-    justifyContent: 'center',
-    alignItems: 'center',
-    zIndex: 10,
+    position: 'absolute', top: 0, bottom: 0, left: 0, right: 0,
+    backgroundColor: 'rgba(220,38,38,0.75)',
+    alignItems: 'center', justifyContent: 'center', zIndex: 20,
   },
-  dangerText: {
-    color: 'white',
-    fontSize: 32,
-    fontWeight: '900',
-    marginTop: 20,
-    textAlign: 'center',
-    textShadowColor: 'rgba(0,0,0,0.5)',
-    textShadowOffset: { width: 0, height: 4 },
-    textShadowRadius: 10,
+  dangerTitle: { color: 'white', fontSize: 28, fontWeight: '900', marginTop: 16, textAlign: 'center' },
+  dangerSub:   { color: 'rgba(255,255,255,0.9)', fontSize: 18, fontWeight: '700', marginTop: 8, letterSpacing: 2 },
+
+  topBar: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', padding: 16 },
+
+  iconBtn: {
+    width: 40, height: 40, borderRadius: 10,
+    backgroundColor: 'rgba(10,14,26,0.75)',
+    borderWidth: 1, borderColor: 'rgba(255,255,255,0.10)',
+    alignItems: 'center', justifyContent: 'center',
   },
-  dangerSubText: { color: 'white', fontSize: 24, fontWeight: 'bold' },
-  topBar: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start', zIndex: 20 },
-  backButton: {
-    width: 44, height: 44, borderRadius: 22,
-    backgroundColor: 'rgba(30, 41, 59, 0.8)',
-    justifyContent: 'center', alignItems: 'center',
-    borderWidth: 1, borderColor: 'rgba(255,255,255,0.1)',
+  statusPill: {
+    flexDirection: 'row', alignItems: 'center', gap: 5,
+    backgroundColor: 'rgba(10,14,26,0.80)',
+    paddingHorizontal: 12, paddingVertical: 7,
+    borderRadius: 100, borderWidth: 1, borderColor: 'rgba(255,255,255,0.10)',
   },
-  statusBadge: {
+  statusDot: { width: 7, height: 7, borderRadius: 4 },
+  statusText: { color: 'rgba(255,255,255,0.85)', fontSize: 11, fontWeight: '700', letterSpacing: 0.8 },
+
+  speedAdj: { flexDirection: 'row', alignItems: 'center', gap: 6 },
+  adjBtn: {
+    width: 28, height: 28, borderRadius: 8,
+    backgroundColor: 'rgba(10,14,26,0.75)',
+    borderWidth: 1, borderColor: 'rgba(255,255,255,0.10)',
+    alignItems: 'center', justifyContent: 'center',
+  },
+  adjBtnText: { color: 'white', fontSize: 18, fontWeight: '300', lineHeight: 26 },
+  adjLabel: { color: 'rgba(255,255,255,0.5)', fontSize: 10, fontWeight: '700' },
+
+  alertBanner: {
     flexDirection: 'row', alignItems: 'center',
-    paddingHorizontal: 12, paddingVertical: 6,
-    borderRadius: 16, borderWidth: 1, borderColor: 'rgba(255,255,255,0.1)',
+    alignSelf: 'center', marginTop: 12,
+    paddingHorizontal: 16, paddingVertical: 10,
+    borderRadius: 10, borderWidth: 1,
+    maxWidth: '85%',
   },
-  statusDot: { width: 8, height: 8, borderRadius: 4, marginRight: 6 },
-  statusText: { color: 'white', fontSize: 12, fontWeight: 'bold' },
-  warningBanner: {
-    flexDirection: 'row', backgroundColor: 'rgba(245, 158, 11, 0.9)',
-    padding: 16, borderRadius: 12, alignItems: 'center', alignSelf: 'center',
-    marginTop: 20, zIndex: 20,
+  alertText: { fontSize: 13, fontWeight: '600', flex: 1 },
+
+  bottomWrap: { padding: 16 },
+  bottomHud: { flexDirection: 'row', alignItems: 'flex-end', justifyContent: 'space-between', gap: 12 },
+
+  speedPanel: {
+    backgroundColor: 'rgba(10,14,26,0.82)',
+    borderWidth: 1, borderColor: 'rgba(255,255,255,0.10)',
+    borderRadius: 14, padding: 14,
   },
-  warningText: { color: 'white', fontWeight: 'bold', fontSize: 16 },
-  bottomHud: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-end', zIndex: 20 },
-  hudPanel: {
-    backgroundColor: 'rgba(15, 23, 42, 0.8)', padding: 16, borderRadius: 16,
-    borderWidth: 1, borderColor: 'rgba(255,255,255,0.1)',
+  speedLabel: { fontSize: 9, fontWeight: '700', color: 'rgba(255,255,255,0.4)', letterSpacing: 1, marginBottom: 2 },
+  speedValue: { fontSize: 42, fontWeight: '800', color: '#F1F5F9', lineHeight: 46 },
+  speedUnit:  { fontSize: 14, fontWeight: '600', color: 'rgba(255,255,255,0.5)', marginBottom: 6 },
+  recRow:     { flexDirection: 'row', alignItems: 'center', gap: 4, marginTop: 4 },
+  recText:    { fontSize: 11, color: theme.colors.success, fontWeight: '600' },
+
+  actionBtn: {
+    flex: 1, paddingVertical: 16, borderRadius: 14,
+    alignItems: 'center', justifyContent: 'center',
   },
-  hudLabel: { color: theme.colors.text.muted, fontSize: 12, fontWeight: 'bold', marginBottom: 4 },
-  speedText: { color: theme.colors.text.primary, fontSize: 36, fontWeight: '900' },
-  unitText: { color: theme.colors.text.secondary, fontSize: 16, fontWeight: '600' },
-  recommendedText: { color: theme.colors.success, fontSize: 14, fontWeight: 'bold', marginTop: 4 },
-  actionButton: { paddingHorizontal: 24, paddingVertical: 16, borderRadius: 16, justifyContent: 'center', alignItems: 'center' },
-  actionButtonText: { color: 'white', fontSize: 16, fontWeight: 'bold' },
-  permissionContainer: { flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: theme.colors.bg, padding: 20 },
-  permissionText: { color: theme.colors.text.primary, fontSize: 18, textAlign: 'center', marginBottom: 20 },
-  button: { backgroundColor: theme.colors.primary, paddingHorizontal: 20, paddingVertical: 12, borderRadius: 8 },
-  buttonText: { color: 'white', fontWeight: 'bold' }
+  actionBtnText: { color: 'white', fontSize: 14, fontWeight: '800', letterSpacing: 1.2 },
+
+  permWrap: { flex: 1, backgroundColor: theme.colors.bg, alignItems: 'center', justifyContent: 'center', padding: 24 },
+  permCard: {
+    backgroundColor: theme.colors.surface, borderRadius: 16,
+    borderWidth: 1, borderColor: theme.colors.border,
+    padding: 28, alignItems: 'center', maxWidth: 320,
+  },
+  permTitle: { fontSize: 18, fontWeight: '700', color: theme.colors.text.primary, marginBottom: 10 },
+  permDesc:  { fontSize: 13, color: theme.colors.text.muted, textAlign: 'center', lineHeight: 20, marginBottom: 24 },
+  permBtn:   { backgroundColor: theme.colors.primary, paddingHorizontal: 24, paddingVertical: 12, borderRadius: 10 },
+  permBtnText: { color: 'white', fontWeight: '700', fontSize: 14 },
 });

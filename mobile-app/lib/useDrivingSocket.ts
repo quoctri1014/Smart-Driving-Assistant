@@ -1,6 +1,8 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { Platform } from 'react-native';
 import { base64ToArrayBuffer } from './buffer-util';
+import { getToken } from './auth';
+import { mobileSpeechService } from './speechService';
 
 export type SocketStatus = 'IDLE' | 'CONNECTING' | 'CONNECTED' | 'RECONNECTING' | 'DISCONNECTED' | 'ERROR';
 
@@ -16,13 +18,14 @@ export function useDrivingSocket() {
   const isIntentionallyClosed = useRef(false);
 
   // Allow override via EXPO_PUBLIC_WS_URL, fallback to emulator 10.0.2.2 or localhost
-  const getWsUrl = () => {
+  const getWsUrl = async () => {
     let wsBase = process.env.EXPO_PUBLIC_WS_URL;
     if (!wsBase) {
        wsBase = Platform.OS === 'android' ? 'ws://10.0.2.2:8000' : 'ws://localhost:8000';
     }
-    // Mobile doesn't have localstorage, maybe secure store, but for demo we just connect without token
-    return `${wsBase}/ws/v1/stream?token=`;
+    const token = await getToken();
+    if (!token) throw new Error('Authentication required');
+    return `${wsBase}/ws/v1/stream?token=${encodeURIComponent(token)}`;
   };
 
   const markStale = useCallback(() => {
@@ -36,13 +39,16 @@ export function useDrivingSocket() {
     staleTimeoutRef.current = setTimeout(markStale, 2500);
   }, [markStale]);
 
-  const connect = useCallback(() => {
+  const connect = useCallback(async () => {
     if (socketRef.current?.readyState === WebSocket.OPEN) return;
 
     isIntentionallyClosed.current = false;
     setStatus(reconnectAttempts.current > 0 ? 'RECONNECTING' : 'CONNECTING');
 
-    const ws = new WebSocket(getWsUrl());
+    let url: string;
+    try { url = await getWsUrl(); } catch { setStatus('ERROR'); return; }
+    if (isIntentionallyClosed.current) return;
+    const ws = new WebSocket(url);
     socketRef.current = ws;
 
     ws.onopen = () => {
@@ -59,8 +65,14 @@ export function useDrivingSocket() {
           return;
         }
         if (data.type === 'detection_result' || data.data) {
-          setResult(data.data || data);
+          const res = data.data || data;
+          setResult(res);
           resetStaleTimer();
+
+          // Phát giọng đọc tiếng Việt theo Decision Engine
+          if (res?.sound_alert || res?.speech_prompt) {
+            mobileSpeechService.handleDecisionAudio(res.sound_alert, res.speech_prompt);
+          }
         }
       } catch (e) {
         console.error('WS Parse Error', e);

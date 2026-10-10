@@ -1,0 +1,57 @@
+{
+  "name": "ADAS_Vietnam_Benchmark_Project",
+  "version": "1.1",
+  "categories": [
+    {
+      "id": 0,
+      "name": "car",
+      "color": "#3388FF",
+      "type": "rectangle"
+    },
+    {
+      "id": 1,
+      "name": "motorbike",
+      "color": "#FF3333",
+      "type": "rectangle"
+    },
+    {
+      "id": 2,
+      "name": "bus",
+      "color": "#33FF57",
+      "type": "rectangle"
+    },
+    {
+      "id": 3,
+      "name": "truck",
+      "color": "#FF9933",
+      "type": "rectangle"
+    },
+    {
+      "id": 4,
+      "name": "bicycle",
+      "color": "#CC33FF",
+      "type": "rectangle"
+    },
+    {
+      "id": 5,
+      "name": "pedestrian",
+      "color": "#FFFF33",
+      "type": "rectangle"
+    },
+    {
+      "id": 6,
+      "name": "license_plate",
+      "color": "#00FFFF",
+      "type": "rectangle"
+    },
+    {
+      "id": 7,
+      "name": "traffic_sign",
+      "color": "#FF00AA",
+      "type": "rectangle"
+    }
+  ],
+  "default_status": "CHƯA DUYỆT",
+  "pre_annotation_model": "YOLOv8m (Ultralytics, 26M params)",
+  "target_model_under_test": "YOLOv8n (Custom pipeline, 3M params)"
+}

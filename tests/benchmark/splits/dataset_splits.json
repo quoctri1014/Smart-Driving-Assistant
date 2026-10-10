@@ -1,0 +1,152 @@
+{
+  "policy": "SPLIT_BY_VIDEO_ZERO_LEAKAGE",
+  "description": "Phân chia tập tinh chỉnh và tập kiểm thử hoàn toàn theo VIDEO độc lập. Tập kiểm thử bị khóa cứng, nghiêm cấm sử dụng cho huấn luyện hoặc tinh chỉnh trọng số.",
+  "lock_status": "LOCKED",
+  "forbidden_for_training": true,
+  "test_set": {
+    "count": 7,
+    "videos": [
+      {
+        "filename": "dong_xe_may_hcm_01.mp4",
+        "condition": "dong_xe_may",
+        "location": "hcm_vong_xoay",
+        "rationale": "Kiểm thử mật độ xe máy cực cao tại vòng xoay TP.HCM",
+        "sha256": "6a08e39ff8017b7903c98ced55c9436fdf46303d1356f5ec1caf6bc5c1770622",
+        "size_bytes": 15680282
+      },
+      {
+        "filename": "dong_xe_may_hanoi_03.mp4",
+        "condition": "dong_xe_may",
+        "location": "hanoi_nga_tu",
+        "rationale": "Kiểm thử xe máy rẽ nhánh cắt ngang dòng tại ngã tư Hà Nội",
+        "sha256": "1a0c402b2ec404072fa75f9abcd9b38b763913cdcde116911479222e114d8e4c",
+        "size_bytes": 21694084
+      },
+      {
+        "filename": "ngay_hcm_02.mp4",
+        "condition": "ngay",
+        "location": "hcm_quoc_lo",
+        "rationale": "Kiểm thử làn đường và xe tải chạy tốc độ cao trên quốc lộ",
+        "sha256": "eb3698e472461ea13089b06900195fc0453fb2a51e09f6d7d470d56d6a1f560d",
+        "size_bytes": 28622695
+      },
+      {
+        "filename": "bien_bao_hcm_01.mp4",
+        "condition": "bien_bao",
+        "location": "hcm_dashcam_route1",
+        "rationale": "Kiểm thử nhận diện biển báo đô thị qua kính lái",
+        "sha256": "6ae89aeb889128f4c719c6a0dad25fb68450ee8571f233b733ddc4fd0c4c4c74",
+        "size_bytes": 35274661
+      },
+      {
+        "filename": "dem_dashcam_01.mp4",
+        "condition": "dem",
+        "location": "dashcam_urban_night",
+        "rationale": "Kiểm thử chóa đèn pha xe ngược chiều ban đêm",
+        "sha256": "506d615a32478b333025d3bd6d5cceb8941140f42b335e96199ddd46fef1afd9",
+        "size_bytes": 19962365
+      },
+      {
+        "filename": "mua_dashcam_02.mp4",
+        "condition": "mua",
+        "location": "dashcam_windshield_rain",
+        "rationale": "Kiểm thử kính lái đọng giọt nước và gạt nước che khuất",
+        "sha256": "a8056204607774027540a05b86a323e2a203102c4666910bd07ee91acc068ada",
+        "size_bytes": 14749868
+      },
+      {
+        "filename": "nguoc_sang_dashcam_01.mp4",
+        "condition": "nguoc_sang",
+        "location": "dashcam_direct_sun_glare",
+        "rationale": "Kiểm thử lóa sáng quang học ngược hướng mặt trời",
+        "sha256": "70e48db5ca010ac8d9afcb5470c7d578a0045fd29d03addba18333fb1953a95d",
+        "size_bytes": 58932475
+      }
+    ]
+  },
+  "train_set": {
+    "count": 10,
+    "videos": [
+      {
+        "filename": "dong_xe_may_hanoi_01.mp4",
+        "condition": "dong_xe_may",
+        "location": "hanoi_bach_mai_sec1",
+        "rationale": "Dữ liệu huấn luyện nhận dạng xe máy nội thành",
+        "sha256": "c684a6354aac84b92ebc184cdd0adc1e6319cf07f5f93e0724f6dd4f4b37bee2",
+        "size_bytes": 20079127
+      },
+      {
+        "filename": "dong_xe_may_hanoi_02.mp4",
+        "condition": "dong_xe_may",
+        "location": "hanoi_bach_mai_sec2",
+        "rationale": "Dữ liệu huấn luyện xe máy trời nhiều mây",
+        "sha256": "a7b483f1089b229938e19aefb62d2def98b37b00e9a602ebd9d2c56a84652445",
+        "size_bytes": 18722117
+      },
+      {
+        "filename": "ngay_hanoi_01.mp4",
+        "condition": "ngay",
+        "location": "hanoi_bach_mai_sec3",
+        "rationale": "Dữ liệu huấn luyện nhận dạng ô tô/buýt bóng râm",
+        "sha256": "1e293c0f6e3dfb81687764960937b5d0bc82b62955ec977ca52b23974899e5a0",
+        "size_bytes": 18840304
+      },
+      {
+        "filename": "dong_xe_may_hcm_02.mp4",
+        "condition": "dong_xe_may",
+        "location": "hcm_nga_tu_cam",
+        "rationale": "Dữ liệu huấn luyện xe máy dừng đèn đỏ",
+        "sha256": "daec20d274c809168120ce7e2679fca824beff132ca799883819f73ad9a77b1d",
+        "size_bytes": 11728875
+      },
+      {
+        "filename": "ngay_hcm_01.mp4",
+        "condition": "ngay",
+        "location": "hcm_dai_lo",
+        "rationale": "Dữ liệu huấn luyện đại lộ thông thoáng",
+        "sha256": "10ca0e0051dfc4434bfa37227a4d1e76d5fd2d719b5e4c32bddb221dddda0d05",
+        "size_bytes": 23806354
+      },
+      {
+        "filename": "bien_bao_hanoi_01.mp4",
+        "condition": "bien_bao",
+        "location": "hanoi_dashcam",
+        "rationale": "Dữ liệu huấn luyện biển báo giao thông Hà Nội",
+        "sha256": "cc0fe02e512b901de6c605acb06f3e5c75698e48d06cc7744c217806fad57004",
+        "size_bytes": 51774235
+      },
+      {
+        "filename": "bien_bao_hcm_02.mp4",
+        "condition": "bien_bao",
+        "location": "hcm_dashcam_route2",
+        "rationale": "Dữ liệu huấn luyện biển báo tốc độ TP.HCM",
+        "sha256": "d847ed83b48e4b7fab65675eb8a117d4b86fb8b2214e51c1c6fcda112613bc41",
+        "size_bytes": 31656337
+      },
+      {
+        "filename": "dem_dashcam_02.mp4",
+        "condition": "dem",
+        "location": "dashcam_highway_night",
+        "rationale": "Dữ liệu huấn luyện theo dõi xe thiếu sáng ban đêm",
+        "sha256": "8632fae98f0dd65ea18f48af6a61ae3b225ff7d3aff6448647d7f228679288ba",
+        "size_bytes": 23514527
+      },
+      {
+        "filename": "mua_dashcam_01.mp4",
+        "condition": "mua",
+        "location": "dashcam_night_rain",
+        "rationale": "Dữ liệu huấn luyện phân biệt vạch làn ướt",
+        "sha256": "344bd1bab749a5c37f3e7cfc47808c660b9c6ff69223464f7aa162b4ba12f01a",
+        "size_bytes": 14330554
+      },
+      {
+        "filename": "mua_dashcam_03.mp4",
+        "condition": "mua",
+        "location": "dashcam_day_rain",
+        "rationale": "Dữ liệu huấn luyện đường trơn ban ngày",
+        "sha256": "d707858921ddc325d263031cb087d36850f032af34a0d9b6567eb8b9f5462fec",
+        "size_bytes": 35773227
+      }
+    ]
+  }
+}

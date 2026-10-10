@@ -1,9 +1,19 @@
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
 
 class ApiClient {
+  private authPromise: Promise<string | null> | null = null;
+
+  public async getValidToken(): Promise<string | null> {
+    if (typeof window === 'undefined') return 'personal_token';
+    let token = localStorage.getItem('access_token');
+    if (token) return token;
+    return 'personal_token';
+  }
+
+
   private async request<T>(endpoint: string, options: RequestInit = {}): Promise<T> {
-    const token = localStorage.getItem('access_token');
-    
+    let token = await this.getValidToken();
+
     const headers: Record<string, string> = {
       'Content-Type': 'application/json',
       ...(options.headers as Record<string, string>),
@@ -13,22 +23,35 @@ class ApiClient {
       headers['Authorization'] = `Bearer ${token}`;
     }
 
-    const response = await fetch(`${API_URL}${endpoint}`, {
-      ...options,
-      headers,
-    });
+    try {
+      let response = await fetch(`${API_URL}${endpoint}`, {
+        ...options,
+        headers,
+      });
 
-    if (response.status === 401) {
-      localStorage.removeItem('access_token');
-      window.dispatchEvent(new Event('auth:unauthorized'));
+      // If 401, clear stored token, auto-login once, and retry
+      if (response.status === 401 && typeof window !== 'undefined') {
+        localStorage.removeItem('access_token');
+        const newToken = await this.getValidToken();
+        if (newToken) {
+          headers['Authorization'] = `Bearer ${newToken}`;
+          response = await fetch(`${API_URL}${endpoint}`, {
+            ...options,
+            headers,
+          });
+        }
+      }
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => null);
+        throw new Error(errorData?.detail || `API Error: ${response.status}`);
+      }
+
+      return response.json();
+    } catch (err: any) {
+      console.warn(`[ApiClient] Request to ${endpoint} failed:`, err.message);
+      throw err;
     }
-
-    if (!response.ok) {
-      const errorData = await response.json().catch(() => null);
-      throw new Error(errorData?.detail || `API Error: ${response.status}`);
-    }
-
-    return response.json();
   }
 
   get<T>(endpoint: string, options?: RequestInit) {
@@ -47,6 +70,14 @@ class ApiClient {
     return this.request<T>(endpoint, {
       ...options,
       method: 'PUT',
+      body: data ? JSON.stringify(data) : undefined,
+    });
+  }
+
+  patch<T>(endpoint: string, data?: any, options?: RequestInit) {
+    return this.request<T>(endpoint, {
+      ...options,
+      method: 'PATCH',
       body: data ? JSON.stringify(data) : undefined,
     });
   }

@@ -1,0 +1,142 @@
+================================================================================
+BỘ MÃ NGUỒN VÀ FILE SƠ ĐỒ CHUẨN ĐẸP 100% CHO DRAW.IO (DIAGRAMS.NET)
+Dự án: TrafficGuard - Smart Driving Assistant
+Thiết kế: Bố cục ngang (Landscape 16:9), Thẻ Card hiện đại, Rộng rãi, Dễ nhìn
+================================================================================
+
+--------------------------------------------------------------------------------
+CÁCH 1: MỞ TRỰC TIẾP FILE .DRAWIO (KHUYÊN DÙNG - ĐẸP CHUẨN TỪNG PIXEL)
+--------------------------------------------------------------------------------
+Trong giao diện web Draw.io (app.diagrams.net):
+1. Bấm vào menu góc trên: Tập tin (File) -> Mở từ (Open from) -> Thiết bị (Device)
+2. Chọn 1 trong 3 file .drawio đã được thiết kế sẵn:
+   - Hình 3.2: report_assets/hinh_3_2_dual_stream_pipeline_pro.drawio
+   - Hình 3.3: report_assets/hinh_3_3_database_erd_schema_pro.drawio
+   - Hình 4.1: report_assets/hinh_4_1_plate_recognition_pipeline_pro.drawio
+=> Toàn bộ các khối hộp, màu sắc Tailwind, font chữ to rõ 13px và mũi tên sẽ tự động dàn ngang tuyệt đẹp!
+
+
+--------------------------------------------------------------------------------
+CÁCH 2: DÁN MÃ MERMAID CẢI TIẾN (ĐÃ TỐI ƯU KHÔNG BỊ CO RÚT THÀNH 1 CỘT)
+--------------------------------------------------------------------------------
+(Vào menu Draw.io: Arrange -> Insert -> Advanced -> Mermaid)
+
+================================================================================
+1. HÌNH 3.2: SƠ ĐỒ LUỒNG XỬ LÝ SONG SONG 2 KÊNH CAMERA (DUAL-STREAM PIPELINE)
+================================================================================
+flowchart LR
+    subgraph S_ROAD["LUONG ROAD-FACING (MAT DUONG)"]
+        direction TB
+        R1["1. Thu nhan Frame: 1080p @ 30 FPS"]
+        R2["2. ROI Dynamic Crop: Bo 30% vung troi"]
+        R3["3. YOLOv8x: Nhan dien Xe & Nguoi"]
+        R4["4. ByteTrack: Gan ID quy dao on dinh"]
+        R5["5. Homography: Chieu BEV tinh Van toc"]
+        R6["6. Bien bao: QCVN 41 & S.508"]
+        R7["7. Cu ly an toan (TT31) & Tinh TTC"]
+        R1 --> R2 --> R3 --> R4 --> R5 --> R6 --> R7
+    end
+
+    subgraph S_CORE["FASTAPI BACKEND CORE ENGINE"]
+        direction TB
+        C1["WebSocket Pipeline In-Memory AsyncIO"]
+        C2["Priority Decision Engine (3 Cap)"]
+        C3["[CAP 1 - NGUY HIEM]: TTC va cham, Ngu gat"]
+        C4["[CAP 2 - CANH BAO]: Qua toc do, Cu ly gan"]
+        C5["[CAP 3 - NHAC NHO]: Day an toan, Nghi 4h"]
+        C6["Debounce Filter chong doi canh bao gia"]
+        C7["Privacy Blur Mat/Bien so + Hash SHA-256"]
+        C1 --> C2 --> C3 --> C4 --> C5 --> C6 --> C7
+    end
+
+    subgraph S_CABIN["LUONG DRIVER-FACING (CABIN DMS)"]
+        direction TB
+        D1["1. Thu nhan Frame IR hong ngoai"]
+        D2["2. MediaPipe Face Mesh: 468 toa do 3D"]
+        D3["3. Dynamic Calibration: Nguong ca nhan"]
+        D4["4. Ty le mat EAR & ngap mieng MAR"]
+        D5["5. Cua so PERCLOS 60s phat hien ngu gat"]
+        D6["6. 3D Head Pose (solvePnP): Mat tap trung"]
+        D7["7. Giam sat day an toan & Gioi han 4h lai"]
+        D1 --> D2 --> D3 --> D4 --> D5 --> D6 --> D7
+    end
+
+    S_ROAD ==>|Frame Stream| S_CORE
+    S_CABIN ==>|DMS Stream| S_CORE
+
+    subgraph S_OUT["DONG BO DAU RA DA KENH THOI GIAN THUC (< 100ms)"]
+        direction LR
+        O1["Web Admin Dashboard<br/>Canvas 2D HUD 60 FPS & GPS"]
+        O2["Mobile Driver App HUD<br/>Giao dien kinh lai tuc thoi"]
+        O3["Web Audio & Voice TTS<br/>Coi bip da tan & Giong noi Viet"]
+    end
+
+    S_CORE ==>|Dong bo tin hieu| S_OUT
+
+    style S_ROAD fill:#EFF6FF,stroke:#2563EB,stroke-width:2px
+    style S_CORE fill:#F0FDF4,stroke:#16A34A,stroke-width:2px
+    style S_CABIN fill:#FAF5FF,stroke:#7C3AED,stroke-width:2px
+    style S_OUT fill:#FFFBEB,stroke:#F59E0B,stroke-width:2px
+
+
+================================================================================
+2. HÌNH 3.3: SƠ ĐỒ QUAN HỆ THỰC THỂ CƠ SỞ DỮ LIỆU (DATABASE ERD SCHEMA)
+================================================================================
+flowchart LR
+    subgraph COL1["Quan Tri & Tai Khoan"]
+        direction TB
+        ORG["<b>organizations</b><hr/>PK id : UUID<br/>- name : VARCHAR(255)<br/>- code : VARCHAR(50)<br/>- plan_tier : VARCHAR(50)<br/>- created_at : TIMESTAMP"]
+        USR["<b>users</b><hr/>PK id : UUID<br/>FK org_id : UUID<br/>- email : VARCHAR(255)<br/>- hashed_pwd : VARCHAR(255)<br/>- role : VARCHAR(50)"]
+        DRV["<b>drivers</b><hr/>PK id : UUID<br/>FK user_id : UUID<br/>- license_no : VARCHAR(50)<br/>- safety_score : FLOAT"]
+        ORG -->|1:N| USR
+        USR -->|1:1| DRV
+    end
+
+    subgraph COL2["Phuong Tien & Hanh Trinh"]
+        direction TB
+        VEH["<b>vehicles</b><hr/>PK id : UUID<br/>FK org_id : UUID<br/>- plate_number : VARCHAR(20)<br/>- model : VARCHAR(100)<br/>- camera_id : VARCHAR(100)"]
+        SES["<b>driving_sessions</b><hr/>PK id : UUID<br/>FK vehicle_id : UUID<br/>FK driver_id : UUID<br/>- start_time : TIMESTAMP<br/>- distance_km : FLOAT"]
+        TRIP["<b>trip_events</b><hr/>PK id : UUID<br/>FK session_id : UUID<br/>- event_type : VARCHAR(50)<br/>- speed : FLOAT<br/>- timestamp : TIMESTAMP"]
+        VEH -->|1:N| SES
+        SES -->|1:N| TRIP
+    end
+
+    subgraph COL3["Vi Pham & Giam Sat IoT"]
+        direction TB
+        VIO["<b>violations</b><hr/>PK id : UUID<br/>FK session_id : UUID<br/>- type : VARCHAR(50)<br/>- evidence_url : TEXT<br/>- sha256_hash : VARCHAR(64)"]
+        REV["<b>violation_reviews</b><hr/>PK id : UUID<br/>FK violation_id : UUID<br/>FK reviewer_id : UUID<br/>- status : VARCHAR(30)<br/>- notes : TEXT"]
+        DEV["<b>device_health</b><hr/>PK id : UUID<br/>FK vehicle_id : UUID<br/>- fps : FLOAT<br/>- gpu_temp : FLOAT<br/>- ping_ms : INT"]
+        VIO -->|1:N| REV
+    end
+
+    ORG -->|1:N| VEH
+    DRV -->|1:N| SES
+    SES -->|1:N| VIO
+    VEH -->|1:N| DEV
+
+    style ORG fill:#EFF6FF,stroke:#1D4ED8,stroke-width:2px,text-align:left
+    style USR fill:#EFF6FF,stroke:#1D4ED8,stroke-width:2px,text-align:left
+    style DRV fill:#F0FDF4,stroke:#15803D,stroke-width:2px,text-align:left
+    style VEH fill:#FFF7ED,stroke:#EA580C,stroke-width:2px,text-align:left
+    style SES fill:#FFF7ED,stroke:#EA580C,stroke-width:2px,text-align:left
+    style TRIP fill:#FAF5FF,stroke:#7C3AED,stroke-width:2px,text-align:left
+    style VIO fill:#FEF2F2,stroke:#DC2626,stroke-width:2px,text-align:left
+    style REV fill:#FEF2F2,stroke:#DC2626,stroke-width:2px,text-align:left
+    style DEV fill:#FEF3C7,stroke:#78350F,stroke-width:2px,text-align:left
+
+
+================================================================================
+3. HÌNH 4.1: QUY TRÌNH 5 BƯỚC NHẬN DẠNG BIỂN SỐ XE VIỆT NAM (ALPR PIPELINE)
+================================================================================
+flowchart LR
+    S1["<b>BUOC 1: Input Frame</b><hr/>1080p RTSP Stream<br/>• Camera hanh trinh<br/>• Do phan giai 1080p<br/>• Tan so 30 FPS<br/>• He mau BGR/RGB"] 
+    --> S2["<b>BUOC 2: YOLOv11 Detector</b><hr/>Plate ROI Detection<br/>• Dinh vi bien so xe<br/>• Cat ROI chu nhat<br/>• Do tre xu ly ~14ms<br/>• Do tin cay > 0.50"]
+    --> S3["<b>BUOC 3: Preprocessing</b><hr/>Perspective & CLAHE<br/>• Nan thang goc nghieng<br/>• Chieu phoi canh 4 diem<br/>• Tang tuong phan CLAHE<br/>• Khu loa & mo nhieu"]
+    --> S4["<b>BUOC 4: EasyOCR Engine</b><hr/>Character Recognition<br/>• Tach ky tu quang hoc<br/>• Nhan dien so & chu<br/>• Bien 1 hang / 2 hang<br/>• Xuat chuoi raw text"]
+    --> S5["<b>BUOC 5: Regex Matcher</b><hr/>Chuan hoa 51H-982.45<br/>• Chuan hoa regex TCVN<br/>• Sua nham O/0, I/1, B/8<br/>• Format bien Viet Nam<br/>• Luu bien ban vi pham"]
+
+    style S1 fill:#EFF6FF,stroke:#2563EB,stroke-width:2px,text-align:left
+    style S2 fill:#F0FDF4,stroke:#16A34A,stroke-width:2px,text-align:left
+    style S3 fill:#FFF7ED,stroke:#EA580C,stroke-width:2px,text-align:left
+    style S4 fill:#FAF5FF,stroke:#7C3AED,stroke-width:2px,text-align:left
+    style S5 fill:#FFFBEB,stroke:#D97706,stroke-width:2px,text-align:left

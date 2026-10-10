@@ -29,7 +29,8 @@ docker-compose.yml  PostgreSQL database setup
 
 ## DEMO QUICK START
 
-Run these in 3 separate terminals **from the project root** (`d:\traffic_ai_project`):
+Run these in separate terminals **from the project root** (`Smart Driving Assistant`):
+> **Mẹo nhanh**: Bạn có thể chạy `.\start_project.bat` để tự động khởi động đồng thời cả Backend và Frontend!
 
 ### TERMINAL 1 — Backend (AI + WebSocket + REST)
 
@@ -134,3 +135,14 @@ The mobile app streams Road Camera frames to `/ws/v1/stream` using:
 ## Project Status: DEMO READY
 
 See `docs/demo-checklist.md` for full validation checklist.
+## Đối chiếu chức năng & Tài liệu hệ thống
+
+- **Đối chiếu 12 tính năng**: [Báo cáo 12 chức năng, kiến trúc đã chỉnh](docs/feature-alignment-review.md)
+- **Hướng dẫn chạy dự án**: [HUONG_DAN_CHAY_DU_AN.md](docs/HUONG_DAN_CHAY_DU_AN.md)
+- **Quyền và chức năng hệ thống**: [DOCS_QUYEN_VA_CHUC_NANG_HE_THONG.md](docs/DOCS_QUYEN_VA_CHUC_NANG_HE_THONG.md)
+- **Kiến trúc hệ thống**: [architecture.md](docs/architecture.md)
+- **Thư mục báo cáo & sổ tay hình ảnh**: [docs/reports/](docs/reports/)
+  - `BAO_CAO_DO_AN_TRAFFICGUARD_90_TRANG.docx`
+  - `SO_TAY_TAT_CA_HINH_ANH_VA_SO_DO_DO_AN.docx`
+  - `SO_TAY_HINH_ANH_VA_SO_DO_TRAFFICGUARD_CLEAN.docx`
+- **Tài liệu tham khảo**: [docs/references/](docs/references/)

@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { DriverMonitorResult } from '../types/detection';
+import { soundEngine } from '../lib/soundEngine';
 
 export type SocketStatus = 'IDLE' | 'CONNECTING' | 'CONNECTED' | 'RECONNECTING' | 'DISCONNECTED' | 'ERROR';
 
@@ -16,8 +17,9 @@ export function useDriverMonitorSocket() {
 
   const getWsUrl = () => {
     const wsBase = process.env.NEXT_PUBLIC_WS_URL || 'ws://localhost:8000';
-    const token = localStorage.getItem('access_token');
-    return `${wsBase}/ws/v1/driver-stream?token=${token || ''}`;
+    const token = localStorage.getItem('access_token') || 'demo';
+    const timerToken = sessionStorage.getItem('driver_timer_token');
+    return `${wsBase}/ws/v1/driver-stream?token=${encodeURIComponent(token || '')}&timer_token=${encodeURIComponent(timerToken || '')}`;
   };
 
   const markStale = useCallback(() => {
@@ -30,7 +32,7 @@ export function useDriverMonitorSocket() {
     staleTimeoutRef.current = setTimeout(markStale, 2500); // 2.5s for stale data
   }, [markStale]);
 
-  const connect = useCallback(() => {
+  const connect = useCallback(function doConnect() {
     if (socketRef.current?.readyState === WebSocket.OPEN) return;
 
     isIntentionallyClosed.current = false;
@@ -52,8 +54,18 @@ export function useDriverMonitorSocket() {
           console.error('Driver WebSocket Error from server:', data.message);
           return;
         }
-        setResult(data as DriverMonitorResult);
-        resetStaleTimer();
+        if (data.type === 'driver_session') {
+          sessionStorage.setItem('driver_timer_token', data.timer_token);
+        } else if (data.type === 'driver_monitor_result') {
+          const res = data.data as DriverMonitorResult;
+          setResult(res);
+          resetStaleTimer();
+          if (res.sound_alert || res.speech_prompt) {
+            soundEngine.handleDecisionAudio(res.sound_alert, res.speech_prompt);
+          }
+        } else if (data.type === 'break_status') {
+          setResult(previous => previous ? { ...previous, driving_time: data.data } : previous);
+        }
       } catch (e) {
         console.error('Failed to parse Driver WebSocket message', e);
       }
@@ -76,7 +88,7 @@ export function useDriverMonitorSocket() {
         reconnectAttempts.current += 1;
         
         reconnectTimeoutRef.current = setTimeout(() => {
-          connect();
+          doConnect();
         }, delay);
       } else {
         setStatus('IDLE');
@@ -105,6 +117,12 @@ export function useDriverMonitorSocket() {
     }
   }, []);
 
+  const setResting = useCallback((resting: boolean) => {
+    if (socketRef.current?.readyState === WebSocket.OPEN) {
+      socketRef.current.send(JSON.stringify({ type: resting ? 'break_started' : 'break_ended' }));
+    }
+  }, []);
+
   useEffect(() => {
     return () => {
       disconnect();
@@ -117,6 +135,7 @@ export function useDriverMonitorSocket() {
     isStale,
     connect,
     disconnect,
-    sendFrame
+    sendFrame,
+    setResting
   };
 }

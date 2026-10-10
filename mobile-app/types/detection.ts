@@ -10,6 +10,7 @@ export interface VehicleDetection {
   bbox: BoundingBox;
   class: string;
   zone?: string;
+  speed_kmh?: number | null;
 }
 
 export interface PlateDetection {
@@ -33,6 +34,8 @@ export interface SpeedAdvice {
 export interface CollisionWarning {
   level: 'none' | 'warning' | 'danger';
   distance_estimate?: number;
+  recommended_distance_m?: number | null;
+  recommended_speed_kmh?: number | null;
 }
 
 export interface TrafficSign {
@@ -54,18 +57,23 @@ export interface DetectionResult {
 
 export interface DrowsinessStatus {
   is_drowsy: boolean;
+  available?: boolean;
+  face_detected?: boolean;
   ear_value: number;
   yawn_count: number;
   alert_level: string;
 }
 
 export interface SeatbeltStatus {
-  seatbelt_on: boolean;
+  seatbelt_on: boolean | null;
+  mode?: string;
   confidence: number;
 }
 
 export interface DrivingTimeStatus {
   continuous_minutes: number;
+  alert_level?: string;
+  is_resting?: boolean;
   should_rest: boolean;
   message: string;
 }

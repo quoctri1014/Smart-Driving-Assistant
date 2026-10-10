@@ -1,0 +1,10 @@
+# TẬP KIỂM THỬ ĐÃ KHÓA (LOCKED BENCHMARK TEST SET)
+# NGHIÊM CẤM DÙNG CÁC VIDEO NÀY ĐỂ HUẤN LUYỆN HOẶC TINH CHỈNH MÔ HÌNH
+
+dong_xe_may_hcm_01.mp4 | SHA256: 6a08e39ff8017b7903c98ced55c9436fdf46303d1356f5ec1caf6bc5c1770622 | dong_xe_may | Kiểm thử mật độ xe máy cực cao tại vòng xoay TP.HCM
+dong_xe_may_hanoi_03.mp4 | SHA256: 1a0c402b2ec404072fa75f9abcd9b38b763913cdcde116911479222e114d8e4c | dong_xe_may | Kiểm thử xe máy rẽ nhánh cắt ngang dòng tại ngã tư Hà Nội
+ngay_hcm_02.mp4 | SHA256: eb3698e472461ea13089b06900195fc0453fb2a51e09f6d7d470d56d6a1f560d | ngay | Kiểm thử làn đường và xe tải chạy tốc độ cao trên quốc lộ
+bien_bao_hcm_01.mp4 | SHA256: 6ae89aeb889128f4c719c6a0dad25fb68450ee8571f233b733ddc4fd0c4c4c74 | bien_bao | Kiểm thử nhận diện biển báo đô thị qua kính lái
+dem_dashcam_01.mp4 | SHA256: 506d615a32478b333025d3bd6d5cceb8941140f42b335e96199ddd46fef1afd9 | dem | Kiểm thử chóa đèn pha xe ngược chiều ban đêm
+mua_dashcam_02.mp4 | SHA256: a8056204607774027540a05b86a323e2a203102c4666910bd07ee91acc068ada | mua | Kiểm thử kính lái đọng giọt nước và gạt nước che khuất
+nguoc_sang_dashcam_01.mp4 | SHA256: 70e48db5ca010ac8d9afcb5470c7d578a0045fd29d03addba18333fb1953a95d | nguoc_sang | Kiểm thử lóa sáng quang học ngược hướng mặt trời

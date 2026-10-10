@@ -1,0 +1,80 @@
+<mxfile host="app.diagrams.net" modified="2026-10-10T14:40:00.000Z" agent="TrafficGuard" version="24.0.0" type="device">
+  <diagram id="diag_3_3b" name="Hình 3.3b ERD Vehicles & Sessions">
+    <mxGraphModel dx="1300" dy="600" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1300" pageHeight="600" background="#F8FAFC" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+
+        <mxCell id="title" value="&lt;b&gt;&lt;font style=&quot;font-size: 20px; color: #0F172A;&quot;&gt;HÌNH 3.3b: ERD PHÂN HỆ PHƯƠNG TIỆN, THIẾT BỊ CẢM BIẾN &amp;amp; HÀNH TRÌNH LÁI XE&lt;/font&gt;&lt;/b&gt;" style="text;html=1;align=center;verticalAlign=middle;strokeColor=none;fillColor=none;" vertex="1" parent="1">
+          <mxGeometry x="100" y="20" width="1100" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="subtitle" value="&lt;font style=&quot;font-size: 13px; color: #64748B;&quot;&gt;Quản lý tài sản xe, Lịch sử bàn giao tài xế, Tình trạng 7 cảm biến Edge AI &amp;amp; Chuỗi viễn trắc hành trình GPS&lt;/font&gt;" style="text;html=1;align=center;verticalAlign=middle;strokeColor=none;fillColor=none;" vertex="1" parent="1">
+          <mxGeometry x="150" y="55" width="1000" height="25" as="geometry" />
+        </mxCell>
+
+        <!-- vehicles -->
+        <mxCell id="h_veh" value="&lt;b&gt;&lt;font color=&quot;#ffffff&quot;&gt;vehicles&lt;/font&gt;&lt;/b&gt;" style="rounded=1;arcSize=8;whiteSpace=wrap;html=1;fillColor=#EA580C;strokeColor=#EA580C;align=center;" vertex="1" parent="1">
+          <mxGeometry x="60" y="95" width="280" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="b_veh" value="&lt;div style=&quot;line-height: 160%; font-size: 11px;&quot;&gt;&lt;b&gt;PK id&lt;/b&gt; : INT&lt;br&gt;&lt;b&gt;FK company_id&lt;/b&gt; : INT [-&amp;gt; org.id]&lt;br&gt;&lt;b&gt;FK branch_id&lt;/b&gt; : INT [-&amp;gt; bra.id]&lt;br&gt;&lt;b&gt;FK fleet_id&lt;/b&gt; : INT [-&amp;gt; fleets.id]&lt;br&gt;&lt;b&gt;• license_plate&lt;/b&gt; : VARCHAR(50) [UNIQUE]&lt;br&gt;&lt;b&gt;• vehicle_type&lt;/b&gt; : VARCHAR(50) (car/truck)&lt;br&gt;&lt;b&gt;• status&lt;/b&gt; : VARCHAR(30) (active/maintenance)&lt;/div&gt;" style="rounded=1;arcSize=8;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#EA580C;strokeWidth=1.8;align=left;spacingLeft=12;verticalAlign=top;spacingTop=6;shadow=1;" vertex="1" parent="1">
+          <mxGeometry x="60" y="125" width="280" height="135" as="geometry" />
+        </mxCell>
+
+        <!-- vehicle_assignments -->
+        <mxCell id="h_asg" value="&lt;b&gt;&lt;font color=&quot;#ffffff&quot;&gt;vehicle_assignments&lt;/font&gt;&lt;/b&gt;" style="rounded=1;arcSize=8;whiteSpace=wrap;html=1;fillColor=#EA580C;strokeColor=#EA580C;align=center;" vertex="1" parent="1">
+          <mxGeometry x="60" y="315" width="280" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="b_asg" value="&lt;div style=&quot;line-height: 160%; font-size: 11px;&quot;&gt;&lt;b&gt;PK id&lt;/b&gt; : INT&lt;br&gt;&lt;b&gt;FK company_id&lt;/b&gt; : INT [-&amp;gt; org.id]&lt;br&gt;&lt;b&gt;FK vehicle_id&lt;/b&gt; : INT [-&amp;gt; veh.id]&lt;br&gt;&lt;b&gt;FK driver_id&lt;/b&gt; : INT [-&amp;gt; drivers.id]&lt;br&gt;&lt;b&gt;• assigned_from&lt;/b&gt; : DATETIME&lt;br&gt;&lt;b&gt;• assigned_to&lt;/b&gt; : DATETIME&lt;br&gt;&lt;b&gt;FK assigned_by&lt;/b&gt; : INT (Dispatcher)&lt;br&gt;&lt;b&gt;• status&lt;/b&gt; : VARCHAR(30) (active/ended)&lt;/div&gt;" style="rounded=1;arcSize=8;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#EA580C;strokeWidth=1.8;align=left;spacingLeft=12;verticalAlign=top;spacingTop=6;shadow=1;" vertex="1" parent="1">
+          <mxGeometry x="60" y="345" width="280" height="150" as="geometry" />
+        </mxCell>
+
+        <!-- device_health -->
+        <mxCell id="h_dev" value="&lt;b&gt;&lt;font color=&quot;#ffffff&quot;&gt;device_health (7 Cảm biến Edge)&lt;/font&gt;&lt;/b&gt;" style="rounded=1;arcSize=8;whiteSpace=wrap;html=1;fillColor=#78350F;strokeColor=#78350F;align=center;" vertex="1" parent="1">
+          <mxGeometry x="470" y="95" width="310" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="b_dev" value="&lt;div style=&quot;line-height: 160%; font-size: 11px;&quot;&gt;&lt;b&gt;PK id&lt;/b&gt; : INT&lt;br&gt;&lt;b&gt;UK device_id&lt;/b&gt; : VARCHAR(100)&lt;br&gt;&lt;b&gt;FK vehicle_id&lt;/b&gt; : INT [-&amp;gt; veh.id]&lt;br&gt;&lt;b&gt;• status&lt;/b&gt; : VARCHAR(50) (ONLINE/OFFLINE)&lt;br&gt;&lt;b&gt;• road_camera_status&lt;/b&gt; : VARCHAR(50)&lt;br&gt;&lt;b&gt;• cabin_camera_status&lt;/b&gt; : VARCHAR(50)&lt;br&gt;&lt;b&gt;• gps_status&lt;/b&gt; : VARCHAR(50)&lt;br&gt;&lt;b&gt;• dms_status&lt;/b&gt; : VARCHAR(50)&lt;br&gt;&lt;b&gt;• firmware_version&lt;/b&gt; : VARCHAR(50) (v2.4.1)&lt;br&gt;&lt;b&gt;• last_heartbeat_at&lt;/b&gt; : DATETIME&lt;/div&gt;" style="rounded=1;arcSize=8;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#78350F;strokeWidth=1.8;align=left;spacingLeft=12;verticalAlign=top;spacingTop=6;shadow=1;" vertex="1" parent="1">
+          <mxGeometry x="470" y="125" width="310" height="180" as="geometry" />
+        </mxCell>
+
+        <!-- device_heartbeats -->
+        <mxCell id="h_hb" value="&lt;b&gt;&lt;font color=&quot;#ffffff&quot;&gt;device_heartbeats&lt;/font&gt;&lt;/b&gt;" style="rounded=1;arcSize=8;whiteSpace=wrap;html=1;fillColor=#78350F;strokeColor=#78350F;align=center;" vertex="1" parent="1">
+          <mxGeometry x="470" y="355" width="310" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="b_hb" value="&lt;div style=&quot;line-height: 160%; font-size: 11px;&quot;&gt;&lt;b&gt;PK id&lt;/b&gt; : INT&lt;br&gt;&lt;b&gt;FK device_id&lt;/b&gt; : VARCHAR [-&amp;gt; dev.device_id]&lt;br&gt;&lt;b&gt;• heartbeat_at&lt;/b&gt; : DATETIME&lt;br&gt;&lt;b&gt;• metrics_json&lt;/b&gt; : TEXT (CPU, GPU Temp, FPS)&lt;/div&gt;" style="rounded=1;arcSize=8;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#78350F;strokeWidth=1.8;align=left;spacingLeft=12;verticalAlign=top;spacingTop=6;shadow=1;" vertex="1" parent="1">
+          <mxGeometry x="470" y="385" width="310" height="85" as="geometry" />
+        </mxCell>
+
+        <!-- driving_sessions -->
+        <mxCell id="h_ses" value="&lt;b&gt;&lt;font color=&quot;#ffffff&quot;&gt;driving_sessions&lt;/font&gt;&lt;/b&gt;" style="rounded=1;arcSize=8;whiteSpace=wrap;html=1;fillColor=#2563EB;strokeColor=#2563EB;align=center;" vertex="1" parent="1">
+          <mxGeometry x="910" y="95" width="280" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="b_ses" value="&lt;div style=&quot;line-height: 160%; font-size: 11px;&quot;&gt;&lt;b&gt;PK id&lt;/b&gt; : INT&lt;br&gt;&lt;b&gt;FK company_id&lt;/b&gt; : INT [-&amp;gt; org.id]&lt;br&gt;&lt;b&gt;FK driver_id&lt;/b&gt; : INT [-&amp;gt; drivers.id]&lt;br&gt;&lt;b&gt;• start_time&lt;/b&gt; : DATETIME&lt;br&gt;&lt;b&gt;• end_time&lt;/b&gt; : DATETIME&lt;br&gt;&lt;b&gt;• total_minutes&lt;/b&gt; : FLOAT&lt;br&gt;&lt;i&gt;[Invariant: 1 Active Session / Driver]&lt;/i&gt;&lt;/div&gt;" style="rounded=1;arcSize=8;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#2563EB;strokeWidth=1.8;align=left;spacingLeft=12;verticalAlign=top;spacingTop=6;shadow=1;" vertex="1" parent="1">
+          <mxGeometry x="910" y="125" width="280" height="135" as="geometry" />
+        </mxCell>
+
+        <!-- trip_events -->
+        <mxCell id="h_tri" value="&lt;b&gt;&lt;font color=&quot;#ffffff&quot;&gt;trip_events&lt;/font&gt;&lt;/b&gt;" style="rounded=1;arcSize=8;whiteSpace=wrap;html=1;fillColor=#2563EB;strokeColor=#2563EB;align=center;" vertex="1" parent="1">
+          <mxGeometry x="910" y="315" width="280" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="b_tri" value="&lt;div style=&quot;line-height: 160%; font-size: 11px;&quot;&gt;&lt;b&gt;PK id&lt;/b&gt; : INT&lt;br&gt;&lt;b&gt;FK session_id&lt;/b&gt; : INT [-&amp;gt; ses.id]&lt;br&gt;&lt;b&gt;• event_type&lt;/b&gt; : VARCHAR(50) (GPS/BRAKE)&lt;br&gt;&lt;b&gt;• timestamp&lt;/b&gt; : DATETIME&lt;br&gt;&lt;b&gt;• latitude&lt;/b&gt; : FLOAT&lt;br&gt;&lt;b&gt;• longitude&lt;/b&gt; : FLOAT&lt;br&gt;&lt;b&gt;• speed_kmh&lt;/b&gt; : FLOAT&lt;br&gt;&lt;b&gt;• metadata_json&lt;/b&gt; : TEXT&lt;/div&gt;" style="rounded=1;arcSize=8;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#2563EB;strokeWidth=1.8;align=left;spacingLeft=12;verticalAlign=top;spacingTop=6;shadow=1;" vertex="1" parent="1">
+          <mxGeometry x="910" y="345" width="280" height="150" as="geometry" />
+        </mxCell>
+
+        <!-- Arrows -->
+        <mxCell id="r_veh_asg" value="1 : N" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#EA580C;strokeWidth=1.8;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="b_veh" target="h_asg">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="r_veh_dev" value="1 : 1" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#78350F;strokeWidth=1.8;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="b_veh" target="b_dev">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="r_dev_hb" value="1 : N" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#78350F;strokeWidth=1.8;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="b_dev" target="h_hb">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="r_ses_tri" value="1 : N" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#2563EB;strokeWidth=1.8;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="b_ses" target="h_tri">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+    
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

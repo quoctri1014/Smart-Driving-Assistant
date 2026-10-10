@@ -3,7 +3,7 @@ import cv2
 import numpy as np
 from modules.detector import VehicleDetector
 
-def run_benchmark(video_path="sample_videos/road_test.mp4", num_frames=100):
+def run_benchmark(video_path="sample_videos/traffic.mp4", num_frames=100):
     print(f"Starting benchmark on {video_path} for {num_frames} frames...")
     detector = VehicleDetector()
     
@@ -12,7 +12,7 @@ def run_benchmark(video_path="sample_videos/road_test.mp4", num_frames=100):
     
     start_time = time.time()
     for i in range(num_frames):
-        _ = detector.detect_vehicles(dummy_frame)
+        _ = detector.detect(dummy_frame)
     
     end_time = time.time()
     

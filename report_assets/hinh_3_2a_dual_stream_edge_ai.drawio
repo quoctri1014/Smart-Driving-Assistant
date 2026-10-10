@@ -1,0 +1,46 @@
+<mxfile host="app.diagrams.net" modified="2026-10-10T14:40:00.000Z" agent="TrafficGuard" version="24.0.0" type="device">
+  <diagram id="diag_3_2a" name="Hình 3.2a Edge AI Perception">
+    <mxGraphModel dx="1300" dy="600" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1300" pageHeight="600" background="#F8FAFC" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+
+        <mxCell id="title" value="&lt;b&gt;&lt;font style=&quot;font-size: 20px; color: #0F172A;&quot;&gt;HÌNH 3.2a: PHÂN LUỒNG CẢM BIẾN &amp;amp; XỬ LÝ THỊ GIÁC KÉP TẠI BIÊN (EDGE AI PERCEPTION)&lt;/font&gt;&lt;/b&gt;" style="text;html=1;align=center;verticalAlign=middle;strokeColor=none;fillColor=none;" vertex="1" parent="1">
+          <mxGeometry x="100" y="25" width="1100" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="subtitle" value="&lt;font style=&quot;font-size: 13px; color: #64748B;&quot;&gt;Thu nhận song song 2 kênh camera 1080p @ 30 FPS và trích xuất chỉ số động học mặt đường &amp;amp; sinh trắc khoang lái&lt;/font&gt;" style="text;html=1;align=center;verticalAlign=middle;strokeColor=none;fillColor=none;" vertex="1" parent="1">
+          <mxGeometry x="200" y="65" width="900" height="25" as="geometry" />
+        </mxCell>
+
+        <!-- Column 1: Road-Facing ADAS -->
+        <mxCell id="hdr_road" value="&lt;b&gt;&lt;font style=&quot;font-size: 15px; color: #FFFFFF;&quot;&gt;KÊNH 1: ROAD-FACING ADAS PIPELINE (MẶT ĐƯỜNG PHÍA TRƯỚC)&lt;/font&gt;&lt;/b&gt;" style="rounded=1;arcSize=10;whiteSpace=wrap;html=1;fillColor=#0284C7;strokeColor=#0369A1;strokeWidth=2;align=center;" vertex="1" parent="1">
+          <mxGeometry x="60" y="115" width="560" height="42" as="geometry" />
+        </mxCell>
+        <mxCell id="box_road" value="&lt;div style=&quot;text-align: left; line-height: 190%; font-size: 12.5px; color: #1E293B;&quot;&gt;&lt;b&gt;1. Thu nhận Frame:&lt;/b&gt; Camera hành trình góc rộng 1080p @ 30 FPS&lt;br&gt;&lt;b&gt;2. Tiền xử lý &amp;amp; Dynamic ROI:&lt;/b&gt; Loại bỏ 30% vùng trời nhiễu sáng + Tăng tương phản CLAHE&lt;br&gt;&lt;b&gt;3. Object Detection:&lt;/b&gt; YOLOv8x nhận diện Xe ô tô, Xe máy, Xe tải &amp;amp; Người đi bộ&lt;br&gt;&lt;b&gt;4. Traffic Sign Recognition:&lt;/b&gt; Nhận diện biển báo giới hạn tốc độ chuẩn QCVN 41:2019&lt;br&gt;&lt;b&gt;5. Multi-Object Tracking:&lt;/b&gt; ByteTrack gán ID quỹ đạo ổn định, chống nhảy ID khi bị che khuất&lt;br&gt;&lt;b&gt;6. Homography Bird's Eye View (BEV):&lt;/b&gt; Biến đổi phối cảnh chiếu phẳng mặt đường đo khoảng cách thực (m)&lt;br&gt;&lt;b&gt;7. Phân tích Va chạm &amp;amp; Luật:&lt;/b&gt; Tính toán thời gian va chạm TTC &amp;amp; Cự ly an toàn theo TT 31/2019&lt;/div&gt;" style="rounded=1;arcSize=10;whiteSpace=wrap;html=1;fillColor=#F0F9FF;strokeColor=#0284C7;strokeWidth=2;align=left;spacingLeft=18;spacingRight=15;verticalAlign=top;spacingTop=16;shadow=1;" vertex="1" parent="1">
+          <mxGeometry x="60" y="165" width="560" height="300" as="geometry" />
+        </mxCell>
+        <mxCell id="out_road" value="&lt;b&gt;&lt;font color=&quot;#0369A1&quot; style=&quot;font-size: 13px;&quot;&gt;ROAD TELEMETRY JSON&lt;/font&gt;&lt;/b&gt;&lt;br&gt;TTC (s), Khoảng cách xe trước (m), Vận tốc tương đối (km/h), Biển báo tốc độ QCVN 41" style="rounded=1;arcSize=8;whiteSpace=wrap;html=1;fillColor=#E0F2FE;strokeColor=#0284C7;strokeWidth=1.8;align=center;" vertex="1" parent="1">
+          <mxGeometry x="60" y="485" width="560" height="55" as="geometry" />
+        </mxCell>
+        <mxCell id="arr_road" style="endArrow=classic;html=1;rounded=0;strokeColor=#0284C7;strokeWidth=2.5;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="box_road" target="out_road">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- Column 2: Driver-Facing DMS -->
+        <mxCell id="hdr_dms" value="&lt;b&gt;&lt;font style=&quot;font-size: 15px; color: #FFFFFF;&quot;&gt;KÊNH 2: DRIVER-FACING DMS PIPELINE (KHOANG LÁI &amp;amp; TÀI XẾ)&lt;/font&gt;&lt;/b&gt;" style="rounded=1;arcSize=10;whiteSpace=wrap;html=1;fillColor=#D97706;strokeColor=#B45309;strokeWidth=2;align=center;" vertex="1" parent="1">
+          <mxGeometry x="680" y="115" width="560" height="42" as="geometry" />
+        </mxCell>
+        <mxCell id="box_dms" value="&lt;div style=&quot;text-align: left; line-height: 190%; font-size: 12.5px; color: #1E293B;&quot;&gt;&lt;b&gt;1. Thu nhận Frame IR:&lt;/b&gt; Camera hồng ngoại cabin góc nhìn tài xế, chiếu sáng ban đêm chống chói&lt;br&gt;&lt;b&gt;2. MediaPipe Face Mesh:&lt;/b&gt; Trích xuất 468 mốc tọa độ 3D khuôn mặt thời gian thực (&amp;lt; 15ms)&lt;br&gt;&lt;b&gt;3. Dynamic Calibration:&lt;/b&gt; Hiệu chuẩn cá nhân hóa ngưỡng mở mắt/ngáp theo từng người lái&lt;br&gt;&lt;b&gt;4. 3D Head Pose (solvePnP):&lt;/b&gt; Ước lượng góc nghiêng đầu Pitch, Yaw, Roll phát hiện lơ đãng quay mặt&lt;br&gt;&lt;b&gt;5. Chỉ số Sinh trắc học Mắt &amp;amp; Miệng:&lt;/b&gt; Tính toán tỷ lệ mắt mở EAR &amp;amp; tần suất ngáp miệng MAR&lt;br&gt;&lt;b&gt;6. Sliding Window PERCLOS:&lt;/b&gt; Tỷ lệ thời gian mắt nhắm trong cửa sổ trượt 60 giây (ngưỡng 15%)&lt;br&gt;&lt;b&gt;7. Dây an toàn &amp;amp; Ca lái:&lt;/b&gt; Kiểm tra thắt dây đai Seatbelt &amp;amp; Bộ đếm thời gian lái xe liên tục (&amp;gt; 4 giờ)&lt;/div&gt;" style="rounded=1;arcSize=10;whiteSpace=wrap;html=1;fillColor=#FFFBEB;strokeColor=#D97706;strokeWidth=2;align=left;spacingLeft=18;spacingRight=15;verticalAlign=top;spacingTop=16;shadow=1;" vertex="1" parent="1">
+          <mxGeometry x="680" y="165" width="560" height="300" as="geometry" />
+        </mxCell>
+        <mxCell id="out_dms" value="&lt;b&gt;&lt;font color=&quot;#B45309&quot; style=&quot;font-size: 13px;&quot;&gt;DMS TELEMETRY JSON&lt;/font&gt;&lt;/b&gt;&lt;br&gt;Trạng thái ngủ gật (EAR/PERCLOS), Ngáp ngủ (MAR), Góc quay đầu (Head Pose), Dây đai an toàn, Timer ca lái" style="rounded=1;arcSize=8;whiteSpace=wrap;html=1;fillColor=#FEF3C7;strokeColor=#D97706;strokeWidth=1.8;align=center;" vertex="1" parent="1">
+          <mxGeometry x="680" y="485" width="560" height="55" as="geometry" />
+        </mxCell>
+        <mxCell id="arr_dms" style="endArrow=classic;html=1;rounded=0;strokeColor=#D97706;strokeWidth=2.5;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="box_dms" target="out_dms">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+    
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

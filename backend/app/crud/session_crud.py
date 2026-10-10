@@ -4,8 +4,8 @@ from typing import Optional, List
 from datetime import datetime
 from backend.app.models_db.driving_session import DrivingSession
 
-async def create_session(db: AsyncSession, driver_id: int) -> DrivingSession:
-    db_session = DrivingSession(driver_id=driver_id)
+async def create_session(db: AsyncSession, driver_id: int, organization_id: int) -> DrivingSession:
+    db_session = DrivingSession(driver_id=driver_id, organization_id=organization_id)
     db.add(db_session)
     await db.commit()
     await db.refresh(db_session)

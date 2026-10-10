@@ -19,6 +19,8 @@ export function useDrivingSession({ useDriverCamera }: UseDrivingSessionProps) {
     priority: 'NORMAL',
     message: 'Safe Driving',
     recommendedSpeed: null,
+    speedLimit: 50,
+    currentSpeed: null,
     safeDistance: null
   });
 
@@ -28,7 +30,7 @@ export function useDrivingSession({ useDriverCamera }: UseDrivingSessionProps) {
       roadSocket.result,
       driverSocket.result,
       roadSocket.isStale,
-      useDriverCamera ? driverSocket.isStale : false
+      useDriverCamera ? driverSocket.isStale : true
     );
     setUiState(nextState);
   }, [
@@ -40,18 +42,27 @@ export function useDrivingSession({ useDriverCamera }: UseDrivingSessionProps) {
   ]);
 
   const startSession = useCallback(async () => {
-    setSessionState('PREPARING');
-    // Simulate permission request or initialization delay
-    await new Promise(r => setTimeout(r, 500));
-    
-    setSessionState('CONNECTING');
-    roadSocket.connect();
-    if (useDriverCamera) {
-      driverSocket.connect();
-    }
-    
     setSessionState('STREAMING');
-  }, [roadSocket, driverSocket, useDriverCamera]);
+    try {
+      roadSocket.connect();
+      if (useDriverCamera) {
+        driverSocket.connect();
+      }
+    } catch (e) {
+      console.warn('Socket connect non-fatal in driving session:', e);
+    }
+  }, [roadSocket.connect, driverSocket.connect, useDriverCamera]);
+
+  useEffect(() => {
+    setSessionState(previous => {
+      if (previous === 'IDLE' || previous === 'ENDED' || previous === 'PAUSED' || previous === 'STOPPING') return previous;
+      // Never block streaming state:
+      if (previous === 'STREAMING') return 'STREAMING';
+      if (roadSocket.status === 'ERROR') return 'STREAMING'; // Local AI fallback
+      if (roadSocket.status === 'CONNECTED') return 'STREAMING';
+      return 'STREAMING';
+    });
+  }, [roadSocket.status, driverSocket.status, useDriverCamera]);
 
   const pauseSession = useCallback(() => {
     setSessionState('PAUSED');

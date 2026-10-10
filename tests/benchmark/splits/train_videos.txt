@@ -1,0 +1,12 @@
+# TẬP TINH CHỈNH / HUẤN LUYỆN (FINE-TUNING TRAIN SET)
+
+dong_xe_may_hanoi_01.mp4 | SHA256: c684a6354aac84b92ebc184cdd0adc1e6319cf07f5f93e0724f6dd4f4b37bee2 | dong_xe_may
+dong_xe_may_hanoi_02.mp4 | SHA256: a7b483f1089b229938e19aefb62d2def98b37b00e9a602ebd9d2c56a84652445 | dong_xe_may
+ngay_hanoi_01.mp4 | SHA256: 1e293c0f6e3dfb81687764960937b5d0bc82b62955ec977ca52b23974899e5a0 | ngay
+dong_xe_may_hcm_02.mp4 | SHA256: daec20d274c809168120ce7e2679fca824beff132ca799883819f73ad9a77b1d | dong_xe_may
+ngay_hcm_01.mp4 | SHA256: 10ca0e0051dfc4434bfa37227a4d1e76d5fd2d719b5e4c32bddb221dddda0d05 | ngay
+bien_bao_hanoi_01.mp4 | SHA256: cc0fe02e512b901de6c605acb06f3e5c75698e48d06cc7744c217806fad57004 | bien_bao
+bien_bao_hcm_02.mp4 | SHA256: d847ed83b48e4b7fab65675eb8a117d4b86fb8b2214e51c1c6fcda112613bc41 | bien_bao
+dem_dashcam_02.mp4 | SHA256: 8632fae98f0dd65ea18f48af6a61ae3b225ff7d3aff6448647d7f228679288ba | dem
+mua_dashcam_01.mp4 | SHA256: 344bd1bab749a5c37f3e7cfc47808c660b9c6ff69223464f7aa162b4ba12f01a | mua
+mua_dashcam_03.mp4 | SHA256: d707858921ddc325d263031cb087d36850f032af34a0d9b6567eb8b9f5462fec | mua

@@ -1,0 +1,87 @@
+<mxfile host="app.diagrams.net" modified="2026-10-10T14:40:00.000Z" agent="TrafficGuard" version="24.0.0" type="device">
+  <diagram id="diag_3_2b" name="Hình 3.2b FastAPI Decision Core">
+    <mxGraphModel dx="1300" dy="650" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1300" pageHeight="650" background="#F8FAFC" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+
+        <mxCell id="title" value="&lt;b&gt;&lt;font style=&quot;font-size: 20px; color: #0F172A;&quot;&gt;HÌNH 3.2b: TRUNG TÂM ĐIỀU PHỐI QUYẾT ĐỊNH FASTAPI CORE ENGINE&lt;/font&gt;&lt;/b&gt;" style="text;html=1;align=center;verticalAlign=middle;strokeColor=none;fillColor=none;" vertex="1" parent="1">
+          <mxGeometry x="100" y="20" width="1100" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="subtitle" value="&lt;font style=&quot;font-size: 13px; color: #64748B;&quot;&gt;Bộ đệm bất đồng bộ, Bộ lọc nhiễu temporal debounce, Cây quyết định ưu tiên 3 cấp &amp;amp; Bảo mật ẩn danh Nghị định 13/2023&lt;/font&gt;" style="text;html=1;align=center;verticalAlign=middle;strokeColor=none;fillColor=none;" vertex="1" parent="1">
+          <mxGeometry x="150" y="58" width="1000" height="25" as="geometry" />
+        </mxCell>
+
+        <!-- Top Ingestion -->
+        <mxCell id="in_ws" value="&lt;b&gt;&lt;font style=&quot;font-size: 14px; color: #FFFFFF;&quot;&gt;1. CỔNG TIẾP NHẬN BẤT ĐỒNG BỘ: WEBSOCKET ASYNC INGESTION &amp;amp; LOAD SHEDDER&lt;/font&gt;&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size: 11.5px; color: #E2E8F0;&quot;&gt;Tiếp nhận song song Road Telemetry &amp;amp; DMS Telemetry qua WebSocket. Cơ chế Load Shedder loại bỏ frame trễ &amp;gt; 45ms&lt;/font&gt;" style="rounded=1;arcSize=8;whiteSpace=wrap;html=1;fillColor=#1E293B;strokeColor=#0F172A;strokeWidth=2;align=center;" vertex="1" parent="1">
+          <mxGeometry x="80" y="95" width="1140" height="50" as="geometry" />
+        </mxCell>
+
+        <mxCell id="in_debounce" value="&lt;b&gt;&lt;font style=&quot;font-size: 13px; color: #1E3A8A;&quot;&gt;2. BỘ LỌC CHỐNG NHIỄU THỜI GIAN: TEMPORAL PERSISTENCE FILTER (DEBOUNCE 3 - 8 FRAMES)&lt;/font&gt;&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size: 11.5px; color: #334155;&quot;&gt;Duy trì trạng thái bất thường liên tục qua 3-8 khung hình để triệt tiêu chớp mắt sinh lý, bóng râm mặt đường hoặc camera rung lắc&lt;/font&gt;" style="rounded=1;arcSize=8;whiteSpace=wrap;html=1;fillColor=#DBEAFE;strokeColor=#3B82F6;strokeWidth=1.8;align=center;" vertex="1" parent="1">
+          <mxGeometry x="80" y="165" width="1140" height="45" as="geometry" />
+        </mxCell>
+        <mxCell id="arr_in1" style="endArrow=classic;html=1;rounded=0;strokeColor=#3B82F6;strokeWidth=2.2;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="in_ws" target="in_debounce">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- 3 Priority Levels -->
+        <!-- Level 1 -->
+        <mxCell id="h_l1" value="&lt;b&gt;&lt;font style=&quot;font-size: 13.5px; color: #FFFFFF;&quot;&gt;CẤP 1: CRITICAL (KHẨN CẤP)&lt;/font&gt;&lt;/b&gt;" style="rounded=1;arcSize=8;whiteSpace=wrap;html=1;fillColor=#DC2626;strokeColor=#B91C1C;strokeWidth=2;align=center;" vertex="1" parent="1">
+          <mxGeometry x="80" y="240" width="360" height="35" as="geometry" />
+        </mxCell>
+        <mxCell id="b_l1" value="&lt;div style=&quot;text-align: left; line-height: 180%; font-size: 12px; color: #7F1D1D;&quot;&gt;&lt;b&gt;• Điều kiện kích hoạt:&lt;/b&gt;&lt;br&gt;&amp;nbsp;&amp;nbsp;- Va chạm cực gần: TTC &amp;le; 1.5s&lt;br&gt;&amp;nbsp;&amp;nbsp;- Ngủ gật nguy hiểm: Nhắm mắt &amp;gt; 5.0s&lt;br&gt;&lt;b&gt;• Cơ chế xử lý:&lt;/b&gt;&lt;br&gt;&amp;nbsp;&amp;nbsp;- Chiếm quyền kênh phát (Preemption)&lt;br&gt;&amp;nbsp;&amp;nbsp;- Còi hú báo động âm tần cao tức thì&lt;br&gt;&amp;nbsp;&amp;nbsp;- Kích hoạt cảnh báo đỏ trên Kính lái HUD&lt;/div&gt;" style="rounded=1;arcSize=8;whiteSpace=wrap;html=1;fillColor=#FEF2F2;strokeColor=#DC2626;strokeWidth=2;align=left;spacingLeft=14;verticalAlign=top;spacingTop=10;shadow=1;" vertex="1" parent="1">
+          <mxGeometry x="80" y="275" width="360" height="155" as="geometry" />
+        </mxCell>
+
+        <!-- Level 2 -->
+        <mxCell id="h_l2" value="&lt;b&gt;&lt;font style=&quot;font-size: 13.5px; color: #FFFFFF;&quot;&gt;CẤP 2: WARNING (CẢNH BÁO CAO)&lt;/font&gt;&lt;/b&gt;" style="rounded=1;arcSize=8;whiteSpace=wrap;html=1;fillColor=#D97706;strokeColor=#B45309;strokeWidth=2;align=center;" vertex="1" parent="1">
+          <mxGeometry x="470" y="240" width="360" height="35" as="geometry" />
+        </mxCell>
+        <mxCell id="b_l2" value="&lt;div style=&quot;text-align: left; line-height: 180%; font-size: 12px; color: #78350F;&quot;&gt;&lt;b&gt;• Điều kiện kích hoạt:&lt;/b&gt;&lt;br&gt;&amp;nbsp;&amp;nbsp;- Vượt tốc độ giới hạn (QCVN 41:2019)&lt;br&gt;&amp;nbsp;&amp;nbsp;- Vi phạm cự ly an toàn (TT 31/2019)&lt;br&gt;&amp;nbsp;&amp;nbsp;- Mệt mỏi giai đoạn sớm: PERCLOS &amp;gt; 15%&lt;br&gt;&amp;nbsp;&amp;nbsp;- Lái xe liên tục vượt quá 4 giờ quy định&lt;br&gt;&lt;b&gt;• Cơ chế xử lý:&lt;/b&gt; Voice TTS cảnh báo + HUD vàng&lt;/div&gt;" style="rounded=1;arcSize=8;whiteSpace=wrap;html=1;fillColor=#FFFBEB;strokeColor=#D97706;strokeWidth=2;align=left;spacingLeft=14;verticalAlign=top;spacingTop=10;shadow=1;" vertex="1" parent="1">
+          <mxGeometry x="470" y="275" width="360" height="155" as="geometry" />
+        </mxCell>
+
+        <!-- Level 3 -->
+        <mxCell id="h_l3" value="&lt;b&gt;&lt;font style=&quot;font-size: 13.5px; color: #FFFFFF;&quot;&gt;CẤP 3: CAUTION (NHẮC NHỞ)&lt;/font&gt;&lt;/b&gt;" style="rounded=1;arcSize=8;whiteSpace=wrap;html=1;fillColor=#2563EB;strokeColor=#1D4ED8;strokeWidth=2;align=center;" vertex="1" parent="1">
+          <mxGeometry x="860" y="240" width="360" height="35" as="geometry" />
+        </mxCell>
+        <mxCell id="b_l3" value="&lt;div style=&quot;text-align: left; line-height: 180%; font-size: 12px; color: #1E3A8A;&quot;&gt;&lt;b&gt;• Điều kiện kích hoạt:&lt;/b&gt;&lt;br&gt;&amp;nbsp;&amp;nbsp;- Chưa thắt dây an toàn (No Seatbelt)&lt;br&gt;&amp;nbsp;&amp;nbsp;- Biển báo sắp vào khu đông dân cư&lt;br&gt;&amp;nbsp;&amp;nbsp;- Biển báo đường cong gấp nguy hiểm&lt;br&gt;&lt;b&gt;• Cơ chế xử lý:&lt;/b&gt;&lt;br&gt;&amp;nbsp;&amp;nbsp;- Nhắc nhở âm lượng êm dịu, icon xanh&lt;br&gt;&amp;nbsp;&amp;nbsp;- Không gây giật mình tài xế&lt;/div&gt;" style="rounded=1;arcSize=8;whiteSpace=wrap;html=1;fillColor=#EFF6FF;strokeColor=#2563EB;strokeWidth=2;align=left;spacingLeft=14;verticalAlign=top;spacingTop=10;shadow=1;" vertex="1" parent="1">
+          <mxGeometry x="860" y="275" width="360" height="155" as="geometry" />
+        </mxCell>
+
+        <mxCell id="arr_l1" style="endArrow=classic;html=1;rounded=0;strokeColor=#DC2626;strokeWidth=2;exitX=0.2;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="in_debounce" target="h_l1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="arr_l2" style="endArrow=classic;html=1;rounded=0;strokeColor=#D97706;strokeWidth=2;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="in_debounce" target="h_l2">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="arr_l3" style="endArrow=classic;html=1;rounded=0;strokeColor=#2563EB;strokeWidth=2;exitX=0.8;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="in_debounce" target="h_l3">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- Security & Dispatcher Bottom -->
+        <mxCell id="box_sec" value="&lt;b&gt;&lt;font style=&quot;font-size: 13.5px; color: #581C87;&quot;&gt;3. BẢO VỆ DỮ LIỆU CÁ NHÂN &amp;amp; BĂM TOÀN VẸN BẰNG CHỨNG (PRIVACY &amp;amp; SHA-256 INTEGRITY)&lt;/font&gt;&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size: 11.5px; color: #3B0764;&quot;&gt;• Tự động làm mờ khuôn mặt người đi đường &amp;amp; tài xế trong snapshot vi phạm theo Nghị định 13/2023/NĐ-CP&lt;br&gt;• Sinh mã băm SHA-256 cho từng file ảnh bằng chứng để bảo đảm tính toàn vẹn pháp lý, chống sửa đổi&lt;/font&gt;" style="rounded=1;arcSize=8;whiteSpace=wrap;html=1;fillColor=#FAF5FF;strokeColor=#9333EA;strokeWidth=2;align=center;" vertex="1" parent="1">
+          <mxGeometry x="80" y="460" width="1140" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="arr_sec1" style="endArrow=classic;html=1;rounded=0;strokeColor=#6B21A8;strokeWidth=1.8;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.2;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="b_l1" target="box_sec">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="arr_sec2" style="endArrow=classic;html=1;rounded=0;strokeColor=#6B21A8;strokeWidth=1.8;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="b_l2" target="box_sec">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="arr_sec3" style="endArrow=classic;html=1;rounded=0;strokeColor=#6B21A8;strokeWidth=1.8;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.8;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="b_l3" target="box_sec">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- Final Output -->
+        <mxCell id="box_dispatch" value="&lt;b&gt;&lt;font style=&quot;font-size: 13.5px; color: #065F46;&quot;&gt;4. REALTIME EVENT DISPATCHER (BỘ PHÂN PHỐI SỰ KIỆN ĐA KÊNH &amp;lt; 100ms)&lt;/font&gt;&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size: 11.5px; color: #047857;&quot;&gt;Đóng gói Payload cảnh báo kèm mức ưu tiên và đẩy tức thì tới Audio/TTS, Mobile HUD và Web Fleet Dashboard&lt;/font&gt;" style="rounded=1;arcSize=8;whiteSpace=wrap;html=1;fillColor=#ECFDF5;strokeColor=#059669;strokeWidth=2;align=center;" vertex="1" parent="1">
+          <mxGeometry x="80" y="550" width="1140" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="arr_disp" style="endArrow=classic;html=1;rounded=0;strokeColor=#059669;strokeWidth=2.5;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="box_sec" target="box_dispatch">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+    
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

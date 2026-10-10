@@ -1,47 +1,222 @@
 @import "tailwindcss";
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans), Arial, Helvetica, sans-serif;
-  --font-mono: var(--font-geist-mono), monospace;
+/* ═════════════════════════════════════════════════════════════════
+   TRAFFICGUARD SIGNAL UI — DESIGN SYSTEM FOUNDATION
+   Bright • Clean • Enterprise • Safety-Oriented • Road-Inspired
+   ═════════════════════════════════════════════════════════════════ */
 
-  /* ADAS Custom Colors */
-  --color-adas-bg: #080B12;
-  --color-adas-surface: #111620;
-  --color-adas-card: #171D29;
-  --color-adas-elevated: #1D2533;
-  --color-adas-primary: #5B8CFF;
-  --color-adas-success: #22C55E;
-  --color-adas-warning: #F59E0B;
-  --color-adas-danger: #EF4444;
-  --color-adas-text-primary: #F8FAFC;
-  --color-adas-text-secondary: #94A3B8;
-  --color-adas-text-muted: #64748B;
-  --color-adas-border: rgba(255, 255, 255, 0.08);
+@theme inline {
+  --font-sans: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-mono: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+
+  /* ── Canvas & Surface Tokens ── */
+  --color-tg-bg:                 #F6F8FA;
+  --color-tg-surface:            #FFFFFF;
+  --color-tg-surface-secondary:  #F1F4F7;
+  --color-tg-surface-hover:      #EAEFF5;
+
+  /* ── Border Tokens ── */
+  --color-tg-border:             #E4E9EF;
+  --color-tg-border-subtle:      #EEF2F6;
+  --color-tg-border-strong:      #D0D7DE;
+
+  /* ── Brand & Accent ── */
+  --color-tg-primary:            #175CD3;
+  --color-tg-primary-hover:      #154EB7;
+  --color-tg-primary-light:      #EFF4FF;
+  --color-tg-primary-border:     #B2CCFF;
+
+  --color-tg-secondary:          #0E9384;
+  --color-tg-secondary-hover:    #0B7B6E;
+  --color-tg-secondary-light:    #F0FDF9;
+  --color-tg-secondary-border:   #99F6E0;
+
+  /* ── Typography Tokens ── */
+  --color-tg-text-primary:       #16202A;
+  --color-tg-text-secondary:     #667085;
+  --color-tg-muted:              #98A2B3;
+  --color-tg-text-disabled:      #CBD5E1;
+
+  /* ── Safety Status Colors (SIGNAL Tokens) ── */
+  --color-tg-safe:               #17B26A;
+  --color-tg-safe-hover:         #129B5C;
+  --color-tg-safe-light:         #ECFDF3;
+  --color-tg-safe-border:        #A6F4C5;
+
+  --color-tg-warning:            #F79009;
+  --color-tg-warning-hover:      #DC7702;
+  --color-tg-warning-light:      #FFFAEB;
+  --color-tg-warning-border:     #FEDF89;
+
+  --color-tg-critical:           #F04438;
+  --color-tg-critical-hover:     #D92D20;
+  --color-tg-critical-light:     #FEF3F2;
+  --color-tg-critical-border:    #FECDCA;
+
+  --color-tg-info:               #2E90FA;
+  --color-tg-info-hover:         #1570EF;
+  --color-tg-info-light:         #EFF8FF;
+  --color-tg-info-border:        #B2DDFF;
+
+  /* ── Backward Compatibility Mappings ── */
+  --color-background:            #F6F8FA;
+  --color-foreground:            #16202A;
+  --color-adas-bg:               #F6F8FA;
+  --color-adas-bg-secondary:     #F1F4F7;
+  --color-adas-surface:          #FFFFFF;
+  --color-adas-card:             #FFFFFF;
+  --color-adas-elevated:         #F8FAFC;
+  --color-adas-border:           #E4E9EF;
+  --color-adas-border-hover:     #D0D7DE;
+  --color-adas-primary:          #175CD3;
+  --color-adas-primary-dim:      #154EB7;
+  --color-adas-success:          #17B26A;
+  --color-adas-warning:          #F79009;
+  --color-adas-danger:           #F04438;
+  --color-adas-info:             #2E90FA;
+  --color-adas-text-primary:     #16202A;
+  --color-adas-text-secondary:   #667085;
+  --color-adas-text-muted:       #98A2B3;
+  --color-adas-text-disabled:    #CBD5E1;
 }
 
 :root {
-  /* Enforce Dark First */
-  --background: #080B12;
-  --foreground: #F8FAFC;
+  --tg-bg: #F6F8FA;
+  --tg-surface: #FFFFFF;
+  --tg-surface-secondary: #F1F4F7;
+  --tg-surface-hover: #EAEFF5;
+
+  --tg-border: #E4E9EF;
+  --tg-border-subtle: #EEF2F6;
+  --tg-border-strong: #D0D7DE;
+
+  --tg-primary: #175CD3;
+  --tg-primary-hover: #154EB7;
+  --tg-primary-light: #EFF4FF;
+  --tg-primary-border: #B2CCFF;
+
+  --tg-secondary: #0E9384;
+  --tg-secondary-hover: #0B7B6E;
+  --tg-secondary-light: #F0FDF9;
+  --tg-secondary-border: #99F6E0;
+
+  --tg-text-primary: #16202A;
+  --tg-text-secondary: #667085;
+  --tg-muted: #98A2B3;
+  --tg-text-disabled: #CBD5E1;
+
+  --tg-safe: #17B26A;
+  --tg-safe-hover: #129B5C;
+  --tg-safe-light: #ECFDF3;
+  --tg-safe-border: #A6F4C5;
+
+  --tg-warning: #F79009;
+  --tg-warning-hover: #DC7702;
+  --tg-warning-light: #FFFAEB;
+  --tg-warning-border: #FEDF89;
+
+  --tg-critical: #F04438;
+  --tg-critical-hover: #D92D20;
+  --tg-critical-light: #FEF3F2;
+  --tg-critical-border: #FECDCA;
+
+  --tg-info: #2E90FA;
+  --tg-info-hover: #1570EF;
+  --tg-info-light: #EFF8FF;
+  --tg-info-border: #B2DDFF;
+
+  /* Shadows — crisp enterprise minimal */
+  --tg-shadow-xs: 0 1px 2px rgba(16, 24, 40, 0.05);
+  --tg-shadow-sm: 0 1px 3px rgba(16, 24, 40, 0.08), 0 1px 2px rgba(16, 24, 40, 0.04);
+  --tg-shadow-md: 0 4px 8px -2px rgba(16, 24, 40, 0.08), 0 2px 4px -2px rgba(16, 24, 40, 0.04);
+  --tg-shadow-lg: 0 12px 16px -4px rgba(16, 24, 40, 0.1), 0 4px 6px -2px rgba(16, 24, 40, 0.05);
+
+  /* Radius */
+  --tg-radius-button: 8px;
+  --tg-radius-input: 8px;
+  --tg-radius-card: 10px;
+  --tg-radius-modal: 12px;
+  --tg-radius-badge: 6px;
+
+  color-scheme: light;
+}
+
+*, *::before, *::after {
+  box-sizing: border-box;
 }
 
 body {
-  background-color: var(--background);
-  color: var(--foreground);
-  font-family: var(--font-sans);
+  background-color: var(--tg-bg);
+  color: var(--tg-text-primary);
+  font-family: var(--font-sans), 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  min-height: 100vh;
 }
 
-/* Custom utilities */
-@utility text-balance {
-  text-wrap: balance;
+/* ── Unified Clean Typography Across Entire App ── */
+body, button, input, select, textarea, table, th, td, pre, code, .font-mono {
+  font-family: var(--font-sans), 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
 }
 
-@utility glass-panel {
-  background: rgba(17, 22, 32, 0.6);
-  backdrop-filter: blur(12px);
-  border: 1px solid var(--color-adas-border);
+/* ── Light Enterprise Scrollbars ── */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: #F1F4F7;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #D0D7DE;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #98A2B3;
+}
+
+.custom-scrollbar::-webkit-scrollbar {
+  width: 5px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: #D0D7DE;
+  border-radius: 3px;
+}
+
+/* ── Prominent Timeline Scrollbar for Easy Tracking ── */
+.timeline-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: #B2CCFF #F8FAFC;
+}
+
+.timeline-scrollbar::-webkit-scrollbar {
+  width: 6px;
+}
+
+.timeline-scrollbar::-webkit-scrollbar-track {
+  background: #F8FAFC;
+  border-radius: 4px;
+}
+
+.timeline-scrollbar::-webkit-scrollbar-thumb {
+  background: #B2CCFF;
+  border-radius: 4px;
+}
+
+.timeline-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: #175CD3;
+}
+
+/* ── Signal Rail Line Animation (Subtle) ── */
+@keyframes tgPulseSafe {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.6; }
+}
+
+.animate-signal-pulse {
+  animation: tgPulseSafe 2.5s cubic-bezier(0.4, 0, 0.6, 1) infinite;
 }

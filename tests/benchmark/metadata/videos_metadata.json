@@ -1,0 +1,280 @@
+[
+  {
+    "filename": "dong_xe_may_hanoi_01.mp4",
+    "filepath": "tests/benchmark/videos/dong_xe_may_hanoi_01.mp4",
+    "condition": "dong_xe_may",
+    "location": "hanoi",
+    "duration_sec": 35.0,
+    "resolution": "1280x720",
+    "fps": 30.0,
+    "road_type": "Do thi noi thanh",
+    "weather": "Ngay, nang nhe",
+    "sharpness": "Cao (720p)",
+    "file_size_bytes": 20079127,
+    "sources": [
+      "raw_hanoi_bach_mai.mp4"
+    ]
+  },
+  {
+    "filename": "dong_xe_may_hanoi_02.mp4",
+    "filepath": "tests/benchmark/videos/dong_xe_may_hanoi_02.mp4",
+    "condition": "dong_xe_may",
+    "location": "hanoi",
+    "duration_sec": 35.0,
+    "resolution": "1280x720",
+    "fps": 30.0,
+    "road_type": "Do thi noi thanh",
+    "weather": "Ngay, nhieu may",
+    "sharpness": "Cao (720p)",
+    "file_size_bytes": 18722117,
+    "sources": [
+      "raw_hanoi_bach_mai.mp4"
+    ]
+  },
+  {
+    "filename": "dong_xe_may_hanoi_03.mp4",
+    "filepath": "tests/benchmark/videos/dong_xe_may_hanoi_03.mp4",
+    "condition": "dong_xe_may",
+    "location": "hanoi",
+    "duration_sec": 35.0,
+    "resolution": "1280x720",
+    "fps": 30.0,
+    "road_type": "Do thi nga tu",
+    "weather": "Ngay, mat me",
+    "sharpness": "Cao (720p)",
+    "file_size_bytes": 21694084,
+    "sources": [
+      "raw_hanoi_bach_mai.mp4"
+    ]
+  },
+  {
+    "filename": "dong_xe_may_hcm_01.mp4",
+    "filepath": "tests/benchmark/videos/dong_xe_may_hcm_01.mp4",
+    "condition": "dong_xe_may",
+    "location": "hcm",
+    "duration_sec": 35.0,
+    "resolution": "1280x720",
+    "fps": 30.0,
+    "road_type": "Vong xoay do thi",
+    "weather": "Ngay, nang gat",
+    "sharpness": "Rat cao (1080p source)",
+    "file_size_bytes": 15680282,
+    "sources": [
+      "raw_uit_cs338_demo.mp4"
+    ]
+  },
+  {
+    "filename": "dong_xe_may_hcm_02.mp4",
+    "filepath": "tests/benchmark/videos/dong_xe_may_hcm_02.mp4",
+    "condition": "dong_xe_may",
+    "location": "hcm",
+    "duration_sec": 30.0,
+    "resolution": "1280x720",
+    "fps": 30.0,
+    "road_type": "Nga tu do thi",
+    "weather": "Ngay, nang",
+    "sharpness": "Cao (720p)",
+    "file_size_bytes": 11728875,
+    "sources": [
+      "raw_uit_cs338_cam.mp4"
+    ]
+  },
+  {
+    "filename": "ngay_hcm_01.mp4",
+    "filepath": "tests/benchmark/videos/ngay_hcm_01.mp4",
+    "condition": "ngay",
+    "location": "hcm",
+    "duration_sec": 30.0,
+    "resolution": "1280x720",
+    "fps": 30.0,
+    "road_type": "Dai lo do thi",
+    "weather": "Ngay, trong xanh",
+    "sharpness": "Rat cao (1080p source)",
+    "file_size_bytes": 23806354,
+    "sources": [
+      "raw_uit_cs338_v1.mp4"
+    ]
+  },
+  {
+    "filename": "ngay_hcm_02.mp4",
+    "filepath": "tests/benchmark/videos/ngay_hcm_02.mp4",
+    "condition": "ngay",
+    "location": "hcm",
+    "duration_sec": 30.0,
+    "resolution": "1280x720",
+    "fps": 30.0,
+    "road_type": "Quoc lo ven do",
+    "weather": "Ngay, nang",
+    "sharpness": "Trung binh (360p upscaled)",
+    "file_size_bytes": 28622695,
+    "sources": [
+      "raw_tuanquoc_vehicle.mp4"
+    ]
+  },
+  {
+    "filename": "ngay_hanoi_01.mp4",
+    "filepath": "tests/benchmark/videos/ngay_hanoi_01.mp4",
+    "condition": "ngay",
+    "location": "hanoi",
+    "duration_sec": 35.0,
+    "resolution": "1280x720",
+    "fps": 30.0,
+    "road_type": "Truc duong chinh",
+    "weather": "Ngay, ram mat",
+    "sharpness": "Cao (720p)",
+    "file_size_bytes": 18840304,
+    "sources": [
+      "raw_hanoi_bach_mai.mp4"
+    ]
+  },
+  {
+    "filename": "bien_bao_hanoi_01.mp4",
+    "filepath": "tests/benchmark/videos/bien_bao_hanoi_01.mp4",
+    "condition": "bien_bao",
+    "location": "hanoi",
+    "duration_sec": 30.0,
+    "resolution": "1280x720",
+    "fps": 30.0,
+    "road_type": "Do thi co bien bao",
+    "weather": "Ngay, quang may",
+    "sharpness": "Cao (Dashcam)",
+    "file_size_bytes": 51774235,
+    "sources": [
+      "raw_kasumi_sign_dashcam.mp4"
+    ]
+  },
+  {
+    "filename": "bien_bao_hcm_01.mp4",
+    "filepath": "tests/benchmark/videos/bien_bao_hcm_01.mp4",
+    "condition": "bien_bao",
+    "location": "hcm",
+    "duration_sec": 35.0,
+    "resolution": "1280x720",
+    "fps": 30.0,
+    "road_type": "Tuyen duong co bien bao",
+    "weather": "Ngay, nang",
+    "sharpness": "Cao (Dashcam)",
+    "file_size_bytes": 35274661,
+    "sources": [
+      "raw_franceto_traffic_sign_01.mp4"
+    ]
+  },
+  {
+    "filename": "bien_bao_hcm_02.mp4",
+    "filepath": "tests/benchmark/videos/bien_bao_hcm_02.mp4",
+    "condition": "bien_bao",
+    "location": "hcm",
+    "duration_sec": 30.0,
+    "resolution": "1280x720",
+    "fps": 30.0,
+    "road_type": "Tuyen duong co bien bao",
+    "weather": "Ngay, nang",
+    "sharpness": "Cao (Dashcam)",
+    "file_size_bytes": 31656337,
+    "sources": [
+      "raw_franceto_traffic_sign_02.mp4"
+    ]
+  },
+  {
+    "filename": "dem_dashcam_01.mp4",
+    "filepath": "tests/benchmark/videos/dem_dashcam_01.mp4",
+    "condition": "dem",
+    "location": "quoc_te_pov",
+    "duration_sec": 30.0,
+    "resolution": "1280x720",
+    "fps": 30.0,
+    "road_type": "Duong pho dem co den duong",
+    "weather": "Dem, den pha chieu",
+    "sharpness": "Cao (HD)",
+    "file_size_bytes": 19962365,
+    "sources": [
+      "night_clip1.mp4",
+      "night_clip2.mp4"
+    ]
+  },
+  {
+    "filename": "dem_dashcam_02.mp4",
+    "filepath": "tests/benchmark/videos/dem_dashcam_02.mp4",
+    "condition": "dem",
+    "location": "quoc_te_pov",
+    "duration_sec": 30.0,
+    "resolution": "1280x720",
+    "fps": 30.0,
+    "road_type": "Duong cao toc dem",
+    "weather": "Dem, toi kem den duong",
+    "sharpness": "Cao (HD)",
+    "file_size_bytes": 23514527,
+    "sources": [
+      "night_clip80.mp4",
+      "night_clip79.mp4"
+    ]
+  },
+  {
+    "filename": "mua_dashcam_01.mp4",
+    "filepath": "tests/benchmark/videos/mua_dashcam_01.mp4",
+    "condition": "mua",
+    "location": "quoc_te_pov",
+    "duration_sec": 30.0,
+    "resolution": "1280x720",
+    "fps": 30.0,
+    "road_type": "Duong pho mua dem",
+    "weather": "Mua nhe, mat duonguot",
+    "sharpness": "Cao (HD)",
+    "file_size_bytes": 14330554,
+    "sources": [
+      "rain_night_clip12.mp4",
+      "rain_night_clip13.mp4"
+    ]
+  },
+  {
+    "filename": "mua_dashcam_02.mp4",
+    "filepath": "tests/benchmark/videos/mua_dashcam_02.mp4",
+    "condition": "mua",
+    "location": "quoc_te_pov",
+    "duration_sec": 30.0,
+    "resolution": "1280x720",
+    "fps": 30.0,
+    "road_type": "Kinh lai dinh hat mua",
+    "weather": "Mua, gat nuoc",
+    "sharpness": "Cao (HD)",
+    "file_size_bytes": 14749868,
+    "sources": [
+      "rain_windshield_clip11.mp4",
+      "rain_windshield_clip12.mp4"
+    ]
+  },
+  {
+    "filename": "mua_dashcam_03.mp4",
+    "filepath": "tests/benchmark/videos/mua_dashcam_03.mp4",
+    "condition": "mua",
+    "location": "quoc_te_pov",
+    "duration_sec": 30.0,
+    "resolution": "1280x720",
+    "fps": 30.0,
+    "road_type": "Duong ngoai o mua ngay",
+    "weather": "Am u, duong tron",
+    "sharpness": "Cao (HD)",
+    "file_size_bytes": 35773227,
+    "sources": [
+      "rain_day_clip14.mp4",
+      "rain_day_clip15.mp4"
+    ]
+  },
+  {
+    "filename": "nguoc_sang_dashcam_01.mp4",
+    "filepath": "tests/benchmark/videos/nguoc_sang_dashcam_01.mp4",
+    "condition": "nguoc_sang",
+    "location": "quoc_te_pov",
+    "duration_sec": 30.0,
+    "resolution": "1280x720",
+    "fps": 30.0,
+    "road_type": "Tuyen duong chieu thang mat troi",
+    "weather": "Nang gat, loa sang",
+    "sharpness": "Cao (HD)",
+    "file_size_bytes": 58932475,
+    "sources": [
+      "glare_clip58.mp4",
+      "glare_clip57.mp4"
+    ]
+  }
+]

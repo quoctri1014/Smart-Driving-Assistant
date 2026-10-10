@@ -1,0 +1,174 @@
+{
+  "system": {
+    "version": "2.4.0-commercial-ready",
+    "country": "VN",
+    "timezone": "Asia/Ho_Chi_Minh",
+    "commercial_licensing_notice": "CẢNH BÁO PHÁP LÝ BẢN QUYỀN THƯƠNG MẠI: Ultralytics YOLOv8/YOLO11 phân phối theo giấy phép AGPL-3.0. Khi đóng gói thương mại hoặc cung cấp SaaS khép kín, doanh nghiệp cần sở hữu Ultralytics Commercial License hoặc chuyển đổi sang mô hình cấp phép mở (Apache 2.0: RT-DETR, YOLOX, hoặc ONNX Runtime runtime-only)."
+  },
+  "quality_gate": {
+    "blur_laplacian_threshold": 65.0,
+    "min_brightness_mean": 35.0,
+    "max_brightness_mean": 225.0,
+    "min_contrast_std": 22.0,
+    "glare_saturated_ratio_threshold": 0.12,
+    "local_blur_droplet_variance_threshold": 0.40,
+    "clahe_clip_limit": 2.0,
+    "clahe_tile_grid_size": [8, 8],
+    "quality_score_minimum": 0.45
+  },
+  "confidence_calibration": {
+    "method": "temperature_scaling",
+    "default_temperature": 1.15,
+    "module_calibrated_thresholds": {
+      "vehicle_detection": 0.28,
+      "traffic_sign": 0.45,
+      "license_plate": 0.35,
+      "helmet": 0.40,
+      "dms_drowsiness": 0.50
+    }
+  },
+  "sensor_fusion_ekf": {
+    "gps_speed_weight": 0.85,
+    "imu_accel_weight": 0.15,
+    "max_physical_acceleration_mps2": 11.76,
+    "deadband_velocity_threshold_kph": 1.5,
+    "dead_reckoning_max_seconds": 15.0,
+    "pitch_slope_compensation_enabled": true
+  },
+  "load_shedder": {
+    "target_fps": 25.0,
+    "latency_overload_threshold_ms": 140.0,
+    "latency_recovery_threshold_ms": 80.0,
+    "downscale_factor_on_overload": 0.75,
+    "critical_modules_never_shed": ["collision_warning", "drowsiness_detector"]
+  },
+  "health_monitor": {
+    "camera_obstructed_dark_threshold": 10.0,
+    "camera_obstructed_variance_threshold": 15.0,
+    "frame_freeze_diff_threshold": 0.8,
+    "frame_timeout_seconds": 2.0,
+    "horizon_tilt_max_degrees": 25.0
+  },
+  "legal_regulations": {
+    "tt_31_2019_tt_bgtvt": {
+      "title": "Thông tư số 31/2019/TT-BGTVT ngày 29/08/2019 của Bộ GTVT",
+      "article_11_safe_distance_dry_road": [
+        {"max_speed_kph": 60, "min_safe_distance_m": 35.0, "note": "Vận tốc <= 60 km/h: Chủ động giữ khoảng cách phù hợp (khuyến cáo an toàn >= 35m)"},
+        {"max_speed_kph": 80, "min_safe_distance_m": 55.0, "note": "Vận tốc 60 - 80 km/h: Tối thiểu 55m"},
+        {"max_speed_kph": 100, "min_safe_distance_m": 70.0, "note": "Vận tốc 80 - 100 km/h: Tối thiểu 70m"},
+        {"max_speed_kph": 120, "min_safe_distance_m": 100.0, "note": "Vận tốc 100 - 120 km/h: Tối thiểu 100m"}
+      ],
+      "adverse_weather_distance_multiplier": 1.30
+    },
+    "driving_hours_law": {
+      "law_reference": "Luật Giao thông đường bộ (Điều 65) & Luật Trật tự an toàn giao thông đường bộ",
+      "max_continuous_hours": 4.0,
+      "max_daily_hours": 10.0,
+      "min_break_minutes": 15
+    },
+    "qcvn_41_2019_bgtvt": {
+      "title": "Quy chuẩn kỹ thuật quốc gia QCVN 41:2019/BGTVT về báo hiệu đường bộ",
+      "speed_sign_code": "P.127",
+      "end_speed_sign_code": "DP.134",
+      "valid_speed_values": [30, 40, 50, 60, 70, 80, 90, 100, 120]
+    }
+  },
+  "modules_config": {
+    "m1_vehicle_detector": {
+      "soft_nms_enabled": true,
+      "soft_nms_sigma": 0.5,
+      "diou_nms_enabled": true,
+      "diou_threshold": 0.65,
+      "sahi_sliced_inference": {
+        "enabled": false,
+        "slice_height": 384,
+        "slice_width": 384,
+        "overlap_ratio": 0.20
+      },
+      "trailer_merge_enabled": true,
+      "trailer_merge_iou_min": 0.15,
+      "night_headlight_pair_suppression": true
+    },
+    "m2_tracking": {
+      "tracker_type": "ByteTrack-BoTSORT",
+      "max_lost_frames": 35,
+      "reid_similarity_threshold": 0.65,
+      "ecc_camera_motion_compensation": true,
+      "ghost_track_min_hits": 2
+    },
+    "m3_speed_estimation": {
+      "primary_ego_source": "GPS_IMU_EKF",
+      "other_vehicle_homography_required": true,
+      "pitch_compensation_enabled": true,
+      "speed_deadband_kph": 1.5,
+      "max_reasonable_acceleration_mps2": 11.76,
+      "optical_flow_dead_reckoning_timeout_sec": 30.0
+    },
+    "m4_lane_zone": {
+      "auto_ego_lane_detection": true,
+      "lane_markings_color_thresholds": {
+        "white_val_min": 180,
+        "white_sat_max": 45,
+        "yellow_hue_range": [15, 35],
+        "yellow_sat_min": 60
+      },
+      "max_tilt_recalibrate_deg": 25.0,
+      "lane_change_threshold_ratio": 0.35
+    },
+    "m5_license_plate": {
+      "multi_frame_voting_min_hits": 3,
+      "min_plate_confidence": 0.70,
+      "vietnam_provinces_valid_range": [11, 99],
+      "perspective_rectify": true,
+      "two_line_separation": true
+    },
+    "m6_helmet": {
+      "rider_head_crop_ratio": 0.40,
+      "track_voting_frames": 5,
+      "uncertain_confidence_threshold": 0.55
+    },
+    "m7_collision_ttc": {
+      "early_warning_ttc_sec": 2.5,
+      "urgent_warning_ttc_sec": 1.5,
+      "min_speed_suppress_kph": 10.0,
+      "standard_vehicle_widths_m": {
+        "car": 1.8,
+        "bus": 2.55,
+        "truck": 2.5,
+        "motorbike": 0.8,
+        "default": 1.8
+      },
+      "default_camera_focal_length_px": 800.0,
+      "default_camera_height_m": 1.45
+    },
+    "m8_safe_distance": {
+      "tt_31_2019_enforcement": true,
+      "discretionary_speed_threshold_kph": 60.0
+    },
+    "m9_traffic_signs": {
+      "multi_frame_voting_frames": 4,
+      "sign_expiry_distance_m": 500.0,
+      "map_fusion_preferred": "camera_highest_confidence"
+    },
+    "m10_speed_recommendation": {
+      "rule_engine_mode": "strict_minimum",
+      "default_urban_speed_kph": 50.0,
+      "default_rural_speed_kph": 80.0
+    },
+    "m11_dms": {
+      "perclos_window_sec": 60,
+      "perclos_drowsy_threshold": 0.15,
+      "ear_threshold_default": 0.21,
+      "mar_yawn_threshold": 0.55,
+      "nodding_pitch_down_deg": 25.0,
+      "distraction_yaw_deg": 30.0,
+      "nir_camera_recommended": true
+    },
+    "m12_seatbelt_driving_timer": {
+      "decision_window_frames": 15,
+      "continuous_driving_limit_hours": 4.0,
+      "daily_driving_limit_hours": 10.0,
+      "min_rest_duration_minutes": 15.0
+    }
+  }
+}

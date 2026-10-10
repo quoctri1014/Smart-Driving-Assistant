@@ -1,5 +1,7 @@
 # 🚦 Smart Traffic AI — Python + YOLO
 
+**Cập nhật 12 chức năng:** xem [đối chiếu triển khai và cấu hình](../docs/feature-alignment-review.md). Bảng bốn chức năng dưới đây là nền tảng ban đầu; `main.py` đã nối nhóm A, nhóm B chạy độc lập qua backend. Chế độ một YOLO yêu cầu model đa lớp đã huấn luyện, không phải COCO mặc định.
+
 Dự án giám sát giao thông thông minh, gộp **4 tính năng** phổ biến trong các
 project Python + YOLO về giao thông (giống loại clip demo trên TikTok/Youtube):
 

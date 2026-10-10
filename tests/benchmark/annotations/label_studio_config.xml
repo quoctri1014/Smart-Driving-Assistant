@@ -1,0 +1,41 @@
+<View>
+  <Header value="ADAS Traffic Vietnam Benchmark Annotation Project" />
+  
+  <View style="display: flex;">
+    <View style="flex: 70%">
+      <Image name="image" value="$image" zoom="true" rotateControl="true"/>
+    </View>
+    
+    <View style="flex: 30%; margin-left: 20px;">
+      <Header value="1. Đối tượng giao thông (Traffic Objects)" />
+      <RectangleLabels name="objects" toName="image">
+        <Label value="car" background="#3388FF" />
+        <Label value="motorbike" background="#FF3333" />
+        <Label value="bus" background="#33FF57" />
+        <Label value="truck" background="#FF9933" />
+        <Label value="bicycle" background="#CC33FF" />
+        <Label value="pedestrian" background="#FFFF33" />
+        <Label value="license_plate" background="#00FFFF" />
+        <Label value="traffic_sign" background="#FF00AA" />
+      </RectangleLabels>
+
+      <Header value="2. Trạng thái kiểm duyệt (Audit Status)" />
+      <Choices name="review_status" toName="image" required="true">
+        <Choice value="CHƯA DUYỆT" selected="true" />
+        <Choice value="ĐÃ DUYỆT - HỢP LỆ" />
+        <Choice value="ĐÃ DUYỆT - ĐIỀU CHỈNH BOX" />
+        <Choice value="BÁC BỎ - FALSE POSITIVE" />
+      </Choices>
+
+      <Header value="3. Điều kiện khó (Edge Case Tags)" />
+      <Choices name="edge_cases" toName="image" choice="multiple">
+        <Choice value="Đêm tối / Chói đèn pha" />
+        <Choice value="Trời mưa / Kính lái đọng nước" />
+        <Choice value="Ngược sáng / Nắng gắt" />
+        <Choice value="Xe máy chen chúc / Che khuất > 50%" />
+        <Choice value="Biển số nhỏ / Mờ xa" />
+        <Choice value="Biển báo che khuất / Xoay lệch" />
+      </Choices>
+    </View>
+  </View>
+</View>

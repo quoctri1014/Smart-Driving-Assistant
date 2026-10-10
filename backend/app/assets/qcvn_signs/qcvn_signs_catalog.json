@@ -1,0 +1,1388 @@
+[
+  {
+    "code": "P.101",
+    "name": "Đường cấm",
+    "category": "CẤM",
+    "action": "Cấm tất cả các loại phương tiện đi lại cả hai hướng",
+    "speed_limit": null,
+    "img_filename": "P_101.png",
+    "page": 2
+  },
+  {
+    "code": "P.102",
+    "name": "Cấm đi ngược chiều",
+    "category": "CẤM",
+    "action": "Cấm tất cả các loại xe đi vào theo chiều đặt biển",
+    "speed_limit": null,
+    "img_filename": "P_102.png",
+    "page": 2
+  },
+  {
+    "code": "P.112",
+    "name": "Cấm người đi bộ",
+    "category": "CẤM",
+    "action": "Cấm người đi bộ qua lại trên đoạn đường này",
+    "speed_limit": null,
+    "img_filename": "P_112.png",
+    "page": 2
+  },
+  {
+    "code": "P.110a",
+    "name": "Cấm xe đạp",
+    "category": "CẤM",
+    "action": "Cấm xe đạp đi vào đoạn đường này",
+    "speed_limit": null,
+    "img_filename": "P_110a.png",
+    "page": 2
+  },
+  {
+    "code": "P.111a",
+    "name": "Cấm xe gắn máy",
+    "category": "CẤM",
+    "action": "Cấm các loại xe gắn máy đi vào",
+    "speed_limit": null,
+    "img_filename": "P_111a.png",
+    "page": 2
+  },
+  {
+    "code": "P.104",
+    "name": "Cấm xe mô tô 2-3 bánh",
+    "category": "CẤM",
+    "action": "Cấm các loại xe mô tô hai bánh và ba bánh",
+    "speed_limit": null,
+    "img_filename": "P_104.png",
+    "page": 2
+  },
+  {
+    "code": "P.103a",
+    "name": "Cấm xe ô tô",
+    "category": "CẤM",
+    "action": "Cấm tất cả các loại xe cơ giới từ 3 bánh trở lên đi vào",
+    "speed_limit": null,
+    "img_filename": "P_103a.png",
+    "page": 2
+  },
+  {
+    "code": "P.105",
+    "name": "Cấm ô tô và xe máy",
+    "category": "CẤM",
+    "action": "Cấm các loại xe cơ giới và xe mô tô",
+    "speed_limit": null,
+    "img_filename": "P_105.png",
+    "page": 2
+  },
+  {
+    "code": "P.107a",
+    "name": "Cấm xe ô tô khách",
+    "category": "CẤM",
+    "action": "Cấm ô tô chở khách từ 9 chỗ trở lên",
+    "speed_limit": null,
+    "img_filename": "P_107a.png",
+    "page": 2
+  },
+  {
+    "code": "P.106a",
+    "name": "Cấm xe ô tô tải",
+    "category": "CẤM",
+    "action": "Cấm các loại xe ô tô tải trừ xe ưu tiên",
+    "speed_limit": null,
+    "img_filename": "P_106a.png",
+    "page": 2
+  },
+  {
+    "code": "P.107b",
+    "name": "Cấm xe ô tô khách và ô tô tải",
+    "category": "CẤM",
+    "action": "Cấm cả ô tô tải và ô tô khách",
+    "speed_limit": null,
+    "img_filename": "P_107b.png",
+    "page": 2
+  },
+  {
+    "code": "P.107c",
+    "name": "Cấm xe ô tô taxi",
+    "category": "CẤM",
+    "action": "Cấm các loại xe taxi lưu thông",
+    "speed_limit": null,
+    "img_filename": "P_107c.png",
+    "page": 2
+  },
+  {
+    "code": "P.108a",
+    "name": "Cấm xe sơ-mi rơ-moóc",
+    "category": "CẤM",
+    "action": "Cấm các loại xe đầu kéo kéo sơ-mi rơ-moóc",
+    "speed_limit": null,
+    "img_filename": "P_108a.png",
+    "page": 2
+  },
+  {
+    "code": "P.108",
+    "name": "Cấm xe kéo rơ-moóc",
+    "category": "CẤM",
+    "action": "Cấm các loại xe cơ giới kéo theo rơ-moóc",
+    "speed_limit": null,
+    "img_filename": "P_108.png",
+    "page": 2
+  },
+  {
+    "code": "P.109",
+    "name": "Cấm máy kéo",
+    "category": "CẤM",
+    "action": "Cấm các loại máy kéo bánh hơi và bánh xích",
+    "speed_limit": null,
+    "img_filename": "P_109.png",
+    "page": 2
+  },
+  {
+    "code": "P.113",
+    "name": "Cấm xe công nông",
+    "category": "CẤM",
+    "action": "Cấm xe công nông và xe tự chế",
+    "speed_limit": null,
+    "img_filename": "P_113.png",
+    "page": 2
+  },
+  {
+    "code": "P.114",
+    "name": "Cấm xe súc vật kéo",
+    "category": "CẤM",
+    "action": "Cấm súc vật vận tải hoặc kéo xe",
+    "speed_limit": null,
+    "img_filename": "P_114.png",
+    "page": 2
+  },
+  {
+    "code": "P.111b",
+    "name": "Cấm xe ba bánh có động cơ",
+    "category": "CẤM",
+    "action": "Cấm các loại xe lam, xe lôi, xích lô máy",
+    "speed_limit": null,
+    "img_filename": "P_111b.png",
+    "page": 2
+  },
+  {
+    "code": "P.111c",
+    "name": "Cấm xe ba bánh không có động cơ",
+    "category": "CẤM",
+    "action": "Cấm xe xích lô và xe ba gác đạp",
+    "speed_limit": null,
+    "img_filename": "P_111c.png",
+    "page": 2
+  },
+  {
+    "code": "P.111d",
+    "name": "Cấm xe lôi",
+    "category": "CẤM",
+    "action": "Cấm các loại xe lôi đạp và kéo",
+    "speed_limit": null,
+    "img_filename": "P_111d.png",
+    "page": 2
+  },
+  {
+    "code": "P.110b",
+    "name": "Cấm xe chở hàng nguy hiểm",
+    "category": "CẤM",
+    "action": "Cấm các xe vận chuyển chất cháy, nổ, độc hại",
+    "speed_limit": null,
+    "img_filename": "P_110b.png",
+    "page": 2
+  },
+  {
+    "code": "P.123a",
+    "name": "Cấm rẽ trái",
+    "category": "CẤM",
+    "action": "Cấm các loại phương tiện cơ giới và thô sơ rẽ trái (được phép quay đầu)",
+    "speed_limit": null,
+    "img_filename": "P_123a.png",
+    "page": 2
+  },
+  {
+    "code": "P.103c",
+    "name": "Cấm xe ô tô rẽ trái",
+    "category": "CẤM",
+    "action": "Cấm các loại xe cơ giới rẽ trái",
+    "speed_limit": null,
+    "img_filename": "P_103c.png",
+    "page": 2
+  },
+  {
+    "code": "P.123b",
+    "name": "Cấm rẽ phải",
+    "category": "CẤM",
+    "action": "Cấm các loại phương tiện cơ giới và thô sơ rẽ phải",
+    "speed_limit": null,
+    "img_filename": "P_123b.png",
+    "page": 2
+  },
+  {
+    "code": "P.103b",
+    "name": "Cấm xe ô tô rẽ phải",
+    "category": "CẤM",
+    "action": "Cấm các loại xe cơ giới rẽ phải",
+    "speed_limit": null,
+    "img_filename": "P_103b.png",
+    "page": 2
+  },
+  {
+    "code": "P.124a",
+    "name": "Cấm quay đầu xe",
+    "category": "CẤM",
+    "action": "Cấm tất cả phương tiện quay đầu xe theo kiểu chữ U",
+    "speed_limit": null,
+    "img_filename": "P_124a.png",
+    "page": 2
+  },
+  {
+    "code": "P.124b",
+    "name": "Cấm ô tô quay đầu xe",
+    "category": "CẤM",
+    "action": "Cấm xe ô tô quay đầu xe theo kiểu chữ U",
+    "speed_limit": null,
+    "img_filename": "P_124b.png",
+    "page": 2
+  },
+  {
+    "code": "P.124b_alt",
+    "name": "Cấm ô tô quay đầu xe (mẫu 2)",
+    "category": "CẤM",
+    "action": "Cấm xe ô tô quay đầu xe",
+    "speed_limit": null,
+    "img_filename": "P_124b_alt.png",
+    "page": 2
+  },
+  {
+    "code": "P.124b_alt2",
+    "name": "Cấm ô tô quay đầu xe (mẫu 3)",
+    "category": "CẤM",
+    "action": "Cấm xe ô tô quay đầu xe",
+    "speed_limit": null,
+    "img_filename": "P_124b_alt2.png",
+    "page": 2
+  },
+  {
+    "code": "P.124c",
+    "name": "Cấm rẽ trái và quay đầu xe",
+    "category": "CẤM",
+    "action": "Cấm các phương tiện rẽ trái đồng thời cấm quay đầu xe",
+    "speed_limit": null,
+    "img_filename": "P_124c.png",
+    "page": 2
+  },
+  {
+    "code": "P.124e",
+    "name": "Cấm ô tô rẽ trái và quay đầu xe",
+    "category": "CẤM",
+    "action": "Cấm ô tô rẽ trái đồng thời cấm quay đầu xe",
+    "speed_limit": null,
+    "img_filename": "P_124e.png",
+    "page": 2
+  },
+  {
+    "code": "P.124d",
+    "name": "Cấm rẽ phải và quay đầu xe",
+    "category": "CẤM",
+    "action": "Cấm các phương tiện rẽ phải đồng thời cấm quay đầu xe",
+    "speed_limit": null,
+    "img_filename": "P_124d.png",
+    "page": 2
+  },
+  {
+    "code": "P.124f",
+    "name": "Cấm ô tô rẽ phải và quay đầu xe",
+    "category": "CẤM",
+    "action": "Cấm ô tô rẽ phải đồng thời cấm quay đầu xe",
+    "speed_limit": null,
+    "img_filename": "P_124f.png",
+    "page": 2
+  },
+  {
+    "code": "P.117",
+    "name": "Hạn chế chiều cao xe",
+    "category": "CẤM",
+    "action": "Cấm các xe có chiều cao vượt quá chỉ số ghi trên biển",
+    "speed_limit": null,
+    "img_filename": "P_117.png",
+    "page": 2
+  },
+  {
+    "code": "P.118",
+    "name": "Hạn chế chiều ngang xe",
+    "category": "CẤM",
+    "action": "Cấm các xe có chiều ngang vượt quá mức ghi trên biển",
+    "speed_limit": null,
+    "img_filename": "P_118.png",
+    "page": 2
+  },
+  {
+    "code": "P.115",
+    "name": "Hạn chế tải trọng toàn bộ xe",
+    "category": "CẤM",
+    "action": "Cấm xe có trọng lượng toàn bộ vượt quá số tấn ghi trên biển",
+    "speed_limit": null,
+    "img_filename": "P_115.png",
+    "page": 2
+  },
+  {
+    "code": "P.116",
+    "name": "Hạn chế tải trọng trên trục xe",
+    "category": "CẤM",
+    "action": "Cấm xe có tải trọng phân bổ trên trục vượt quá chỉ số ghi trên biển",
+    "speed_limit": null,
+    "img_filename": "P_116.png",
+    "page": 2
+  },
+  {
+    "code": "P.119",
+    "name": "Hạn chế chiều dài xe",
+    "category": "CẤM",
+    "action": "Cấm các xe có chiều dài tổng thể vượt quá mức ghi trên biển",
+    "speed_limit": null,
+    "img_filename": "P_119.png",
+    "page": 2
+  },
+  {
+    "code": "P.120",
+    "name": "Hạn chế chiều dài xe kéo moóc",
+    "category": "CẤM",
+    "action": "Cấm đoàn xe kéo moóc có tổng chiều dài vượt quá mức ghi trên biển",
+    "speed_limit": null,
+    "img_filename": "P_120.png",
+    "page": 2
+  },
+  {
+    "code": "P.121",
+    "name": "Cự ly tối thiểu giữa hai xe",
+    "category": "CẤM",
+    "action": "Giữ khoảng cách tối thiểu với xe đi trước theo chỉ số mét",
+    "speed_limit": null,
+    "img_filename": "P_121.png",
+    "page": 2
+  },
+  {
+    "code": "P.125",
+    "name": "Cấm vượt",
+    "category": "CẤM",
+    "action": "Cấm tất cả các loại xe cơ giới vượt nhau",
+    "speed_limit": null,
+    "img_filename": "P_125.png",
+    "page": 2
+  },
+  {
+    "code": "P.126",
+    "name": "Cấm ô tô tải vượt",
+    "category": "CẤM",
+    "action": "Cấm các loại ô tô tải có khối lượng chuyên chở vượt xe cơ giới khác",
+    "speed_limit": null,
+    "img_filename": "P_126.png",
+    "page": 2
+  },
+  {
+    "code": "P.127",
+    "name": "Tốc độ tối đa cho phép",
+    "category": "CẤM",
+    "action": "Chạy dưới hoặc bằng tốc độ tối đa ghi trên mặt biển",
+    "speed_limit": 50,
+    "img_filename": "P_127.png",
+    "page": 2
+  },
+  {
+    "code": "P.127b",
+    "name": "Tốc độ tối đa ban đêm",
+    "category": "CẤM",
+    "action": "Chạy dưới hoặc bằng tốc độ quy định vào khung giờ ban đêm",
+    "speed_limit": 70,
+    "img_filename": "P_127b.png",
+    "page": 2
+  },
+  {
+    "code": "P.128",
+    "name": "Cấm sử dụng còi",
+    "category": "CẤM",
+    "action": "Không được bấm còi trong phạm vi có hiệu lực",
+    "speed_limit": null,
+    "img_filename": "P_128.png",
+    "page": 2
+  },
+  {
+    "code": "P.130",
+    "name": "Cấm dừng xe và đỗ xe",
+    "category": "CẤM",
+    "action": "Cấm các phương tiện dừng xe và đỗ xe ở đoạn đường này",
+    "speed_limit": null,
+    "img_filename": "P_130.png",
+    "page": 2
+  },
+  {
+    "code": "P.131a",
+    "name": "Cấm đỗ xe",
+    "category": "CẤM",
+    "action": "Cấm tất cả các phương tiện đỗ xe ở đoạn đường đặt biển",
+    "speed_limit": null,
+    "img_filename": "P_131a.png",
+    "page": 2
+  },
+  {
+    "code": "P.131b",
+    "name": "Cấm đỗ xe ngày lẻ",
+    "category": "CẤM",
+    "action": "Cấm đỗ xe vào các ngày lẻ trong tháng",
+    "speed_limit": null,
+    "img_filename": "P_131b.png",
+    "page": 2
+  },
+  {
+    "code": "P.131c",
+    "name": "Cấm đỗ xe ngày chẵn",
+    "category": "CẤM",
+    "action": "Cấm đỗ xe vào các ngày chẵn trong tháng",
+    "speed_limit": null,
+    "img_filename": "P_131c.png",
+    "page": 2
+  },
+  {
+    "code": "P.132",
+    "name": "Nhường đường cho xe ngược chiều",
+    "category": "CẤM",
+    "action": "Nhường đường cho xe cơ giới đi ngược chiều qua đoạn đường hẹp",
+    "speed_limit": null,
+    "img_filename": "P_132.png",
+    "page": 2
+  },
+  {
+    "code": "P.127c",
+    "name": "Tốc độ tối đa theo phương tiện trên từng làn đường",
+    "category": "CẤM",
+    "action": "Tuân thủ tốc độ tối đa theo từng làn xe quy định",
+    "speed_limit": null,
+    "img_filename": "P_127c.png",
+    "page": 2
+  },
+  {
+    "code": "P.127d",
+    "name": "Tốc độ tối đa theo từng làn đường",
+    "category": "CẤM",
+    "action": "Tuân thủ tốc độ tối đa theo từng làn đường chỉ định",
+    "speed_limit": null,
+    "img_filename": "P_127d.png",
+    "page": 2
+  },
+  {
+    "code": "DP.135",
+    "name": "Hết tất cả các lệnh cấm",
+    "category": "HIỆU LỆNH",
+    "action": "Đã hết hiệu lực của các biển cấm trước đó",
+    "speed_limit": null,
+    "img_filename": "DP_135.png",
+    "page": 2
+  },
+  {
+    "code": "DP.133",
+    "name": "Hết cấm vượt",
+    "category": "HIỆU LỆNH",
+    "action": "Được phép vượt xe trở lại bình thường",
+    "speed_limit": null,
+    "img_filename": "DP_133.png",
+    "page": 2
+  },
+  {
+    "code": "DP.134",
+    "name": "Hết hạn chế tốc độ tối đa",
+    "category": "HIỆU LỆNH",
+    "action": "Hết hiệu lực của biển hạn chế tốc độ trước đó",
+    "speed_limit": null,
+    "img_filename": "DP_134.png",
+    "page": 2
+  },
+  {
+    "code": "DP.134b",
+    "name": "Hết hạn chế tốc độ theo biển ghép",
+    "category": "HIỆU LỆNH",
+    "action": "Hết hiệu lực hạn chế tốc độ ghép",
+    "speed_limit": null,
+    "img_filename": "DP_134b.png",
+    "page": 2
+  },
+  {
+    "code": "W.205a",
+    "name": "Đường giao nhau cùng mức (ngã tư)",
+    "category": "CẢNH BÁO",
+    "action": "Giao nhau cùng mức các tuyến đường cùng cấp",
+    "speed_limit": null,
+    "img_filename": "W_205a.png",
+    "page": 1
+  },
+  {
+    "code": "W.205b",
+    "name": "Đường giao nhau nhánh bên phải",
+    "category": "CẢNH BÁO",
+    "action": "Giao nhau nhánh đường cùng cấp bên phải",
+    "speed_limit": null,
+    "img_filename": "W_205b.png",
+    "page": 1
+  },
+  {
+    "code": "W.205c",
+    "name": "Đường giao nhau nhánh bên trái",
+    "category": "CẢNH BÁO",
+    "action": "Giao nhau nhánh đường cùng cấp bên trái",
+    "speed_limit": null,
+    "img_filename": "W_205c.png",
+    "page": 1
+  },
+  {
+    "code": "W.207a",
+    "name": "Giao nhau với đường không ưu tiên",
+    "category": "CẢNH BÁO",
+    "action": "Đang đi trên đường ưu tiên qua nơi giao nhau",
+    "speed_limit": null,
+    "img_filename": "W_207a.png",
+    "page": 1
+  },
+  {
+    "code": "W.207b",
+    "name": "Giao nhau đường không ưu tiên bên phải",
+    "category": "CẢNH BÁO",
+    "action": "Có nhánh đường phụ nhập vào từ bên phải",
+    "speed_limit": null,
+    "img_filename": "W_207b.png",
+    "page": 1
+  },
+  {
+    "code": "W.207c",
+    "name": "Giao nhau đường không ưu tiên bên trái",
+    "category": "CẢNH BÁO",
+    "action": "Có nhánh đường phụ nhập vào từ bên trái",
+    "speed_limit": null,
+    "img_filename": "W_207c.png",
+    "page": 1
+  },
+  {
+    "code": "W.208",
+    "name": "Giao nhau với đường ưu tiên",
+    "category": "CẢNH BÁO",
+    "action": "Nhường đường cho xe trên tuyến đường ưu tiên",
+    "speed_limit": null,
+    "img_filename": "W_208.png",
+    "page": 1
+  },
+  {
+    "code": "W.209",
+    "name": "Nơi giao nhau có tín hiệu đèn",
+    "category": "CẢNH BÁO",
+    "action": "Chuẩn bị tới nơi giao nhau có đèn giao thông",
+    "speed_limit": null,
+    "img_filename": "W_209.png",
+    "page": 1
+  },
+  {
+    "code": "W.226",
+    "name": "Đường người đi xe đạp cắt ngang",
+    "category": "CẢNH BÁO",
+    "action": "Chú ý người đi xe đạp qua đường",
+    "speed_limit": null,
+    "img_filename": "W_226.png",
+    "page": 1
+  },
+  {
+    "code": "W.224",
+    "name": "Đường người đi bộ cắt ngang",
+    "category": "CẢNH BÁO",
+    "action": "Giảm tốc độ, chú ý nhường đường người đi bộ",
+    "speed_limit": null,
+    "img_filename": "W_224.png",
+    "page": 1
+  },
+  {
+    "code": "W.225",
+    "name": "Trẻ em qua đường",
+    "category": "CẢNH BÁO",
+    "action": "Khu vực trường học hoặc sân chơi trẻ em, đi chậm",
+    "speed_limit": null,
+    "img_filename": "W_225.png",
+    "page": 1
+  },
+  {
+    "code": "W.204",
+    "name": "Đường hai chiều",
+    "category": "CẢNH BÁO",
+    "action": "Đoạn đường lưu thông theo cả 2 chiều ngược nhau",
+    "speed_limit": null,
+    "img_filename": "W_204.png",
+    "page": 1
+  },
+  {
+    "code": "W.234",
+    "name": "Giao nhau với đường hai chiều",
+    "category": "CẢNH BÁO",
+    "action": "Sắp giao nhau với tuyến đường hai chiều",
+    "speed_limit": null,
+    "img_filename": "W_234.png",
+    "page": 1
+  },
+  {
+    "code": "W.235",
+    "name": "Đường đôi",
+    "category": "CẢNH BÁO",
+    "action": "Bắt đầu đoạn đường đôi có dải phân cách giữa",
+    "speed_limit": null,
+    "img_filename": "W_235.png",
+    "page": 1
+  },
+  {
+    "code": "W.236",
+    "name": "Kết thúc đường đôi",
+    "category": "CẢNH BÁO",
+    "action": "Hết đoạn đường đôi, chú ý làn xe ngược chiều",
+    "speed_limit": null,
+    "img_filename": "W_236.png",
+    "page": 1
+  },
+  {
+    "code": "W.216",
+    "name": "Cầu vồng",
+    "category": "CẢNH BÁO",
+    "action": "Đoạn cầu vồng dốc gồ ghề hạn chế tầm nhìn",
+    "speed_limit": null,
+    "img_filename": "W_216.png",
+    "page": 1
+  },
+  {
+    "code": "W.217",
+    "name": "Cửa chui",
+    "category": "CẢNH BÁO",
+    "action": "Sắp qua cửa chui hẹp, chú ý chiều cao xe",
+    "speed_limit": null,
+    "img_filename": "W_217.png",
+    "page": 1
+  },
+  {
+    "code": "W.218",
+    "name": "Đường hầm",
+    "category": "CẢNH BÁO",
+    "action": "Sắp vào hầm đường bộ, bật đèn xe",
+    "speed_limit": null,
+    "img_filename": "W_218.png",
+    "page": 1
+  },
+  {
+    "code": "W.238",
+    "name": "Đường cao tốc phía trước",
+    "category": "CẢNH BÁO",
+    "action": "Sắp vào đường cao tốc",
+    "speed_limit": null,
+    "img_filename": "W_238.png",
+    "page": 1
+  },
+  {
+    "code": "W.246",
+    "name": "Ùn tắc giao thông",
+    "category": "CẢNH BÁO",
+    "action": "Đoạn đường thường xuyên ùn tắc",
+    "speed_limit": null,
+    "img_filename": "W_246.png",
+    "page": 1
+  },
+  {
+    "code": "W.222",
+    "name": "Đường trơn",
+    "category": "CẢNH BÁO",
+    "action": "Mặt đường trơn trượt, giảm tốc độ tránh phanh gấp",
+    "speed_limit": null,
+    "img_filename": "W_222.png",
+    "page": 1
+  },
+  {
+    "code": "W.244",
+    "name": "Đoạn đường hay xảy ra tai nạn",
+    "category": "CẢNH BÁO",
+    "action": "Đi chậm và chú ý quan sát đặc biệt",
+    "speed_limit": null,
+    "img_filename": "W_244.png",
+    "page": 1
+  },
+  {
+    "code": "W.230",
+    "name": "Gia súc",
+    "category": "CẢNH BÁO",
+    "action": "Gia súc thường qua đường bất ngờ",
+    "speed_limit": null,
+    "img_filename": "W_230.png",
+    "page": 1
+  },
+  {
+    "code": "W.231",
+    "name": "Gió ngang",
+    "category": "CẢNH BÁO",
+    "action": "Gió thổi ngang mạnh nguy hiểm, giữ vững tay lái",
+    "speed_limit": null,
+    "img_filename": "W_231.png",
+    "page": 1
+  },
+  {
+    "code": "W.232",
+    "name": "Nền đường yếu",
+    "category": "CẢNH BÁO",
+    "action": "Đoạn đường có nền đất yếu dễ sụt lún",
+    "speed_limit": null,
+    "img_filename": "W_232.png",
+    "page": 1
+  },
+  {
+    "code": "W.229",
+    "name": "Sỏi đá bắn lên",
+    "category": "CẢNH BÁO",
+    "action": "Mặt đường rải sỏi đá dăm, giữ cự ly xa xe trước",
+    "speed_limit": null,
+    "img_filename": "W_229.png",
+    "page": 1
+  },
+  {
+    "code": "W.239",
+    "name": "Đường cáp điện ở phía trên",
+    "category": "CẢNH BÁO",
+    "action": "Chú ý tĩnh không đường dây điện cao thế",
+    "speed_limit": null,
+    "img_filename": "W_239.png",
+    "page": 1
+  },
+  {
+    "code": "W.215",
+    "name": "Bến phà",
+    "category": "CẢNH BÁO",
+    "action": "Sắp đến bến phà, đi chậm theo hướng dẫn",
+    "speed_limit": null,
+    "img_filename": "W_215.png",
+    "page": 1
+  },
+  {
+    "code": "W.228",
+    "name": "Đá lở",
+    "category": "CẢNH BÁO",
+    "action": "Nguy cơ đất đá sạt lở từ taluy dương",
+    "speed_limit": null,
+    "img_filename": "W_228.png",
+    "page": 1
+  },
+  {
+    "code": "W.227",
+    "name": "Công trường thi công",
+    "category": "CẢNH BÁO",
+    "action": "Đoạn đường đang sửa chữa hoặc thi công, giảm tốc",
+    "speed_limit": null,
+    "img_filename": "W_227.png",
+    "page": 1
+  },
+  {
+    "code": "W.240",
+    "name": "Lề đường nguy hiểm",
+    "category": "CẢNH BÁO",
+    "action": "Lề đường không ổn định dễ trượt bánh",
+    "speed_limit": null,
+    "img_filename": "W_240.png",
+    "page": 1
+  },
+  {
+    "code": "W.212",
+    "name": "Kè, vực sâu phía trước",
+    "category": "CẢNH BÁO",
+    "action": "Bờ kè hoặc bờ vực phía trước",
+    "speed_limit": null,
+    "img_filename": "W_212.png",
+    "page": 1
+  },
+  {
+    "code": "W.213",
+    "name": "Kè, vực sâu bên trái",
+    "category": "CẢNH BÁO",
+    "action": "Bờ vực hoặc mặt nước bên trái",
+    "speed_limit": null,
+    "img_filename": "W_213.png",
+    "page": 1
+  },
+  {
+    "code": "W.214",
+    "name": "Kè, vực sâu bên phải",
+    "category": "CẢNH BÁO",
+    "action": "Bờ vực hoặc mặt nước bên phải",
+    "speed_limit": null,
+    "img_filename": "W_214.png",
+    "page": 1
+  },
+  {
+    "code": "W.219",
+    "name": "Dốc xuống nguy hiểm",
+    "category": "CẢNH BÁO",
+    "action": "Đoạn dốc xuống sâu nguy hiểm, đi số thấp",
+    "speed_limit": null,
+    "img_filename": "W_219.png",
+    "page": 1
+  },
+  {
+    "code": "W.220",
+    "name": "Dốc lên nguy hiểm",
+    "category": "CẢNH BÁO",
+    "action": "Đoạn dốc lên cao, chú ý không vượt ẩu",
+    "speed_limit": null,
+    "img_filename": "W_220.png",
+    "page": 1
+  },
+  {
+    "code": "W.221b",
+    "name": "Đường có gờ giảm tốc",
+    "category": "CẢNH BÁO",
+    "action": "Mặt đường có gờ giảm tốc, đi chậm lại",
+    "speed_limit": null,
+    "img_filename": "W_221b.png",
+    "page": 1
+  },
+  {
+    "code": "W.221a",
+    "name": "Đường có ổ gà lồi lõm",
+    "category": "CẢNH BÁO",
+    "action": "Mặt đường xấu, lồi lõm nhiều ổ gà",
+    "speed_limit": null,
+    "img_filename": "W_221a.png",
+    "page": 1
+  },
+  {
+    "code": "W.211",
+    "name": "Cầu hẹp",
+    "category": "CẢNH BÁO",
+    "action": "Đoạn cầu hẹp một làn xe",
+    "speed_limit": null,
+    "img_filename": "W_211.png",
+    "page": 1
+  },
+  {
+    "code": "W.211b",
+    "name": "Cầu tạm",
+    "category": "CẢNH BÁO",
+    "action": "Đoạn cầu tạm có tải trọng giới hạn",
+    "speed_limit": null,
+    "img_filename": "W_211b.png",
+    "page": 1
+  },
+  {
+    "code": "W.213b",
+    "name": "Cầu quay - cầu cất",
+    "category": "CẢNH BÁO",
+    "action": "Cầu quay hoặc cầu cất nhịp thông thuyền",
+    "speed_limit": null,
+    "img_filename": "W_213b.png",
+    "page": 1
+  },
+  {
+    "code": "W.201a",
+    "name": "Chỗ ngoặt nguy hiểm vòng bên trái",
+    "category": "CẢNH BÁO",
+    "action": "Đoạn đường cong gấp nguy hiểm về phía bên trái",
+    "speed_limit": null,
+    "img_filename": "W_201a.png",
+    "page": 1
+  },
+  {
+    "code": "W.201b",
+    "name": "Chỗ ngoặt nguy hiểm vòng bên phải",
+    "category": "CẢNH BÁO",
+    "action": "Đoạn đường cong gấp nguy hiểm về phía bên phải",
+    "speed_limit": null,
+    "img_filename": "W_201b.png",
+    "page": 1
+  },
+  {
+    "code": "W.203a",
+    "name": "Đường bị hẹp cả hai bên",
+    "category": "CẢNH BÁO",
+    "action": "Mặt đường bị hẹp đột ngột từ cả hai phía",
+    "speed_limit": null,
+    "img_filename": "W_203a.png",
+    "page": 1
+  },
+  {
+    "code": "W.203b",
+    "name": "Đường bị hẹp về phía trái",
+    "category": "CẢNH BÁO",
+    "action": "Mặt đường bị hẹp đột ngột về phía bên trái",
+    "speed_limit": null,
+    "img_filename": "W_203b.png",
+    "page": 1
+  },
+  {
+    "code": "W.203c",
+    "name": "Đường bị hẹp về phía phải",
+    "category": "CẢNH BÁO",
+    "action": "Mặt đường bị hẹp đột ngột về phía bên phải",
+    "speed_limit": null,
+    "img_filename": "W_203c.png",
+    "page": 1
+  },
+  {
+    "code": "W.202a",
+    "name": "Nhiều chỗ ngoặt nguy hiểm liên tiếp sang trái",
+    "category": "CẢNH BÁO",
+    "action": "Nhiều khúc cua gấp liên tiếp, cua đầu sang trái",
+    "speed_limit": null,
+    "img_filename": "W_202a.png",
+    "page": 1
+  },
+  {
+    "code": "W.202b",
+    "name": "Nhiều chỗ ngoặt nguy hiểm liên tiếp sang phải",
+    "category": "CẢNH BÁO",
+    "action": "Nhiều khúc cua gấp liên tiếp, cua đầu sang phải",
+    "speed_limit": null,
+    "img_filename": "W_202b.png",
+    "page": 1
+  },
+  {
+    "code": "W.206",
+    "name": "Giao nhau chạy theo vòng xuyến",
+    "category": "CẢNH BÁO",
+    "action": "Nơi giao nhau có đảo giao thông vòng xuyến",
+    "speed_limit": null,
+    "img_filename": "W_206.png",
+    "page": 1
+  },
+  {
+    "code": "W.242",
+    "name": "Giao nhau với đường tàu điện",
+    "category": "CẢNH BÁO",
+    "action": "Giao cắt với tuyến tàu điện",
+    "speed_limit": null,
+    "img_filename": "W_242.png",
+    "page": 1
+  },
+  {
+    "code": "W.210",
+    "name": "Giao nhau với đường sắt có rào chắn",
+    "category": "CẢNH BÁO",
+    "action": "Đường sắt giao nhau có rào chắn tự động",
+    "speed_limit": null,
+    "img_filename": "W_210.png",
+    "page": 1
+  },
+  {
+    "code": "W.211a",
+    "name": "Giao nhau với đường sắt không rào chắn",
+    "category": "CẢNH BÁO",
+    "action": "Đường sắt giao nhau không rào chắn, dừng lại quan sát",
+    "speed_limit": null,
+    "img_filename": "W_211a.png",
+    "page": 1
+  },
+  {
+    "code": "W.243a",
+    "name": "Nơi đường sắt giao vuông góc",
+    "category": "CẢNH BÁO",
+    "action": "Nơi đường sắt giao cắt vuông góc với đường bộ",
+    "speed_limit": null,
+    "img_filename": "W_243a.png",
+    "page": 1
+  },
+  {
+    "code": "W.243b",
+    "name": "Nơi đường sắt giao không vuông góc",
+    "category": "CẢNH BÁO",
+    "action": "Nơi đường sắt giao cắt chéo với đường bộ",
+    "speed_limit": null,
+    "img_filename": "W_243b.png",
+    "page": 1
+  },
+  {
+    "code": "R.301a",
+    "name": "Các xe chỉ được đi thẳng",
+    "category": "HIỆU LỆNH",
+    "action": "Các phương tiện chỉ được phép đi thẳng",
+    "speed_limit": null,
+    "img_filename": "R_301a.png",
+    "page": 3
+  },
+  {
+    "code": "R.301b",
+    "name": "Các xe chỉ được rẽ phải",
+    "category": "HIỆU LỆNH",
+    "action": "Các phương tiện chỉ được phép rẽ sang phải",
+    "speed_limit": null,
+    "img_filename": "R_301b.png",
+    "page": 3
+  },
+  {
+    "code": "R.301c",
+    "name": "Các xe chỉ được rẽ trái",
+    "category": "HIỆU LỆNH",
+    "action": "Các phương tiện chỉ được phép rẽ sang trái",
+    "speed_limit": null,
+    "img_filename": "R_301c.png",
+    "page": 3
+  },
+  {
+    "code": "R.301d",
+    "name": "Các xe chỉ được rẽ phải (ngã ba/tư)",
+    "category": "HIỆU LỆNH",
+    "action": "Chỉ được phép rẽ phải ở phạm vi ngã ba, ngã tư",
+    "speed_limit": null,
+    "img_filename": "R_301d.png",
+    "page": 3
+  },
+  {
+    "code": "R.301e",
+    "name": "Các xe chỉ được đi thẳng và rẽ trái",
+    "category": "HIỆU LỆNH",
+    "action": "Chỉ được phép đi thẳng hoặc rẽ trái",
+    "speed_limit": null,
+    "img_filename": "R_301e.png",
+    "page": 3
+  },
+  {
+    "code": "R.301f",
+    "name": "Các xe chỉ được đi thẳng và rẽ phải",
+    "category": "HIỆU LỆNH",
+    "action": "Chỉ được phép đi thẳng hoặc rẽ phải",
+    "speed_limit": null,
+    "img_filename": "R_301f.png",
+    "page": 3
+  },
+  {
+    "code": "R.301h",
+    "name": "Các xe rẽ trái và rẽ phải",
+    "category": "HIỆU LỆNH",
+    "action": "Chỉ được rẽ trái hoặc rẽ phải",
+    "speed_limit": null,
+    "img_filename": "R_301h.png",
+    "page": 3
+  },
+  {
+    "code": "R.302a",
+    "name": "Hướng phải đi vòng sang phải",
+    "category": "HIỆU LỆNH",
+    "action": "Phải đi vòng tránh chướng ngại vật sang bên phải",
+    "speed_limit": null,
+    "img_filename": "R_302a.png",
+    "page": 3
+  },
+  {
+    "code": "R.302b",
+    "name": "Hướng phải đi vòng sang trái",
+    "category": "HIỆU LỆNH",
+    "action": "Phải đi vòng tránh chướng ngại vật sang bên trái",
+    "speed_limit": null,
+    "img_filename": "R_302b.png",
+    "page": 3
+  },
+  {
+    "code": "R.303",
+    "name": "Nơi giao nhau chạy theo vòng xuyến",
+    "category": "HIỆU LỆNH",
+    "action": "Chạy vòng quanh đảo an toàn theo chiều mũi tên",
+    "speed_limit": null,
+    "img_filename": "R_303.png",
+    "page": 3
+  },
+  {
+    "code": "R.304",
+    "name": "Đường dành cho xe thô sơ",
+    "category": "HIỆU LỆNH",
+    "action": "Đoạn đường chỉ dành riêng cho xe thô sơ",
+    "speed_limit": null,
+    "img_filename": "R_304.png",
+    "page": 3
+  },
+  {
+    "code": "R.305",
+    "name": "Đường dành cho người đi bộ",
+    "category": "HIỆU LỆNH",
+    "action": "Đoạn đường chỉ dành riêng cho người đi bộ",
+    "speed_limit": null,
+    "img_filename": "R_305.png",
+    "page": 3
+  },
+  {
+    "code": "R.306",
+    "name": "Tốc độ tối thiểu cho phép",
+    "category": "HIỆU LỆNH",
+    "action": "Chạy với tốc độ lớn hơn hoặc bằng tốc độ ghi trên biển",
+    "speed_limit": 60,
+    "img_filename": "R_306.png",
+    "page": 3
+  },
+  {
+    "code": "R.307",
+    "name": "Hết hạn chế tốc độ tối thiểu",
+    "category": "HIỆU LỆNH",
+    "action": "Hết hiệu lực tốc độ tối thiểu",
+    "speed_limit": null,
+    "img_filename": "R_307.png",
+    "page": 3
+  },
+  {
+    "code": "R.403a",
+    "name": "Đường dành cho ô tô",
+    "category": "HIỆU LỆNH",
+    "action": "Bắt đầu đoạn đường dành riêng cho xe ô tô",
+    "speed_limit": null,
+    "img_filename": "R_403a.png",
+    "page": 3
+  },
+  {
+    "code": "R.403b",
+    "name": "Đường dành cho ô tô và xe máy",
+    "category": "HIỆU LỆNH",
+    "action": "Đoạn đường dành riêng cho ô tô và xe máy",
+    "speed_limit": null,
+    "img_filename": "R_403b.png",
+    "page": 3
+  },
+  {
+    "code": "R.404a",
+    "name": "Hết đoạn đường dành cho ô tô",
+    "category": "HIỆU LỆNH",
+    "action": "Hết đoạn đường dành riêng cho ô tô",
+    "speed_limit": null,
+    "img_filename": "R_404a.png",
+    "page": 3
+  },
+  {
+    "code": "R.404b",
+    "name": "Hết đoạn đường dành cho ô tô và xe máy",
+    "category": "HIỆU LỆNH",
+    "action": "Hết đoạn đường dành riêng cho ô tô và xe máy",
+    "speed_limit": null,
+    "img_filename": "R_404b.png",
+    "page": 3
+  },
+  {
+    "code": "R.411",
+    "name": "Hướng đi trên mỗi làn đường theo vạch kẻ",
+    "category": "HIỆU LỆNH",
+    "action": "Tuân thủ hướng đi quy định trên từng làn đường",
+    "speed_limit": null,
+    "img_filename": "R_411.png",
+    "page": 3
+  },
+  {
+    "code": "R.412a",
+    "name": "Làn đường dành cho ô tô khách",
+    "category": "HIỆU LỆNH",
+    "action": "Làn đường dành riêng cho ô tô khách",
+    "speed_limit": null,
+    "img_filename": "R_412a.png",
+    "page": 3
+  },
+  {
+    "code": "R.412b",
+    "name": "Làn đường dành cho ô tô con",
+    "category": "HIỆU LỆNH",
+    "action": "Làn đường dành riêng cho ô tô con",
+    "speed_limit": null,
+    "img_filename": "R_412b.png",
+    "page": 3
+  },
+  {
+    "code": "R.412c",
+    "name": "Làn đường dành cho ô tô tải",
+    "category": "HIỆU LỆNH",
+    "action": "Làn đường dành riêng cho ô tô tải",
+    "speed_limit": null,
+    "img_filename": "R_412c.png",
+    "page": 3
+  },
+  {
+    "code": "R.412d",
+    "name": "Làn đường dành cho xe máy",
+    "category": "HIỆU LỆNH",
+    "action": "Làn đường dành riêng cho xe máy",
+    "speed_limit": null,
+    "img_filename": "R_412d.png",
+    "page": 3
+  },
+  {
+    "code": "R.415",
+    "name": "Biển gộp làn đường theo phương tiện",
+    "category": "HIỆU LỆNH",
+    "action": "Đi đúng làn đường theo loại phương tiện quy định",
+    "speed_limit": null,
+    "img_filename": "R_415.png",
+    "page": 3
+  },
+  {
+    "code": "R.420",
+    "name": "Bắt đầu khu đông dân cư",
+    "category": "HIỆU LỆNH",
+    "action": "Bắt đầu khu vực đông dân cư, giảm tốc độ",
+    "speed_limit": null,
+    "img_filename": "R_420.png",
+    "page": 3
+  },
+  {
+    "code": "R.421",
+    "name": "Hết khu đông dân cư",
+    "category": "HIỆU LỆNH",
+    "action": "Hết khu vực đông dân cư",
+    "speed_limit": null,
+    "img_filename": "R_421.png",
+    "page": 3
+  },
+  {
+    "code": "I.401",
+    "name": "Bắt đầu đường ưu tiên",
+    "category": "CHỈ DẪN",
+    "action": "Đoạn đường được quyền ưu tiên qua nơi giao nhau",
+    "speed_limit": null,
+    "img_filename": "I_401.png",
+    "page": 3
+  },
+  {
+    "code": "I.402",
+    "name": "Hết đoạn đường ưu tiên",
+    "category": "CHỈ DẪN",
+    "action": "Hết quyền ưu tiên qua nơi giao nhau",
+    "speed_limit": null,
+    "img_filename": "I_402.png",
+    "page": 3
+  },
+  {
+    "code": "I.406",
+    "name": "Được ưu tiên qua đường hẹp",
+    "category": "CHỈ DẪN",
+    "action": "Được quyền ưu tiên qua đoạn đường hẹp",
+    "speed_limit": null,
+    "img_filename": "I_406.png",
+    "page": 3
+  },
+  {
+    "code": "I.407a",
+    "name": "Đường một chiều",
+    "category": "CHỈ DẪN",
+    "action": "Đoạn đường chỉ lưu thông theo một chiều quy định",
+    "speed_limit": null,
+    "img_filename": "I_407a.png",
+    "page": 3
+  },
+  {
+    "code": "I.408a",
+    "name": "Nơi đỗ xe",
+    "category": "CHỈ DẪN",
+    "action": "Khu vực được phép đỗ xe ô tô",
+    "speed_limit": null,
+    "img_filename": "I_408a.png",
+    "page": 3
+  },
+  {
+    "code": "I.408b",
+    "name": "Nơi đỗ xe một phần trên hè phố",
+    "category": "CHỈ DẪN",
+    "action": "Được phép đỗ một phần bánh xe trên hè",
+    "speed_limit": null,
+    "img_filename": "I_408b.png",
+    "page": 3
+  },
+  {
+    "code": "I.409",
+    "name": "Chỗ quay xe",
+    "category": "CHỈ DẪN",
+    "action": "Vị trí được phép quay đầu xe an toàn",
+    "speed_limit": null,
+    "img_filename": "I_409.png",
+    "page": 3
+  },
+  {
+    "code": "I.410",
+    "name": "Khu vực quay xe",
+    "category": "CHỈ DẪN",
+    "action": "Khu vực rộng cho phép các xe quay đầu",
+    "speed_limit": null,
+    "img_filename": "I_410.png",
+    "page": 3
+  },
+  {
+    "code": "S.501",
+    "name": "Phạm vi tác dụng của biển",
+    "category": "BIỂN PHỤ",
+    "action": "Báo chiều dài đoạn đường biển chính có hiệu lực",
+    "speed_limit": null,
+    "img_filename": "S_501.png",
+    "page": 4
+  },
+  {
+    "code": "S.502",
+    "name": "Khoảng cách đến đối tượng báo hiệu",
+    "category": "BIỂN PHỤ",
+    "action": "Báo khoảng cách thực tế từ vị trí đặt biển đến nơi báo hiệu",
+    "speed_limit": null,
+    "img_filename": "S_502.png",
+    "page": 4
+  },
+  {
+    "code": "S.503a",
+    "name": "Hướng tác dụng của biển",
+    "category": "BIỂN PHỤ",
+    "action": "Chỉ hướng tác dụng của biển chính (hai đầu mũi tên)",
+    "speed_limit": null,
+    "img_filename": "S_503a.png",
+    "page": 4
+  },
+  {
+    "code": "S.504",
+    "name": "Làn đường áp dụng",
+    "category": "BIỂN PHỤ",
+    "action": "Chỉ làn đường chịu hiệu lực của biển chính hoặc đèn tín hiệu",
+    "speed_limit": null,
+    "img_filename": "S_504.png",
+    "page": 4
+  },
+  {
+    "code": "S.505",
+    "name": "Loại xe chịu hiệu lực của biển chính",
+    "category": "BIỂN PHỤ",
+    "action": "Chỉ loại xe chịu hiệu lực của biển báo chính",
+    "speed_limit": null,
+    "img_filename": "S_505.png",
+    "page": 4
+  },
+  {
+    "code": "S.506a",
+    "name": "Hướng đường ưu tiên",
+    "category": "BIỂN PHỤ",
+    "action": "Chỉ hướng của đường ưu tiên tại nơi giao nhau",
+    "speed_limit": null,
+    "img_filename": "S_506a.png",
+    "page": 4
+  },
+  {
+    "code": "S.507",
+    "name": "Hướng rẽ",
+    "category": "BIỂN PHỤ",
+    "action": "Báo trước chỗ rẽ nguy hiểm và chỉ hướng rẽ",
+    "speed_limit": null,
+    "img_filename": "S_507.png",
+    "page": 4
+  },
+  {
+    "code": "S.508",
+    "name": "Thời gian hiệu lực",
+    "category": "BIỂN PHỤ",
+    "action": "Thời gian biển chính có hiệu lực trong ngày hoặc trong tuần (ví dụ: 6:00 - 22:00)",
+    "speed_limit": null,
+    "img_filename": "S_508.png",
+    "page": 4
+  },
+  {
+    "code": "S.509",
+    "name": "Thuyết minh biển chính",
+    "category": "BIỂN PHỤ",
+    "action": "Bổ sung nội dung thuyết minh chỉ dẫn cho biển chính",
+    "speed_limit": null,
+    "img_filename": "S_509.png",
+    "page": 4
+  },
+  {
+    "code": "S.509a",
+    "name": "Thuyết minh biển báo",
+    "category": "BIỂN PHỤ",
+    "action": "Giải thích bổ sung cho biển báo chính",
+    "speed_limit": null,
+    "img_filename": "S_509a.png",
+    "page": 4
+  }
+]

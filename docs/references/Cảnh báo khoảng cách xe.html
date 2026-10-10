@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Cảnh báo khoảng cách xe</title>
+<style>
+:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);
+--bg:#eef0f2;--panel:#fff;--text:#14181d;--muted:#5b6672;--line:#d5dbe1;--ok:#16a34a;--warn:#d97706;--bad:#dc2626;--chip:#f3f5f7}
+:root:not([data-theme="light"]){}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0d1014;--panel:#171b21;--text:#e8ecf0;--muted:#8d98a5;--line:#2a313a;--ok:#22c55e;--warn:#f59e0b;--bad:#ef4444;--chip:#1f252d}}
+:root[data-theme="dark"]{--bg:#0d1014;--panel:#171b21;--text:#e8ecf0;--muted:#8d98a5;--line:#2a313a;--ok:#22c55e;--warn:#f59e0b;--bad:#ef4444;--chip:#1f252d}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font:15px/1.45 "Be Vietnam Pro","Segoe UI",system-ui,sans-serif}
+.wrap{max-width:1000px;margin:0 auto;padding:16px;display:grid;grid-template-columns:minmax(0,420px) minmax(0,1fr);gap:16px;align-items:start}
+@media (max-width:760px){.wrap{grid-template-columns:1fr}}
+h1{font-size:18px;margin:0 0 2px;grid-column:1/-1}
+.sub{grid-column:1/-1;color:var(--muted);margin:0 0 4px;font-size:13px}
+.stage{position:relative;border-radius:10px;overflow:hidden;background:#000;aspect-ratio:3/4;border:1px solid var(--line)}
+canvas{display:block;width:100%;height:100%}
+.edge{position:absolute;pointer-events:none;opacity:0;transition:opacity .15s;--c:transparent}
+.edge.l{left:0;top:0;bottom:0;width:24%;background:linear-gradient(90deg,var(--c),transparent)}
+.edge.r{right:0;top:0;bottom:0;width:24%;background:linear-gradient(270deg,var(--c),transparent)}
+.edge.f{left:0;right:0;top:0;height:18%;background:linear-gradient(180deg,var(--c),transparent)}
+.edge.on1{--c:rgba(245,158,11,.7);opacity:1}
+.edge.on2{--c:rgba(239,68,68,.9);opacity:1;animation:p .45s infinite alternate}
+@keyframes p{from{opacity:.35}to{opacity:1}}
+@media (prefers-reduced-motion:reduce){.edge.on2{animation:none}}
+.banner{position:absolute;left:50%;top:12px;transform:translateX(-50%);padding:6px 14px;border-radius:8px;font-weight:700;font-size:14px;color:#fff;white-space:nowrap;display:none}
+.banner.b1{display:block;background:#b45309}.banner.b2{display:block;background:#b91c1c}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:14px;margin-bottom:12px}
+.panel h2{font-size:14px;margin:0 0 10px}
+.zones{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.z{background:var(--chip);border-radius:8px;padding:8px 10px;border-left:5px solid var(--ok)}
+.z.s1{border-color:var(--warn)}.z.s2{border-color:var(--bad)}
+.z b{display:block;font-size:12px;color:var(--muted);font-weight:600}
+.z span{font-size:20px;font-weight:700}
+.row{display:grid;grid-template-columns:1fr auto;gap:4px 10px;align-items:center;margin-bottom:10px;font-size:13px}
+.row input[type=range]{grid-column:1/-1;width:100%}
+.row output{font-weight:700}
+.btns{display:flex;flex-wrap:wrap;gap:8px}
+button,.file{font:inherit;font-size:13px;padding:7px 12px;border-radius:8px;border:1px solid var(--line);background:var(--chip);color:var(--text);cursor:pointer}
+button:focus-visible,input:focus-visible,.file:focus-within{outline:2px solid #3b82f6;outline-offset:2px}
+label.chk{display:flex;gap:6px;align-items:center;font-size:13px;margin:6px 0}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th{text-align:left;color:var(--muted);font-weight:600;padding:4px 6px}
+td{padding:5px 6px;border-top:1px solid var(--line)}
+.dot{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:6px}
+.note{font-size:12px;color:var(--muted)}
+code{background:var(--chip);padding:1px 5px;border-radius:4px;font-size:12px}
+.scroll{overflow-x:auto}
+</style>
+</head>
+<body>
+<div class="wrap">
+<h1>Cảnh báo khoảng cách và vùng trái, trước, phải</h1>
+<p class="sub">Mô phỏng: khoảng cách được ước lượng từ chiều cao khung nhận diện, không phải đọc từ dữ liệu giả.</p>
+
+<div class="stage" id="stage">
+  <canvas id="cv"></canvas>
+  <div class="edge l" id="eL"></div><div class="edge r" id="eR"></div><div class="edge f" id="eF"></div>
+  <div class="banner" id="banner"></div>
+</div>
+
+<div>
+  <div class="panel">
+    <h2>Trạng thái các vùng</h2>
+    <div class="zones">
+      <div class="z" id="zL"><b>Vùng trái</b><span>–</span></div>
+      <div class="z" id="zF"><b>Phía trước</b><span>–</span></div>
+      <div class="z" id="zR"><b>Vùng phải</b><span>–</span></div>
+    </div>
+  </div>
+
+  <div class="panel">
+    <h2>Cài đặt</h2>
+    <div class="row"><label for="sW">Cảnh báo vàng khi gần hơn</label><output id="oW">8 m</output><input id="sW" type="range" min="3" max="20" step="0.5" value="8"></div>
+    <div class="row"><label for="sD">Cảnh báo đỏ khi gần hơn</label><output id="oD">4 m</output><input id="sD" type="range" min="1" max="10" step="0.5" value="4"></div>
+    <div class="row"><label for="sF">Tiêu cự camera (px)</label><output id="oF">520</output><input id="sF" type="range" min="300" max="900" step="10" value="520"></div>
+    <label class="chk"><input type="checkbox" id="cZ" checked> Hiện vùng và vạch khoảng cách</label>
+    <label class="chk"><input type="checkbox" id="cS"> Bật âm báo khi nguy hiểm</label>
+    <div class="btns" style="margin-top:8px">
+      <button id="bP">Tạm dừng</button>
+      <label class="file">Nạp video nền <input id="fV" type="file" accept="video/*" hidden></label>
+      <button id="bC">Về mô phỏng</button>
+    </div>
+  </div>
+
+  <div class="panel">
+    <h2>Phương tiện đang theo dõi</h2>
+    <div class="scroll"><table><thead><tr><th>Loại</th><th>Cự ly</th><th>Vùng</th><th>Tiến gần</th></tr></thead><tbody id="tb"></tbody></table></div>
+  </div>
+
+  <div class="panel note">
+    Công thức: cự ly = tiêu cự × chiều cao thật ÷ chiều cao khung (px). Chiều cao thật lấy theo loại xe (xe máy 1,5 m, ô tô 1,5 m, người 1,7 m, xe tải 3 m).
+    Để dùng với YOLO thật, gọi <code>setDetections([{id,cls,x1,y1,x2,y2}])</code> mỗi khung hình, toạ độ theo canvas 540×720, <code>cls</code> là motorbike, car, person hoặc truck.
+  </div>
+</div>
+</div>
+
+<script>
+const cv=document.getElementById('cv'),ctx=cv.getContext('2d');
+const W=540,H=720,HZ=288,CAMH=1.3,CX=W/2,RH=5.5,F0=520;
+cv.width=W;cv.height=H;
+const S={f:520,warn:8,danger:4,zones:true,sound:false,paused:false,api:false};
+const CLS={motorbike:{h:1.5,w:.8,c:'#fbbf24',vn:'Xe máy'},car:{h:1.5,w:1.8,c:'#60a5fa',vn:'Ô tô'},person:{h:1.7,w:.5,c:'#e5e7eb',vn:'Người'},truck:{h:3,w:2.5,c:'#f472b6',vn:'Xe tải'}};
+const ZN={L:'Trái',F:'Trước',R:'Phải'};
+const ZC={L:'249,115,22',F:'168,85,247',R:'34,197,94'};
+const $=id=>document.getElementById(id);
+let objs=[],nid=1,video=null,dets=[],track={},info=[],zs={L:null,F:null,R:null},lastBeep=0,t0=performance.now(),lastUI=0,phase=0;
+const P=(X,Z)=>[CX+F0*X/Z,HZ+F0*CAMH/Z];
+const R=(a,b)=>a+Math.random()*(b-a);
+
+function spawn(init){
+  const k=Object.keys(CLS),cls=k[Math.random()*k.length|0];
+  objs.push({id:nid++,cls,X:R(-4.8,4.8),Z:init?R(4,28):R(26,34),vZ:cls==='person'?R(-1,1):R(-6,2),vX:R(-.15,.15)});
+}
+for(let i=0;i<7;i++)spawn(true);
+
+function simDets(dt){
+  objs.forEach(o=>{o.X+=o.vX*dt;o.Z+=o.vZ*dt});
+  objs=objs.filter(o=>o.Z>1.8&&o.Z<38&&Math.abs(o.X)<6);
+  while(objs.length<7)spawn(false);
+  return objs.map(o=>{const c=CLS[o.cls],n=1+R(-.03,.03);
+    const yb=HZ+F0*CAMH/o.Z,h=F0*c.h/o.Z*n,w=F0*c.w/o.Z,xc=CX+F0*o.X/o.Z;
+    return{id:o.id,cls:o.cls,x1:xc-w/2,x2:xc+w/2,y1:yb-h,y2:yb}});
+}
+window.setDetections=a=>{S.api=true;dets=a};
+
+function analyze(list,dt){
+  zs={L:null,F:null,R:null};info=[];
+  const top=HZ+F0*CAMH/32,bot=HZ+F0*CAMH/2;
+  list.forEach(d=>{
+    const c=CLS[d.cls]||CLS.car,hpx=d.y2-d.y1;if(hpx<=1)return;
+    const dist=S.f*c.h/hpx,xc=(d.x1+d.x2)/2,hw=RH*(d.y2-HZ)/CAMH,u=(xc-CX)/hw;
+    const inside=d.y2>=top&&d.y2<=bot&&Math.abs(u)<=1.15;
+    const z=u<-.33?'L':u>.33?'R':'F';
+    let tr=track[d.id];if(!tr)tr=track[d.id]={d:dist,v:0};
+    if(dt>0){const v=-(dist-tr.d)/dt;tr.v=tr.v*.9+v*.1;}tr.d=dist;tr.seen=performance.now();
+    const lvl=dist<=S.danger?2:dist<=S.warn?1:0;
+    info.push({...d,c,dist,z,inside,lvl,v:tr.v*3.6});
+    if(inside&&(!zs[z]||dist<zs[z].dist))zs[z]={dist,lvl,cls:d.cls};
+  });
+  for(const k in track)if(performance.now()-track[k].seen>2000)delete track[k];
+}
+
+function drawBg(dt){
+  if(video&&video.readyState>1){
+    const vr=video.videoWidth/video.videoHeight,cr=W/H;let sw,sh,sx,sy;
+    if(vr>cr){sh=video.videoHeight;sw=sh*cr;sx=(video.videoWidth-sw)/2;sy=0}else{sw=video.videoWidth;sh=sw/cr;sx=0;sy=(video.videoHeight-sh)/2}
+    ctx.drawImage(video,sx,sy,sw,sh,0,0,W,H);return;
+  }
+  let g=ctx.createLinearGradient(0,0,0,HZ);g.addColorStop(0,'#1d2a44');g.addColorStop(.7,'#c2703d');g.addColorStop(1,'#f0b562');
+  ctx.fillStyle=g;ctx.fillRect(0,0,W,HZ);
+  ctx.fillStyle='#22262b';ctx.fillRect(0,HZ,W,H-HZ);
+  const e=RH*(H-HZ)/CAMH;
+  ctx.fillStyle='#343a41';ctx.beginPath();ctx.moveTo(CX,HZ);ctx.lineTo(CX-e,H);ctx.lineTo(CX+e,H);ctx.fill();
+  if(!S.paused)phase=(phase+dt*6)%8;
+  ctx.strokeStyle='#e5e7eb';ctx.lineWidth=2;
+  [-1.85,1.85].forEach(X=>{for(let z=2-phase;z<40;z+=8){const a=Math.max(z,1.6),b=Math.max(z+3,1.6);if(z+3<1.6)continue;
+    const p=P(X,a),q=P(X,b);ctx.beginPath();ctx.moveTo(p[0],p[1]);ctx.lineTo(q[0],q[1]);ctx.stroke()}});
+}
+
+function drawZones(){
+  const Zs=2,Ze=32,edges={L:[-RH,-1.85],F:[-1.85,1.85],R:[1.85,RH]};
+  for(const k in edges){
+    const [a,b]=edges[k],pts=[P(a,Ze),P(b,Ze),P(b,Zs),P(a,Zs)],lv=zs[k]?zs[k].lvl:0;
+    ctx.beginPath();pts.forEach((p,i)=>i?ctx.lineTo(p[0],p[1]):ctx.moveTo(p[0],p[1]));ctx.closePath();
+    ctx.fillStyle=lv==2?'rgba(239,68,68,.35)':lv==1?'rgba(245,158,11,.28)':`rgba(${ZC[k]},.14)`;ctx.fill();
+    ctx.strokeStyle=`rgb(${ZC[k]})`;ctx.lineWidth=2;ctx.stroke();
+    ctx.fillStyle=`rgb(${ZC[k]})`;ctx.font='bold 13px sans-serif';ctx.fillText('Vùng '+ZN[k].toLowerCase(),pts[0][0]+4,pts[0][1]-4);
+  }
+  [[S.warn,'#f59e0b'],[S.danger,'#ef4444']].forEach(([d,c])=>{
+    const p=P(-RH,d),q=P(RH,d);ctx.setLineDash([8,6]);ctx.strokeStyle=c;ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(p[0],p[1]);ctx.lineTo(q[0],q[1]);ctx.stroke();ctx.setLineDash([]);
+    ctx.fillStyle=c;ctx.font='bold 12px sans-serif';ctx.fillText(d+' m',W/2-14,p[1]-4);
+  });
+}
+
+function drawBoxes(){
+  info.forEach(o=>{
+    const col=o.lvl==2?'#ef4444':o.lvl==1?'#f59e0b':o.c.c;
+    ctx.strokeStyle=col;ctx.lineWidth=o.lvl?3:2;ctx.strokeRect(o.x1,o.y1,o.x2-o.x1,o.y2-o.y1);
+    const up=o.v>0.5?'↓':o.v<-0.5?'↑':'•';
+    const t=`${o.c.vn} #${o.id} • ${o.dist.toFixed(1)}m ${up}${Math.abs(o.v).toFixed(0)}km/h`;
+    ctx.font='bold 12px sans-serif';const w=ctx.measureText(t).width+10,y=Math.max(o.y1-18,0);
+    ctx.fillStyle='rgba(10,12,16,.85)';ctx.fillRect(o.x1,y,w,18);ctx.fillStyle=col;ctx.fillText(t,o.x1+5,y+13);
+  });
+}
+
+function beep(f){try{const a=beep.a||(beep.a=new AudioContext()),o=a.createOscillator(),g=a.createGain();
+  o.frequency.value=f;g.gain.value=.08;o.connect(g);g.connect(a.destination);o.start();o.stop(a.currentTime+.12)}catch(e){}}
+
+function ui(){
+  const map={L:['zL','eL'],F:['zF','eF'],R:['zR','eR']};let worst=null,wz=null;
+  for(const k in map){const z=zs[k],lv=z?z.lvl:0;
+    $(map[k][0]).className='z'+(lv?' s'+lv:'');$(map[k][0]).querySelector('span').textContent=z?z.dist.toFixed(1)+' m':'An toàn';
+    $(map[k][1]).className='edge '+map[k][1].slice(1).toLowerCase()+(lv?' on'+lv:'');
+    if(z&&lv&&(!worst||z.dist<worst.dist)){worst=z;wz=k}}
+  const b=$('banner');
+  if(worst){b.className='banner b'+worst.lvl;b.textContent=(worst.lvl==2?'NGUY HIỂM: ':'Chú ý: ')+CLS[worst.cls].vn.toLowerCase()+' '+(wz=='F'?'phía trước':wz=='L'?'bên trái':'bên phải')+' '+worst.dist.toFixed(1)+' m'}
+  else b.className='banner';
+  if(S.sound&&worst){const n=performance.now(),gap=worst.lvl==2?350:900;if(n-lastBeep>gap){lastBeep=n;beep(worst.lvl==2?900:520)}}
+  const rows=info.filter(o=>o.inside).sort((a,b)=>a.dist-b.dist).slice(0,8);
+  $('tb').innerHTML=rows.length?rows.map(o=>`<tr><td><span class="dot" style="background:${o.lvl==2?'var(--bad)':o.lvl==1?'var(--warn)':'var(--ok)'}"></span>${o.c.vn} #${o.id}</td><td>${o.dist.toFixed(1)} m</td><td>${ZN[o.z]}</td><td>${o.v>0.5?o.v.toFixed(0)+' km/h':'–'}</td></tr>`).join(''):'<tr><td colspan="4">Chưa có phương tiện trong vùng</td></tr>';
+}
+
+function frame(now){
+  const dt=Math.min((now-t0)/1000,.1);t0=now;
+  if(!S.paused){
+    if(!S.api)dets=simDets(dt);
+    analyze(dets,dt);
+  }
+  drawBg(dt);
+  if(S.zones)drawZones();
+  drawBoxes();
+  if(now-lastUI>120){lastUI=now;ui()}
+  requestAnimationFrame(frame);
+}
+requestAnimationFrame(frame);
+
+[['sW','warn','oW'],['sD','danger','oD'],['sF','f','oF']].forEach(([i,k,o])=>{
+  $(i).oninput=e=>{S[k]=+e.target.value;$(o).textContent=S[k]+(k=='f'?'':' m');
+    if(S.danger>S.warn){S.danger=S.warn;$('sD').value=S.danger;$('oD').textContent=S.danger+' m'}}});
+$('cZ').onchange=e=>S.zones=e.target.checked;
+$('cS').onchange=e=>{S.sound=e.target.checked;if(S.sound)beep(600)};
+$('bP').onclick=e=>{S.paused=!S.paused;if(video)S.paused?video.pause():video.play();e.target.textContent=S.paused?'Tiếp tục':'Tạm dừng'};
+$('fV').onchange=e=>{const f=e.target.files[0];if(!f)return;
+  video=document.createElement('video');video.src=URL.createObjectURL(f);video.muted=true;video.loop=true;video.playsInline=true;video.play();
+  S.api=true;dets=[]};
+$('bC').onclick=()=>{video=null;S.api=false;dets=[];track={}};
+</script>
+</body>
+</html>

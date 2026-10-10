@@ -1,136 +1,215 @@
+'use client';
+
 import React from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { 
-  LayoutDashboard, 
-  MonitorPlay, 
-  Car, 
-  Route, 
-  AlertOctagon, 
-  BarChart3, 
+import {
+  LayoutDashboard,
+  Video,
+  History,
+  AlertTriangle,
   Cpu,
-  Server,
-  Bell,
-  Settings,
-  ChevronLeft
+  ChevronLeft,
+  ChevronRight,
+  type LucideIcon,
 } from 'lucide-react';
 import { useUiStore } from '../../stores/uiStore';
+import { TGSignalLine } from '../ui/TGSignalLine';
+import { TGStatusBadge } from '../ui/TGStatusBadge';
+import { TrafficGuardLogo } from '../ui/TrafficGuardLogo';
 
-const MAIN_NAV = [
-  { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
-  { name: 'Live Monitor', href: '/live', icon: MonitorPlay },
-  { name: 'Simulator', href: '/simulator', icon: Car },
-];
+interface NavItem {
+  name: string;
+  href: string;
+  icon: LucideIcon;
+  badge?: string | number;
+  badgeVariant?: 'safe' | 'warning' | 'critical' | 'info' | 'primary';
+}
 
-const DATA_NAV = [
-  { name: 'Journeys', href: '/journeys', icon: Route },
-  { name: 'Violations', href: '/violations', icon: AlertOctagon },
-  { name: 'Analytics', href: '/analytics', icon: BarChart3 },
-];
-
-const SYSTEM_NAV = [
-  { name: 'AI Engine', href: '/ai-status', icon: Cpu },
-  { name: 'Devices', href: '/devices', icon: Server },
-  { name: 'Notifications', href: '/notifications', icon: Bell },
-  { name: 'Settings', href: '/settings', icon: Settings },
-];
+interface NavSection {
+  title: string;
+  items: NavItem[];
+}
 
 export function AppSidebar() {
   const pathname = usePathname();
   const { isSidebarOpen, toggleSidebar } = useUiStore();
 
-  const renderLinks = (links: typeof MAIN_NAV) => {
-    return links.map((link) => {
-      const isActive = pathname === link.href || pathname?.startsWith(`${link.href}/`);
-      const Icon = link.icon;
-      
-      return (
-        <Link 
-          key={link.href}
-          href={link.href}
-          className={`flex items-center gap-3 px-3 py-2 rounded-xl transition-colors ${
-            isActive 
-              ? 'bg-adas-primary/10 text-adas-primary font-medium' 
-              : 'text-adas-text-secondary hover:text-adas-text-primary hover:bg-adas-surface'
-          }`}
-          title={!isSidebarOpen ? link.name : undefined}
-        >
-          <Icon className={`shrink-0 ${isActive ? 'text-adas-primary' : 'text-adas-text-muted'} ${isSidebarOpen ? 'w-5 h-5' : 'w-6 h-6 mx-auto'}`} />
-          {isSidebarOpen && <span>{link.name}</span>}
-        </Link>
-      );
-    });
+  const sections: NavSection[] = [
+    {
+      title: 'TRỢ LÝ THỜI GIAN THỰC',
+      items: [
+        {
+          name: 'Trợ lý Lái xe (Live AI)',
+          href: '/live',
+          icon: Video,
+          badge: 'AI Live',
+          badgeVariant: 'safe',
+        },
+        {
+          name: 'Bảng điều khiển cá nhân',
+          href: '/dashboard',
+          icon: LayoutDashboard,
+        },
+      ],
+    },
+    {
+      title: 'HỒ SƠ & NHẬT KÝ',
+      items: [
+        {
+          name: 'Nhật ký hành trình',
+          href: '/journeys',
+          icon: History,
+        },
+        {
+          name: 'Cảnh báo an toàn',
+          href: '/violations',
+          icon: AlertTriangle,
+        },
+      ],
+    },
+    {
+      title: 'CÔNG CỤ & CÔNG NGHỆ',
+      items: [
+        {
+          name: '12 Module AI Thị giác',
+          href: '/ai-status',
+          icon: Cpu,
+        },
+      ],
+    },
+  ];
+
+  const isItemActive = (href: string) => {
+    return pathname === href;
   };
 
   return (
-    <aside 
-      className={`fixed top-0 left-0 z-40 h-screen transition-all duration-300 border-r border-adas-border bg-adas-bg flex flex-col ${
-        isSidebarOpen ? 'w-64' : 'w-20'
+    <aside
+      className={`fixed top-0 left-0 z-40 h-screen bg-white border-r border-[#E4E9EF] flex flex-col transition-[width] duration-200 select-none shadow-[1px_0_3px_rgba(16,24,40,0.03)] ${
+        isSidebarOpen ? 'w-60' : 'w-16'
       }`}
     >
-      <div className="flex h-16 items-center justify-between px-4 border-b border-adas-border/50 shrink-0">
-        {isSidebarOpen && (
-          <div className="flex items-center gap-2 font-bold text-lg text-adas-text-primary">
-            <div className="w-8 h-8 rounded-lg bg-adas-primary flex items-center justify-center text-white shrink-0">
-              <Car className="w-5 h-5" />
+      {/* Brand Header */}
+      <div className="h-14 flex items-center justify-between px-3.5 border-b border-[#E4E9EF] shrink-0 bg-white">
+        <div className="flex items-center gap-2.5 overflow-hidden">
+          <TrafficGuardLogo size={28} className="shrink-0" />
+          {isSidebarOpen && (
+            <div className="flex flex-col truncate">
+              <span className="text-xs font-extrabold text-[#16202A] tracking-wider truncate">
+                DRIVING<span className="text-[#175CD3]">ASSISTANT</span>
+              </span>
+              <span className="text-[10px] text-[#175CD3] font-semibold truncate">
+                Trợ lý lái xe cá nhân
+              </span>
             </div>
-            <span className="truncate">Smart ADAS</span>
-          </div>
-        )}
-        {!isSidebarOpen && (
-          <div className="w-8 h-8 mx-auto rounded-lg bg-adas-primary flex items-center justify-center text-white shrink-0">
-            <Car className="w-5 h-5" />
-          </div>
-        )}
-        
+          )}
+        </div>
+
         {isSidebarOpen && (
-          <button 
+          <button
             onClick={toggleSidebar}
-            className="p-1 rounded-lg hover:bg-adas-surface text-adas-text-muted transition-colors"
+            id="sidebar-toggle"
+            aria-label="Thu gọn thanh điều hướng"
+            className="p-1 rounded-[6px] text-[#667085] hover:text-[#16202A] hover:bg-[#F1F4F7] transition-colors cursor-pointer"
           >
-            <ChevronLeft className="w-5 h-5" />
+            <ChevronLeft className="w-4 h-4" />
           </button>
         )}
       </div>
 
-      <div className="flex-1 overflow-y-auto py-4 px-3 flex flex-col gap-6 custom-scrollbar">
-        <div>
-          {isSidebarOpen && <h3 className="px-3 mb-2 text-xs font-semibold text-adas-text-muted uppercase tracking-wider">Main</h3>}
-          <nav className="flex flex-col gap-1">{renderLinks(MAIN_NAV)}</nav>
-        </div>
+      {/* Navigation Sections */}
+      <div className="flex-1 overflow-y-auto px-2 py-3 space-y-4 custom-scrollbar">
+        {sections.map((section, sIdx) => {
+          return (
+            <div key={sIdx} className="space-y-1">
+              {/* Section Header */}
+              {isSidebarOpen ? (
+                <div className="px-3 py-1 text-[10px] font-bold tracking-wider text-[#98A2B3] uppercase">
+                  {section.title}
+                </div>
+              ) : (
+                <div className="my-1 border-t border-[#F1F4F7]" />
+              )}
 
-        <div>
-          {isSidebarOpen && <h3 className="px-3 mb-2 text-xs font-semibold text-adas-text-muted uppercase tracking-wider">Data</h3>}
-          <nav className="flex flex-col gap-1">{renderLinks(DATA_NAV)}</nav>
-        </div>
+              {/* Section Items */}
+              {section.items.map((item) => {
+                const isActive = isItemActive(item.href);
+                const Icon = item.icon;
 
-        <div>
-          {isSidebarOpen && <h3 className="px-3 mb-2 text-xs font-semibold text-adas-text-muted uppercase tracking-wider">System</h3>}
-          <nav className="flex flex-col gap-1">{renderLinks(SYSTEM_NAV)}</nav>
-        </div>
+                return (
+                  <Link
+                    key={item.href}
+                    href={item.href}
+                    title={!isSidebarOpen ? `${section.title}: ${item.name}` : undefined}
+                    className={`relative flex items-center gap-2.5 px-3 py-2 rounded-[8px] text-xs font-semibold transition-all duration-150 group ${
+                      !isSidebarOpen ? 'justify-center px-2' : 'justify-start'
+                    } ${
+                      isActive
+                        ? 'bg-[#EFF4FF] text-[#175CD3] font-bold shadow-[0_1px_2px_rgba(23,92,211,0.06)]'
+                        : 'text-[#667085] hover:text-[#16202A] hover:bg-[#F1F4F7]'
+                    }`}
+                  >
+                    {isActive && (
+                      <span className="absolute left-0 top-1.5 bottom-1.5 w-1 bg-[#175CD3] rounded-r-full" />
+                    )}
+
+                    <Icon
+                      className={`w-4 h-4 shrink-0 transition-transform group-hover:scale-105 ${
+                        isActive ? 'text-[#175CD3]' : 'text-[#667085]'
+                      }`}
+                    />
+
+                    {isSidebarOpen && (
+                      <span className="truncate flex-1">{item.name}</span>
+                    )}
+
+                    {isSidebarOpen && item.badge && (
+                      <TGStatusBadge
+                        variant={item.badgeVariant || 'info'}
+                        size="sm"
+                        showIcon={false}
+                        className="text-[9px] px-1.5 py-0 font-bold ml-auto"
+                      >
+                        {item.badge}
+                      </TGStatusBadge>
+                    )}
+                  </Link>
+                );
+              })}
+            </div>
+          );
+        })}
       </div>
 
-      <div className="p-4 border-t border-adas-border/50 shrink-0">
-        {!isSidebarOpen && (
-           <button 
-             onClick={toggleSidebar}
-             className="w-full py-2 flex justify-center text-adas-text-muted hover:text-adas-text-primary"
-           >
-             <ChevronLeft className="w-6 h-6 rotate-180" />
-           </button>
-        )}
-        {isSidebarOpen && (
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-full bg-adas-surface border border-adas-border flex items-center justify-center">
-              <span className="text-sm font-medium">AD</span>
+      {/* Footer Status */}
+      <div className="p-3 border-t border-[#E4E9EF] shrink-0 bg-[#F8FAFC]">
+        {isSidebarOpen ? (
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-1.5">
+              <TGSignalLine variant="safe" placement="marker" size="sm" />
+              <span className="text-[11px] text-[#667085] font-medium">Bảo vệ cá nhân</span>
             </div>
-            <div className="flex-1 min-w-0">
-              <p className="text-sm font-medium text-adas-text-primary truncate">Admin User</p>
-              <p className="text-xs text-adas-text-muted truncate">admin@adas.local</p>
-            </div>
+            <TGStatusBadge
+              variant="safe"
+              size="sm"
+              showIcon={false}
+              className="text-[9px] font-bold"
+            >
+              Trực tuyến
+            </TGStatusBadge>
           </div>
+        ) : (
+          <button
+            onClick={toggleSidebar}
+            aria-label="Mở rộng thanh điều hướng"
+            className="w-full flex justify-center py-1 text-[#667085] hover:text-[#16202A] cursor-pointer"
+          >
+            <ChevronRight className="w-4 h-4" />
+          </button>
         )}
       </div>
     </aside>
   );
 }
+
