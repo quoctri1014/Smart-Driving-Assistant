@@ -15,7 +15,7 @@
 
 ---
 
-## ⚙️ Bước 0 — Chuẩn bị lần đầu (chỉ làm 1 lần)
+## ⚙️ Bước 0 — Chuẩn bị lần đầu khi mới tải về (chỉ làm 1 lần)
 
 ### 0.1 — Tạo file cấu hình môi trường
 
@@ -24,27 +24,37 @@ copy .env.example .env
 ```
 
 > File `.env` chứa thông tin kết nối database và JWT key.  
-> Nếu chỉ chạy demo AI (không cần đăng nhập hay lưu lịch sử), **bỏ qua bước 0.2**.
+> Nếu chỉ chạy demo AI (không cần đăng nhập hay lưu lịch sử), **bỏ qua bước 0.4**.
 
 ---
 
-### 0.2 — Khởi động database PostgreSQL *(không bắt buộc)*
+### 0.2 — Cài thư viện Python cho Backend & AI
+
+```powershell
+# Tạo môi trường ảo venv và cài đặt các thư viện cần thiết
+python -m venv venv
+.\venv\Scripts\pip install -r requirements.txt
+```
+
+---
+
+### 0.3 — Cài thư viện cho Web Dashboard
+
+```powershell
+cd web-app
+npm install
+cd ..
+```
+
+---
+
+### 0.4 — Khởi động database PostgreSQL *(không bắt buộc)*
 
 > Cần thiết nếu muốn dùng tính năng: Đăng nhập, Lịch sử hành trình, Danh sách vi phạm.
 
 ```powershell
 # Yêu cầu Docker Desktop đang chạy
 docker compose up -d postgres
-```
-
----
-
-### 0.3 — Cài thư viện cho Web Dashboard *(chỉ làm 1 lần)*
-
-```powershell
-cd web-app
-npm install
-cd ..
 ```
 
 ---
