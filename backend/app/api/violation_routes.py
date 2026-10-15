@@ -139,10 +139,10 @@ async def get_violation_detail(
     if not violation:
         raise HTTPException(status_code=404, detail="Không tìm thấy bản ghi sự cố vi phạm")
 
-    # IDOR Check
+    # IDOR Check — dùng company_id (tên thực trong model Violation)
     is_allowed = await can_access_resource(
         user=current_user,
-        resource_company_id=violation.organization_id,
+        resource_company_id=violation.company_id,
         resource_fleet_id=violation.fleet_id,
         resource_driver_id=violation.driver_id,
         db=db
@@ -167,9 +167,31 @@ async def get_violation_detail(
                 "created_at": r.created_at.isoformat() if r.created_at else None
             })
 
+    # Lấy thêm thông tin tài xế, xe để hiển thị trong drawer
+    driver_name = None
+    driver_phone = None
+    vehicle_plate = None
+    fleet_name = None
+    try:
+        from backend.app.models_db.driver import Driver as DriverModel
+        from backend.app.models_db.vehicle import Vehicle
+        from sqlalchemy import select as sa_select
+
+        if violation.driver_id:
+            drv = (await db.execute(sa_select(DriverModel).where(DriverModel.id == violation.driver_id))).scalars().first()
+            if drv:
+                driver_name = drv.full_name
+
+        if violation.vehicle_id:
+            veh = (await db.execute(sa_select(Vehicle).where(Vehicle.id == violation.vehicle_id))).scalars().first()
+            if veh:
+                vehicle_plate = veh.license_plate
+    except Exception:
+        pass
+
     return {
         "id": violation.id,
-        "organization_id": violation.organization_id,
+        "organization_id": violation.company_id,  # Alias để frontend nhất quán
         "fleet_id": violation.fleet_id,
         "driver_id": violation.driver_id,
         "vehicle_id": violation.vehicle_id,
@@ -190,11 +212,16 @@ async def get_violation_detail(
         "detected_at": violation.detected_at.isoformat() if violation.detected_at else None,
         "timestamp": violation.detected_at.isoformat() if violation.detected_at else None,
         "has_evidence": bool(violation.image_path),
+        "image_path": violation.image_path,  # Trả về để frontend biết có ảnh không
         "reviewed_by": violation.reviewed_by,
         "review_notes": violation.review_notes,
         "reviewed_at": violation.reviewed_at.isoformat() if violation.reviewed_at else None,
         "resolved_at": violation.resolved_at.isoformat() if violation.resolved_at else None,
         "version": violation.version,
+        "driver_name": driver_name,
+        "driver_phone": driver_phone,
+        "vehicle_plate": vehicle_plate,
+        "fleet_name": fleet_name,
         "reviews": reviews_list
     }
 

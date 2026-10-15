@@ -23,7 +23,7 @@ import { DetectionCanvas } from '../driving/DetectionCanvas';
 import { DetectionResult, isValidConfirmedPlate } from '../../types/detection';
 
 import { TGButton } from '../ui/TGButton';
-import { ZoneStatus, TrackedVehicle } from '../../hooks/useTrafficDistanceEngine';
+import { ZoneStatus, TrackedVehicle, ActiveZones } from '../../hooks/useTrafficDistanceEngine';
 
 export interface RoadCameraViewportProps {
   videoRef: React.RefObject<HTMLVideoElement | null>;
@@ -49,6 +49,8 @@ export interface RoadCameraViewportProps {
   focalLength?: number;
   showDistanceZones?: boolean;
   trackedVehicles?: TrackedVehicle[];
+  activeZones?: ActiveZones;
+  onToggleZone?: (zone: 'L' | 'F' | 'R') => void;
   onFullscreen?: () => void;
   onUploadClick?: () => void;
   onSelectSample?: (url: string, name: string) => void;
@@ -85,6 +87,8 @@ export const RoadCameraViewport = memo(function RoadCameraViewport({
   focalLength = 520,
   showDistanceZones = true,
   trackedVehicles = [],
+  activeZones = { L: true, F: true, R: true },
+  onToggleZone,
   onFullscreen,
   onUploadClick,
   onSelectSample,
@@ -420,42 +424,49 @@ export const RoadCameraViewport = memo(function RoadCameraViewport({
         zoneFront={zoneFront}
         zoneRight={zoneRight}
         trackedVehicles={trackedVehicles}
+        activeZones={activeZones}
         className="absolute inset-0 pointer-events-none"
       />
 
-      {/* ── PERIPHERAL VISION EDGE GLOW OVERLAYS TRÊN VIDEO (CẢNH BÁO XE ÁP SÁT 2 BÊN & PHÍA TRƯỚC) ── */}
+      {/* ── PERIPHERAL VISION EDGE GLOW OVERLAYS TRÊN VIDEO (CẢNH BÁO XE ÁP SÁT 2 BÊN & PHÍA TRƯỚC - TÔN TRỌNG BẬT/TẮT) ── */}
       {hasMedia && showDistance && isTrafficTab && (
         <>
           {/* Vùng Trái: Cảnh báo xe áp sát bên trái */}
-          <div
-            className={`absolute left-0 top-0 bottom-0 w-[14%] sm:w-[12%] pointer-events-none transition-opacity duration-150 z-20 ${
-              zoneLeft?.lvl === 2
-                ? 'opacity-100 bg-gradient-to-r from-[rgba(239,68,68,0.75)] to-transparent animate-pulse'
-                : zoneLeft?.lvl === 1
-                ? 'opacity-85 bg-gradient-to-r from-[rgba(245,158,11,0.55)] to-transparent'
-                : 'opacity-0'
-            }`}
-          />
+          {activeZones?.L !== false && (
+            <div
+              className={`absolute left-0 top-0 bottom-0 w-[14%] sm:w-[12%] pointer-events-none transition-opacity duration-150 z-20 ${
+                zoneLeft?.lvl === 2
+                  ? 'opacity-100 bg-gradient-to-r from-[rgba(239,68,68,0.75)] to-transparent animate-pulse'
+                  : zoneLeft?.lvl === 1
+                  ? 'opacity-85 bg-gradient-to-r from-[rgba(245,158,11,0.55)] to-transparent'
+                  : 'opacity-0'
+              }`}
+            />
+          )}
           {/* Phía Trước: Cảnh báo xe phía trước quá gần */}
-          <div
-            className={`absolute left-0 right-0 top-0 h-[14%] sm:h-[12%] pointer-events-none transition-opacity duration-150 z-20 ${
-              zoneFront?.lvl === 2
-                ? 'opacity-100 bg-gradient-to-b from-[rgba(239,68,68,0.75)] to-transparent animate-pulse'
-                : zoneFront?.lvl === 1
-                ? 'opacity-85 bg-gradient-to-b from-[rgba(245,158,11,0.55)] to-transparent'
-                : 'opacity-0'
-            }`}
-          />
+          {activeZones?.F !== false && (
+            <div
+              className={`absolute left-0 right-0 top-0 h-[14%] sm:h-[12%] pointer-events-none transition-opacity duration-150 z-20 ${
+                zoneFront?.lvl === 2
+                  ? 'opacity-100 bg-gradient-to-b from-[rgba(239,68,68,0.75)] to-transparent animate-pulse'
+                  : zoneFront?.lvl === 1
+                  ? 'opacity-85 bg-gradient-to-b from-[rgba(245,158,11,0.55)] to-transparent'
+                  : 'opacity-0'
+              }`}
+            />
+          )}
           {/* Vùng Phải: Cảnh báo xe áp sát bên phải */}
-          <div
-            className={`absolute right-0 top-0 bottom-0 w-[14%] sm:w-[12%] pointer-events-none transition-opacity duration-150 z-20 ${
-              zoneRight?.lvl === 2
-                ? 'opacity-100 bg-gradient-to-l from-[rgba(239,68,68,0.75)] to-transparent animate-pulse'
-                : zoneRight?.lvl === 1
-                ? 'opacity-85 bg-gradient-to-l from-[rgba(245,158,11,0.55)] to-transparent'
-                : 'opacity-0'
-            }`}
-          />
+          {activeZones?.R !== false && (
+            <div
+              className={`absolute right-0 top-0 bottom-0 w-[14%] sm:w-[12%] pointer-events-none transition-opacity duration-150 z-20 ${
+                zoneRight?.lvl === 2
+                  ? 'opacity-100 bg-gradient-to-l from-[rgba(239,68,68,0.75)] to-transparent animate-pulse'
+                  : zoneRight?.lvl === 1
+                  ? 'opacity-85 bg-gradient-to-l from-[rgba(245,158,11,0.55)] to-transparent'
+                  : 'opacity-0'
+              }`}
+            />
+          )}
         </>
       )}
 
@@ -507,12 +518,17 @@ export const RoadCameraViewport = memo(function RoadCameraViewport({
               </div>
             </div>
 
-            {/* HÀNG 2: 3 VÙNG CỰ LY ADAS (VÙNG TRÁI • PHÍA TRƯỚC • VÙNG PHẢI) */}
+            {/* HÀNG 2: 3 VÙNG CỰ LY ADAS (VÙNG TRÁI • PHÍA TRƯỚC • VÙNG PHẢI) - HỖ TRỢ CLICK ĐỂ BẬT/TẮT TỪNG PHÍA */}
             <div className="flex items-center gap-1 sm:gap-2">
               {/* 1. VÙNG TRÁI */}
-              <div
-                className={`flex items-center gap-1.5 sm:gap-2 px-2.5 py-1 rounded-[8px] border transition-all ${
-                  zoneLeft?.lvl === 2
+              <button
+                type="button"
+                onClick={() => onToggleZone?.('L')}
+                title={activeZones?.L !== false ? 'Nhấn để TẮT cảnh báo vùng bên trái' : 'Nhấn để BẬT cảnh báo vùng bên trái'}
+                className={`flex items-center gap-1.5 sm:gap-2 px-2.5 py-1 rounded-[8px] border transition-all cursor-pointer text-left ${
+                  activeZones?.L === false
+                    ? 'bg-slate-900/65 border-slate-700/60 text-slate-400 opacity-60 hover:opacity-100 hover:border-slate-500'
+                    : zoneLeft?.lvl === 2
                     ? 'bg-red-950/85 border-red-500 text-red-100 shadow-[0_0_12px_rgba(239,68,68,0.5)] animate-pulse'
                     : zoneLeft?.lvl === 1
                     ? 'bg-amber-950/75 border-amber-500 text-amber-100 shadow-[0_0_8px_rgba(245,158,11,0.3)]'
@@ -521,33 +537,56 @@ export const RoadCameraViewport = memo(function RoadCameraViewport({
               >
                 <span className="text-sm sm:text-base font-bold">⬅</span>
                 <div className="flex flex-col text-left">
-                  <span className="text-[10px] font-bold uppercase tracking-wider text-white/70 leading-tight">
-                    Vùng trái
-                  </span>
-                  <div className="flex items-baseline gap-1 mt-0.5">
-                    <span className="text-xs sm:text-sm font-extrabold font-mono text-white leading-none">
-                      {zoneLeft?.dist ? `${zoneLeft.dist.toFixed(1)}m` : 'An toàn'}
+                  <div className="flex items-center gap-1">
+                    <span className="text-[10px] font-bold uppercase tracking-wider text-white/70 leading-tight">
+                      Vùng trái
                     </span>
-                    {zoneLeft?.lvl === 2 ? (
-                      <span className="text-[9px] font-black px-1 rounded bg-red-600 text-white animate-bounce">
-                        NGUY HIỂM
-                      </span>
-                    ) : zoneLeft?.lvl === 1 ? (
-                      <span className="text-[9px] font-bold px-1 rounded bg-amber-600 text-white">
-                        CHÚ Ý
-                      </span>
-                    ) : null}
+                    <span className={`text-[8px] px-1 rounded font-bold uppercase leading-tight ${
+                      activeZones?.L === false ? 'bg-slate-800 text-slate-400 border border-slate-600' : 'bg-emerald-800/80 text-emerald-200'
+                    }`}>
+                      {activeZones?.L === false ? 'Tắt' : 'Bật'}
+                    </span>
                   </div>
+                  <div className="flex items-baseline gap-1 mt-0.5">
+                    {activeZones?.L === false ? (
+                      <span className="text-[11px] font-medium text-slate-400 italic">Đã tắt</span>
+                    ) : (
+                      <>
+                        <span className="text-xs sm:text-sm font-extrabold font-mono text-white leading-none">
+                          {zoneLeft?.dist ? `${zoneLeft.dist.toFixed(1)}m` : 'An toàn'}
+                        </span>
+                        {zoneLeft?.lvl === 2 ? (
+                          <span className="text-[9px] font-black px-1 rounded bg-red-600 text-white animate-bounce">
+                            NGUY HIỂM
+                          </span>
+                        ) : zoneLeft?.lvl === 1 ? (
+                          <span className="text-[9px] font-bold px-1 rounded bg-amber-600 text-white">
+                            CHÚ Ý
+                          </span>
+                        ) : null}
+                      </>
+                    )}
+                  </div>
+                  {activeZones?.L !== false && zoneLeft?.approachDesc && (
+                    <span className="text-[9px] text-amber-300 font-medium leading-none mt-0.5">
+                      {zoneLeft.approachDesc}
+                    </span>
+                  )}
                 </div>
-              </div>
+              </button>
 
               {/* PHÂN CÁCH TRÁI - TRƯỚC */}
               <div className="w-px h-6 bg-white/20 hidden sm:block" />
 
               {/* 2. PHÍA TRƯỚC */}
-              <div
-                className={`flex items-center gap-2 px-3 py-1 rounded-[8px] border transition-all ${
-                  zoneFront?.lvl === 2
+              <button
+                type="button"
+                onClick={() => onToggleZone?.('F')}
+                title={activeZones?.F !== false ? 'Nhấn để TẮT cảnh báo phía trước xe' : 'Nhấn để BẬT cảnh báo phía trước xe'}
+                className={`flex items-center gap-2 px-3 py-1 rounded-[8px] border transition-all cursor-pointer text-left ${
+                  activeZones?.F === false
+                    ? 'bg-slate-900/65 border-slate-700/60 text-slate-400 opacity-60 hover:opacity-100 hover:border-slate-500'
+                    : zoneFront?.lvl === 2
                     ? 'bg-red-950/90 border-red-500 text-red-50 shadow-[0_0_20px_rgba(239,68,68,0.6)] animate-pulse ring-2 ring-red-500/50'
                     : zoneFront?.lvl === 1
                     ? 'bg-amber-950/80 border-amber-500 text-amber-50 shadow-[0_0_12px_rgba(245,158,11,0.4)]'
@@ -555,40 +594,70 @@ export const RoadCameraViewport = memo(function RoadCameraViewport({
                 }`}
               >
                 <div className="flex flex-col items-center sm:items-start min-w-[95px] sm:min-w-[120px]">
-                  <div className="flex items-center gap-1">
+                  <div className="flex items-center gap-1.5">
                     <span className="text-xs text-white/80">▲</span>
                     <span className="text-[10px] font-extrabold uppercase tracking-wider text-white/80 leading-tight">
                       Phía trước
                     </span>
+                    <span className={`text-[8px] px-1 rounded font-bold uppercase leading-tight ${
+                      activeZones?.F === false ? 'bg-slate-800 text-slate-400 border border-slate-600' : 'bg-emerald-800/80 text-emerald-200'
+                    }`}>
+                      {activeZones?.F === false ? 'Tắt' : 'Bật'}
+                    </span>
                   </div>
                   <div className="flex items-baseline gap-1.5 mt-0.5">
-                    <span className="text-sm sm:text-base font-black font-mono tracking-tight text-white leading-none">
-                      {zoneFront?.dist ? `${zoneFront.dist.toFixed(1)}m` : 'An toàn'}
-                    </span>
-                    {zoneFront?.lvl === 2 ? (
-                      <span className="text-[10px] font-black px-1.5 py-0.5 rounded bg-red-600 text-white animate-bounce shadow-md">
-                        🚨 PHANH GẤP
-                      </span>
-                    ) : zoneFront?.lvl === 1 ? (
-                      <span className="text-[9px] font-bold px-1.5 py-0.5 rounded bg-amber-600 text-white animate-pulse">
-                        ⚠ CẬN AN TOÀN
-                      </span>
+                    {activeZones?.F === false ? (
+                      <span className="text-[11px] font-medium text-slate-400 italic">Đã tắt</span>
                     ) : (
-                      <span className="text-[10px] font-semibold text-emerald-400">
-                        ✓ An toàn
-                      </span>
+                      <>
+                        <span className="text-sm sm:text-base font-black font-mono tracking-tight text-white leading-none">
+                          {zoneFront?.dist ? `${zoneFront.dist.toFixed(1)}m` : 'An toàn'}
+                        </span>
+                        {zoneFront?.lvl === 2 ? (
+                          <span className="text-[10px] font-black px-1.5 py-0.5 rounded bg-red-600 text-white animate-bounce shadow-md">
+                            🚨 PHANH GẤP
+                          </span>
+                        ) : zoneFront?.lvl === 1 ? (
+                          <span className="text-[9px] font-bold px-1.5 py-0.5 rounded bg-amber-600 text-white animate-pulse">
+                            ⚠ CẬN AN TOÀN
+                          </span>
+                        ) : (
+                          <span className="text-[10px] font-semibold text-emerald-400">
+                            ✓ An toàn
+                          </span>
+                        )}
+                      </>
                     )}
                   </div>
+                  {activeZones?.F !== false && (zoneFront?.ttc != null && zoneFront.ttc > 0 || zoneFront?.approachDesc) && (
+                    <div className="flex items-center gap-1 mt-0.5">
+                      {zoneFront.ttc != null && zoneFront.ttc > 0 && zoneFront.ttc <= 5 && (
+                        <span className="text-[9px] font-bold px-1 rounded bg-black/50 text-amber-300 font-mono">
+                          TTC {zoneFront.ttc.toFixed(1)}s
+                        </span>
+                      )}
+                      {zoneFront.approachDesc && (
+                        <span className="text-[9px] text-sky-300 font-medium">
+                          {zoneFront.approachDesc}
+                        </span>
+                      )}
+                    </div>
+                  )}
                 </div>
-              </div>
+              </button>
 
               {/* PHÂN CÁCH TRƯỚC - PHẢI */}
               <div className="w-px h-6 bg-white/20 hidden sm:block" />
 
               {/* 3. VÙNG PHẢI */}
-              <div
-                className={`flex items-center gap-1.5 sm:gap-2 px-2.5 py-1 rounded-[8px] border transition-all ${
-                  zoneRight?.lvl === 2
+              <button
+                type="button"
+                onClick={() => onToggleZone?.('R')}
+                title={activeZones?.R !== false ? 'Nhấn để TẮT cảnh báo vùng bên phải' : 'Nhấn để BẬT cảnh báo vùng bên phải'}
+                className={`flex items-center gap-1.5 sm:gap-2 px-2.5 py-1 rounded-[8px] border transition-all cursor-pointer text-left ${
+                  activeZones?.R === false
+                    ? 'bg-slate-900/65 border-slate-700/60 text-slate-400 opacity-60 hover:opacity-100 hover:border-slate-500'
+                    : zoneRight?.lvl === 2
                     ? 'bg-red-950/85 border-red-500 text-red-100 shadow-[0_0_12px_rgba(239,68,68,0.5)] animate-pulse'
                     : zoneRight?.lvl === 1
                     ? 'bg-amber-950/75 border-amber-500 text-amber-100 shadow-[0_0_8px_rgba(245,158,11,0.3)]'
@@ -596,26 +665,44 @@ export const RoadCameraViewport = memo(function RoadCameraViewport({
                 }`}
               >
                 <div className="flex flex-col text-right">
-                  <span className="text-[10px] font-bold uppercase tracking-wider text-white/70 leading-tight">
-                    Vùng phải
-                  </span>
-                  <div className="flex items-baseline justify-end gap-1 mt-0.5">
-                    {zoneRight?.lvl === 2 ? (
-                      <span className="text-[9px] font-black px-1 rounded bg-red-600 text-white animate-bounce">
-                        NGUY HIỂM
-                      </span>
-                    ) : zoneRight?.lvl === 1 ? (
-                      <span className="text-[9px] font-bold px-1 rounded bg-amber-600 text-white">
-                        CHÚ Ý
-                      </span>
-                    ) : null}
-                    <span className="text-xs sm:text-sm font-extrabold font-mono text-white leading-none">
-                      {zoneRight?.dist ? `${zoneRight.dist.toFixed(1)}m` : 'An toàn'}
+                  <div className="flex items-center justify-end gap-1">
+                    <span className={`text-[8px] px-1 rounded font-bold uppercase leading-tight ${
+                      activeZones?.R === false ? 'bg-slate-800 text-slate-400 border border-slate-600' : 'bg-emerald-800/80 text-emerald-200'
+                    }`}>
+                      {activeZones?.R === false ? 'Tắt' : 'Bật'}
+                    </span>
+                    <span className="text-[10px] font-bold uppercase tracking-wider text-white/70 leading-tight">
+                      Vùng phải
                     </span>
                   </div>
+                  <div className="flex items-baseline justify-end gap-1 mt-0.5">
+                    {activeZones?.R === false ? (
+                      <span className="text-[11px] font-medium text-slate-400 italic">Đã tắt</span>
+                    ) : (
+                      <>
+                        {zoneRight?.lvl === 2 ? (
+                          <span className="text-[9px] font-black px-1 rounded bg-red-600 text-white animate-bounce">
+                            NGUY HIỂM
+                          </span>
+                        ) : zoneRight?.lvl === 1 ? (
+                          <span className="text-[9px] font-bold px-1 rounded bg-amber-600 text-white">
+                            CHÚ Ý
+                          </span>
+                        ) : null}
+                        <span className="text-xs sm:text-sm font-extrabold font-mono text-white leading-none">
+                          {zoneRight?.dist ? `${zoneRight.dist.toFixed(1)}m` : 'An toàn'}
+                        </span>
+                      </>
+                    )}
+                  </div>
+                  {activeZones?.R !== false && zoneRight?.approachDesc && (
+                    <span className="text-[9px] text-amber-300 font-medium leading-none mt-0.5">
+                      {zoneRight.approachDesc}
+                    </span>
+                  )}
                 </div>
                 <span className="text-sm sm:text-base font-bold">➡</span>
-              </div>
+              </button>
             </div>
 
           </div>

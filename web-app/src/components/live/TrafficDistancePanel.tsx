@@ -2,12 +2,15 @@
 
 import React, { useEffect, useRef } from 'react';
 import { Upload, Pause, Play, RefreshCw } from 'lucide-react';
-import { TrackedVehicle, ZoneStatus, LineCrossingStats } from '../../hooks/useTrafficDistanceEngine';
+import { TrackedVehicle, ZoneStatus, LineCrossingStats, ActiveZones, DrivingProfile } from '../../hooks/useTrafficDistanceEngine';
 
 export interface TrafficDistancePanelProps {
   zoneLeft: ZoneStatus;
   zoneFront: ZoneStatus;
   zoneRight: ZoneStatus;
+  activeZones?: ActiveZones;
+  toggleZone?: (zone: 'L' | 'F' | 'R') => void;
+  setAllZones?: (zones: ActiveZones) => void;
   warnThreshold: number;
   setWarnThreshold: (val: number) => void;
   dangerThreshold: number;
@@ -28,6 +31,11 @@ export interface TrafficDistancePanelProps {
   alertBanner?: { text: string; lvl: 1 | 2 } | null;
   lineCrossings?: LineCrossingStats;
   onResetLineCrossings?: () => void;
+  drivingProfile?: DrivingProfile;
+  setDrivingProfile?: (profile: DrivingProfile) => void;
+  dynamicSafeDistance?: number;
+  effectiveWarnDist?: number;
+  effectiveDangerDist?: number;
 }
 
 const CLS_MAP: Record<string, { h: number; w: number; c: string; vn: string }> = {
@@ -42,6 +50,9 @@ export function TrafficDistancePanel({
   zoneLeft,
   zoneFront,
   zoneRight,
+  activeZones = { L: true, F: true, R: true },
+  toggleZone,
+  setAllZones,
   warnThreshold,
   setWarnThreshold,
   dangerThreshold,
@@ -62,6 +73,11 @@ export function TrafficDistancePanel({
   alertBanner,
   lineCrossings,
   onResetLineCrossings,
+  drivingProfile = 'auto',
+  setDrivingProfile,
+  dynamicSafeDistance,
+  effectiveWarnDist,
+  effectiveDangerDist,
 }: TrafficDistancePanelProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const phaseRef = useRef<number>(0);
@@ -69,20 +85,22 @@ export function TrafficDistancePanel({
 
   const sortedRows = [...trackedVehicles].filter((o) => o.inside).sort((a, b) => a.dist - b.dist).slice(0, 8);
 
-  const formatZoneSpan = (z: ZoneStatus) => {
+  const formatZoneSpan = (z: ZoneStatus, isActive: boolean = true) => {
+    if (!isActive || z.disabled) return 'Đã tắt';
     if (!z.dist) return 'An toàn';
     return `${z.dist.toFixed(1)} m`;
   };
 
-  const getZoneBorderColor = (z: ZoneStatus) => {
+  const getZoneBorderColor = (z: ZoneStatus, isActive: boolean = true) => {
+    if (!isActive || z.disabled) return 'border-l-slate-400 text-slate-400 opacity-60';
     if (z.lvl === 2) return 'border-l-[#EF4444] text-[#B42318]';
     if (z.lvl === 1) return 'border-l-[#F59E0B] text-[#B54708]';
     return 'border-l-[#12B76A] text-[#027A48]';
   };
 
-  const edgeLvlL = zoneLeft?.lvl || 0;
-  const edgeLvlF = zoneFront?.lvl || 0;
-  const edgeLvlR = zoneRight?.lvl || 0;
+  const edgeLvlL = (activeZones.L !== false ? zoneLeft?.lvl : 0) || 0;
+  const edgeLvlF = (activeZones.F !== false ? zoneFront?.lvl : 0) || 0;
+  const edgeLvlR = (activeZones.R !== false ? zoneRight?.lvl : 0) || 0;
 
 
 
@@ -154,18 +172,18 @@ export function TrafficDistancePanel({
         }
       });
 
-      // 2. Vẽ 3 Vùng Giám Sát Cự Ly (Vùng trái, Vùng trước, Vùng phải)
+      // 2. Vẽ 3 Vùng Giám Sát Cự Ly (Vùng trái, Vùng trước, Vùng phải - Tôn trọng Bật/Tắt)
       if (showZones) {
         const Zs = 2;
         const Ze = 32;
         const edges = {
-          L: { a: -RH, b: -1.85, name: 'Vùng trái', col: '249, 115, 22', status: zoneLeft },
-          F: { a: -1.85, b: 1.85, name: 'Vùng trước', col: '168, 85, 247', status: zoneFront },
-          R: { a: 1.85, b: RH, name: 'Vùng phải', col: '34, 197, 94', status: zoneRight },
+          L: { a: -RH, b: -1.85, name: 'Vùng trái', col: '249, 115, 22', status: zoneLeft, active: activeZones.L !== false },
+          F: { a: -1.85, b: 1.85, name: 'Vùng trước', col: '168, 85, 247', status: zoneFront, active: activeZones.F !== false },
+          R: { a: 1.85, b: RH, name: 'Vùng phải', col: '34, 197, 94', status: zoneRight, active: activeZones.R !== false },
         };
 
         for (const k of ['L', 'F', 'R'] as const) {
-          const { a, b, name, col, status } = edges[k];
+          const { a, b, name, col, status, active } = edges[k];
           const pts = [P(a, Ze), P(b, Ze), P(b, Zs), P(a, Zs)];
           const lv = status?.lvl || 0;
 
@@ -173,21 +191,34 @@ export function TrafficDistancePanel({
           pts.forEach((p, i) => (i === 0 ? ctx.moveTo(p[0], p[1]) : ctx.lineTo(p[0], p[1])));
           ctx.closePath();
 
-          ctx.fillStyle =
-            lv === 2
-              ? 'rgba(239, 68, 68, 0.35)'
-              : lv === 1
-              ? 'rgba(245, 158, 11, 0.28)'
-              : `rgba(${col}, 0.14)`;
-          ctx.fill();
+          if (!active) {
+            ctx.fillStyle = 'rgba(100, 116, 139, 0.05)';
+            ctx.fill();
+            ctx.setLineDash([6, 6]);
+            ctx.strokeStyle = 'rgba(148, 163, 184, 0.35)';
+            ctx.lineWidth = 1.5;
+            ctx.stroke();
+            ctx.setLineDash([]);
+            ctx.fillStyle = 'rgba(148, 163, 184, 0.55)';
+            ctx.font = 'bold 12px sans-serif';
+            ctx.fillText(`${name} (TẮT)`, pts[0][0] + 4, pts[0][1] - 4);
+          } else {
+            ctx.fillStyle =
+              lv === 2
+                ? 'rgba(239, 68, 68, 0.35)'
+                : lv === 1
+                ? 'rgba(245, 158, 11, 0.28)'
+                : `rgba(${col}, 0.14)`;
+            ctx.fill();
 
-          ctx.strokeStyle = `rgb(${col})`;
-          ctx.lineWidth = 2;
-          ctx.stroke();
+            ctx.strokeStyle = `rgb(${col})`;
+            ctx.lineWidth = 2;
+            ctx.stroke();
 
-          ctx.fillStyle = `rgb(${col})`;
-          ctx.font = 'bold 13px sans-serif';
-          ctx.fillText(name, pts[0][0] + 4, pts[0][1] - 4);
+            ctx.fillStyle = `rgb(${col})`;
+            ctx.font = 'bold 13px sans-serif';
+            ctx.fillText(name, pts[0][0] + 4, pts[0][1] - 4);
+          }
         }
 
         // 3. Vạch kẻ ngang ngưỡng cự ly cảnh báo (Vàng 8m, Đỏ 4m)
@@ -329,43 +360,93 @@ export function TrafficDistancePanel({
       <div className="lg:col-span-7 xl:col-span-7 space-y-3.5">
         {/* CARD 1: TRẠNG THÁI CÁC VÙNG */}
         <div className="bg-white rounded-[10px] border border-[#E4E9EF] p-4 shadow-xs">
-          <h3 className="text-xs font-bold text-[#16202A] mb-3 uppercase tracking-wider">
-            Trạng thái các vùng
-          </h3>
+          <div className="flex items-center justify-between mb-3">
+            <h3 className="text-xs font-bold text-[#16202A] uppercase tracking-wider">
+              Trạng thái các vùng
+            </h3>
+            <span className="text-[11px] text-[#667085]">
+              (Nhấn BẬT/TẮT để kích hoạt hoặc bỏ qua từng vùng)
+            </span>
+          </div>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
             {/* Vùng trái */}
             <div
-              className={`bg-[#F8FAFC] rounded-[8px] p-3 border-l-4 ${getZoneBorderColor(zoneLeft)} border border-r-[#E4E9EF] border-y-[#E4E9EF] transition-colors`}
+              className={`bg-[#F8FAFC] rounded-[8px] p-3 border-l-4 ${getZoneBorderColor(zoneLeft, activeZones.L !== false)} border border-r-[#E4E9EF] border-y-[#E4E9EF] transition-colors`}
             >
-              <span className="block text-[11px] font-semibold text-[#667085] uppercase tracking-wide">
-                Vùng trái
-              </span>
-              <span className="text-xl font-extrabold text-[#16202A] block mt-0.5">
-                {formatZoneSpan(zoneLeft)}
+              <div className="flex items-center justify-between">
+                <span className="block text-[11px] font-semibold text-[#667085] uppercase tracking-wide">
+                  Vùng trái
+                </span>
+                {toggleZone && (
+                  <button
+                    type="button"
+                    onClick={() => toggleZone('L')}
+                    className={`px-1.5 py-0.5 rounded text-[10px] font-bold cursor-pointer transition-colors ${
+                      activeZones.L !== false
+                        ? 'bg-emerald-100 text-emerald-800 hover:bg-emerald-200'
+                        : 'bg-slate-200 text-slate-600 hover:bg-slate-300'
+                    }`}
+                  >
+                    {activeZones.L !== false ? '● BẬT' : '○ TẮT'}
+                  </button>
+                )}
+              </div>
+              <span className="text-xl font-extrabold text-[#16202A] block mt-1">
+                {formatZoneSpan(zoneLeft, activeZones.L !== false)}
               </span>
             </div>
 
             {/* Phía trước */}
             <div
-              className={`bg-[#F8FAFC] rounded-[8px] p-3 border-l-4 ${getZoneBorderColor(zoneFront)} border border-r-[#E4E9EF] border-y-[#E4E9EF] transition-colors`}
+              className={`bg-[#F8FAFC] rounded-[8px] p-3 border-l-4 ${getZoneBorderColor(zoneFront, activeZones.F !== false)} border border-r-[#E4E9EF] border-y-[#E4E9EF] transition-colors`}
             >
-              <span className="block text-[11px] font-semibold text-[#667085] uppercase tracking-wide">
-                Phía trước
-              </span>
-              <span className="text-xl font-extrabold text-[#16202A] block mt-0.5">
-                {formatZoneSpan(zoneFront)}
+              <div className="flex items-center justify-between">
+                <span className="block text-[11px] font-semibold text-[#667085] uppercase tracking-wide">
+                  Phía trước
+                </span>
+                {toggleZone && (
+                  <button
+                    type="button"
+                    onClick={() => toggleZone('F')}
+                    className={`px-1.5 py-0.5 rounded text-[10px] font-bold cursor-pointer transition-colors ${
+                      activeZones.F !== false
+                        ? 'bg-emerald-100 text-emerald-800 hover:bg-emerald-200'
+                        : 'bg-slate-200 text-slate-600 hover:bg-slate-300'
+                    }`}
+                  >
+                    {activeZones.F !== false ? '● BẬT' : '○ TẮT'}
+                  </button>
+                )}
+              </div>
+              <span className="text-xl font-extrabold text-[#16202A] block mt-1">
+                {formatZoneSpan(zoneFront, activeZones.F !== false)}
               </span>
             </div>
 
             {/* Vùng phải */}
             <div
-              className={`bg-[#F8FAFC] rounded-[8px] p-3 border-l-4 ${getZoneBorderColor(zoneRight)} border border-r-[#E4E9EF] border-y-[#E4E9EF] transition-colors`}
+              className={`bg-[#F8FAFC] rounded-[8px] p-3 border-l-4 ${getZoneBorderColor(zoneRight, activeZones.R !== false)} border border-r-[#E4E9EF] border-y-[#E4E9EF] transition-colors`}
             >
-              <span className="block text-[11px] font-semibold text-[#667085] uppercase tracking-wide">
-                Vùng phải
-              </span>
-              <span className="text-xl font-extrabold text-[#16202A] block mt-0.5">
-                {formatZoneSpan(zoneRight)}
+              <div className="flex items-center justify-between">
+                <span className="block text-[11px] font-semibold text-[#667085] uppercase tracking-wide">
+                  Vùng phải
+                </span>
+                {toggleZone && (
+                  <button
+                    type="button"
+                    onClick={() => toggleZone('R')}
+                    className={`px-1.5 py-0.5 rounded text-[10px] font-bold cursor-pointer transition-colors ${
+                      activeZones.R !== false
+                        ? 'bg-emerald-100 text-emerald-800 hover:bg-emerald-200'
+                        : 'bg-slate-200 text-slate-600 hover:bg-slate-300'
+                    }`}
+                  >
+                    {activeZones.R !== false ? '● BẬT' : '○ TẮT'}
+                  </button>
+                )}
+              </div>
+              <span className="text-xl font-extrabold text-[#16202A] block mt-1">
+                {formatZoneSpan(zoneRight, activeZones.R !== false)}
               </span>
             </div>
           </div>
@@ -548,9 +629,82 @@ export function TrafficDistancePanel({
           </div>
         </div>
         <div className="bg-white rounded-[10px] border border-[#E4E9EF] p-4 shadow-xs space-y-3">
-          <h3 className="text-xs font-bold text-[#16202A] uppercase tracking-wider">
-            Cài đặt
-          </h3>
+          <div className="flex items-center justify-between">
+            <h3 className="text-xs font-bold text-[#16202A] uppercase tracking-wider">
+              Cài đặt & Hồ sơ ADAS
+            </h3>
+            {dynamicSafeDistance != null && (
+              <span className="text-[10px] px-2 py-0.5 rounded-full font-mono font-bold bg-[#E0F2FE] text-[#0369A1] border border-[#BAE6FD]">
+                Chuẩn 2s: ~{Math.round(dynamicSafeDistance)}m
+              </span>
+            )}
+          </div>
+
+          {/* Hồ sơ lái thích ứng theo tốc độ xe */}
+          <div className="p-2.5 rounded-lg bg-[#F8FAFC] border border-[#E2E8F0] space-y-2">
+            <div className="flex items-center justify-between">
+              <span className="text-[11px] font-bold text-[#1E293B] uppercase tracking-wide">
+                Chế độ thích ứng cự ly
+              </span>
+              <span className="text-[10px] text-[#64748B]">
+                {drivingProfile === 'urban'
+                  ? '🚗 Đô thị / Phố đông'
+                  : drivingProfile === 'highway'
+                  ? '🛣️ Cao tốc / Đường trường'
+                  : '🔄 Tự động (Theo tốc độ)'}
+              </span>
+            </div>
+
+            <div className="grid grid-cols-3 gap-1.5">
+              <button
+                type="button"
+                onClick={() => setDrivingProfile?.('auto')}
+                className={`px-2 py-1.5 rounded-md text-[11px] font-semibold transition-all cursor-pointer text-center ${
+                  drivingProfile === 'auto'
+                    ? 'bg-[#175CD3] text-white shadow-xs font-bold'
+                    : 'bg-white border border-[#E2E8F0] text-[#475467] hover:bg-slate-50'
+                }`}
+                title="Tự động co giãn cự ly an toàn và ngưỡng cảnh báo theo tốc độ di chuyển thực tế"
+              >
+                🔄 Tự động
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setDrivingProfile?.('urban')}
+                className={`px-2 py-1.5 rounded-md text-[11px] font-semibold transition-all cursor-pointer text-center ${
+                  drivingProfile === 'urban'
+                    ? 'bg-[#175CD3] text-white shadow-xs font-bold'
+                    : 'bg-white border border-[#E2E8F0] text-[#475467] hover:bg-slate-50'
+                }`}
+                title="Đô thị: Chống hú còi khi dừng đèn đỏ/kẹt xe, cự ly bám đuôi ngắn hơn"
+              >
+                🚗 Đô thị
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setDrivingProfile?.('highway')}
+                className={`px-2 py-1.5 rounded-md text-[11px] font-semibold transition-all cursor-pointer text-center ${
+                  drivingProfile === 'highway'
+                    ? 'bg-[#175CD3] text-white shadow-xs font-bold'
+                    : 'bg-white border border-[#E2E8F0] text-[#475467] hover:bg-slate-50'
+                }`}
+                title="Cao tốc: Mở rộng vùng quét lên 35-65m, cảnh báo sớm phanh gấp"
+              >
+                🛣️ Cao tốc
+              </button>
+            </div>
+
+            <div className="flex items-center justify-between text-[10px] text-[#64748B] pt-0.5">
+              <span>Ngưỡng hiệu dụng:</span>
+              <span className="font-mono">
+                Vàng: <strong className="text-[#D97706]">{effectiveWarnDist ? effectiveWarnDist.toFixed(1) : warnThreshold}m</strong>
+                {' • '}
+                Đỏ: <strong className="text-[#DC2626]">{effectiveDangerDist ? effectiveDangerDist.toFixed(1) : dangerThreshold}m</strong>
+              </span>
+            </div>
+          </div>
 
           {/* Slider 1: Cảnh báo vàng */}
           <div className="space-y-1">
@@ -610,8 +764,114 @@ export function TrafficDistancePanel({
             />
           </div>
 
+          {/* Tùy chọn độc lập 3 vùng cảnh báo va chạm (Trái - Trước - Phải) */}
+          <div className="pt-2 border-t border-[#F1F4F7] space-y-2">
+            <div className="flex items-center justify-between">
+              <span className="text-xs font-bold text-[#16202A] uppercase tracking-wide">
+                Bật/Tắt Vùng Cảnh Báo (3 Phía)
+              </span>
+              <span className="text-[11px] text-[#667085]">
+                {Number(activeZones.L !== false) + Number(activeZones.F !== false) + Number(activeZones.R !== false)}/3 vùng đang bật
+              </span>
+            </div>
+
+            {/* 3 Nút bấm độc lập */}
+            <div className="grid grid-cols-3 gap-2">
+              <button
+                type="button"
+                onClick={() => toggleZone?.('L')}
+                className={`flex items-center justify-center gap-1.5 py-1.5 px-2 rounded-lg border text-xs font-semibold transition-all cursor-pointer ${
+                  activeZones.L !== false
+                    ? 'bg-[#EFF8FF] border-[#B2DDFF] text-[#175CD3]'
+                    : 'bg-[#F8FAFC] border-[#E4E9EF] text-[#98A2B3]'
+                }`}
+              >
+                <span>⬅</span>
+                <span>Vùng Trái</span>
+                <span className={`text-[9px] px-1 rounded font-bold ${
+                  activeZones.L !== false ? 'bg-[#175CD3] text-white' : 'bg-gray-200 text-gray-500'
+                }`}>
+                  {activeZones.L !== false ? 'BẬT' : 'TẮT'}
+                </span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => toggleZone?.('F')}
+                className={`flex items-center justify-center gap-1.5 py-1.5 px-2 rounded-lg border text-xs font-semibold transition-all cursor-pointer ${
+                  activeZones.F !== false
+                    ? 'bg-[#EFF8FF] border-[#B2DDFF] text-[#175CD3]'
+                    : 'bg-[#F8FAFC] border-[#E4E9EF] text-[#98A2B3]'
+                }`}
+              >
+                <span>▲</span>
+                <span>Phía Trước</span>
+                <span className={`text-[9px] px-1 rounded font-bold ${
+                  activeZones.F !== false ? 'bg-[#175CD3] text-white' : 'bg-gray-200 text-gray-500'
+                }`}>
+                  {activeZones.F !== false ? 'BẬT' : 'TẮT'}
+                </span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => toggleZone?.('R')}
+                className={`flex items-center justify-center gap-1.5 py-1.5 px-2 rounded-lg border text-xs font-semibold transition-all cursor-pointer ${
+                  activeZones.R !== false
+                    ? 'bg-[#EFF8FF] border-[#B2DDFF] text-[#175CD3]'
+                    : 'bg-[#F8FAFC] border-[#E4E9EF] text-[#98A2B3]'
+                }`}
+              >
+                <span>➡</span>
+                <span>Vùng Phải</span>
+                <span className={`text-[9px] px-1 rounded font-bold ${
+                  activeZones.R !== false ? 'bg-[#175CD3] text-white' : 'bg-gray-200 text-gray-500'
+                }`}>
+                  {activeZones.R !== false ? 'BẬT' : 'TẮT'}
+                </span>
+              </button>
+            </div>
+
+            {/* Nút Preset cấu hình nhanh theo nhu cầu thực tế */}
+            <div className="flex flex-wrap items-center gap-1.5 pt-1 text-[11px]">
+              <span className="text-[#667085] font-medium mr-0.5">Mẫu nhanh:</span>
+              <button
+                type="button"
+                onClick={() => setAllZones?.({ L: false, F: true, R: false })}
+                className="px-2 py-0.5 rounded bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium cursor-pointer transition-colors"
+                title="Chỉ cảnh báo xe phía trước, tắt bên trái và phải"
+              >
+                Chỉ phía trước
+              </button>
+              <button
+                type="button"
+                onClick={() => setAllZones?.({ L: false, F: true, R: true })}
+                className="px-2 py-0.5 rounded bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium cursor-pointer transition-colors"
+                title="Cảnh báo phía trước và bên phải, tắt bên trái"
+              >
+                Trước + Phải
+              </button>
+              <button
+                type="button"
+                onClick={() => setAllZones?.({ L: true, F: true, R: false })}
+                className="px-2 py-0.5 rounded bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium cursor-pointer transition-colors"
+                title="Cảnh báo phía trước và bên trái, tắt bên phải"
+              >
+                Trước + Trái
+              </button>
+              <button
+                type="button"
+                onClick={() => setAllZones?.({ L: true, F: true, R: true })}
+                className="px-2 py-0.5 rounded bg-blue-50 hover:bg-blue-100 text-blue-700 font-semibold cursor-pointer transition-colors"
+                title="Bật cả 3 phía (mặc định)"
+              >
+                Bật cả 3 phía
+              </button>
+            </div>
+          </div>
+
           {/* Checkboxes */}
-          <div className="space-y-1.5 pt-1">
+          <div className="space-y-1.5 pt-2 border-t border-[#F1F4F7]">
             <label className="flex items-center gap-2 text-xs text-[#344054] cursor-pointer">
               <input
                 type="checkbox"
@@ -686,13 +946,15 @@ export function TrafficDistancePanel({
                   <th className="pb-2">Cự ly</th>
                   <th className="pb-2">Vùng</th>
                   <th className="pb-2">Hướng</th>
-                  <th className="pb-2 text-right pr-1">Vận tốc</th>
+                  <th className="pb-2">Vận tốc</th>
+                  <th className="pb-2 text-center">TTC</th>
+                  <th className="pb-2 text-right pr-1">Tiếp cận</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-[#F1F4F7]">
                 {sortedRows.length === 0 ? (
                   <tr>
-                    <td colSpan={5} className="py-4 text-center text-[#98A2B3]">
+                    <td colSpan={7} className="py-4 text-center text-[#98A2B3]">
                       Chưa có phương tiện trong vùng theo dõi
                     </td>
                   </tr>
@@ -727,8 +989,46 @@ export function TrafficDistancePanel({
                             {o.direction === 'IN' ? '⬇ IN' : o.direction === 'OUT' ? '⬆ OUT' : '•'}
                           </span>
                         </td>
-                        <td className="py-2 text-right pr-1 font-mono font-bold text-[#16202A]">
+                        <td className="py-2 font-mono font-bold text-[#16202A]">
                           {Math.round(Math.abs(o.speed))} km/h
+                        </td>
+                        <td className="py-2 text-center">
+                          {o.ttc != null && o.ttc > 0 && o.ttc <= 10 ? (
+                            <span
+                              className={`px-1.5 py-0.5 rounded font-mono text-[10px] font-bold ${
+                                o.ttc <= 1.8
+                                  ? 'bg-red-100 text-red-700 border border-red-300 animate-pulse'
+                                  : o.ttc <= 3.2
+                                  ? 'bg-amber-100 text-amber-700 border border-amber-300'
+                                  : 'bg-emerald-50 text-emerald-700 border border-emerald-200'
+                              }`}
+                            >
+                              {o.ttc.toFixed(1)}s
+                            </span>
+                          ) : (
+                            <span className="text-[#94A3B8] font-mono text-[10px]">—</span>
+                          )}
+                        </td>
+                        <td className="py-2 text-right pr-1">
+                          {o.approachState === 'CUT_IN' ? (
+                            <span className="px-1.5 py-0.5 rounded text-[10px] font-extrabold bg-red-600 text-white animate-bounce">
+                              🚨 TẠT ĐẦU
+                            </span>
+                          ) : o.approachDesc ? (
+                            <span
+                              className={`px-1.5 py-0.5 rounded text-[10px] font-semibold ${
+                                o.approachState === 'CLOSING_IN'
+                                  ? 'bg-rose-50 text-rose-700 border border-rose-200'
+                                  : o.approachState === 'PULLING_AWAY'
+                                  ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
+                                  : 'bg-slate-100 text-slate-600'
+                              }`}
+                            >
+                              {o.approachDesc}
+                            </span>
+                          ) : (
+                            <span className="text-[#94A3B8] text-[10px]">Ổn định</span>
+                          )}
                         </td>
                       </tr>
                     );

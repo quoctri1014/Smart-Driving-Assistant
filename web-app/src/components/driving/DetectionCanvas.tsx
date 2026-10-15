@@ -17,6 +17,7 @@ interface DetectionCanvasProps {
   zoneFront?: any;
   zoneRight?: any;
   trackedVehicles?: any[];
+  activeZones?: { L: boolean; F: boolean; R: boolean };
 }
 
 export function DetectionCanvas({
@@ -35,6 +36,7 @@ export function DetectionCanvas({
   zoneFront,
   zoneRight,
   trackedVehicles = [],
+  activeZones = { L: true, F: true, R: true },
 }: DetectionCanvasProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
@@ -259,12 +261,16 @@ export function DetectionCanvas({
         const zMin = 3.2;
         const zMax = 28.0;
 
-        // Vạch phân vùng làn đường phối cảnh
+        const isLeftOn = activeZones.L !== false;
+        const isFrontOn = activeZones.F !== false;
+        const isRightOn = activeZones.R !== false;
+
+        // Vạch phân vùng làn đường phối cảnh (tự động mờ khi tắt vùng)
         const laneBoundaries = [
-          { X: -3.8, stroke: 'rgba(245, 158, 11, 0.45)', dash: [6, 6] },
-          { X: -1.35, stroke: 'rgba(59, 130, 246, 0.70)', dash: [8, 6] },
-          { X: 1.35, stroke: 'rgba(59, 130, 246, 0.70)', dash: [8, 6] },
-          { X: 3.8, stroke: 'rgba(16, 185, 129, 0.45)', dash: [6, 6] },
+          { X: -3.8, stroke: isLeftOn ? 'rgba(245, 158, 11, 0.45)' : 'rgba(148, 163, 184, 0.15)', dash: [6, 6] },
+          { X: -1.35, stroke: (isLeftOn || isFrontOn) ? 'rgba(59, 130, 246, 0.70)' : 'rgba(148, 163, 184, 0.15)', dash: [8, 6] },
+          { X: 1.35, stroke: (isRightOn || isFrontOn) ? 'rgba(59, 130, 246, 0.70)' : 'rgba(148, 163, 184, 0.15)', dash: [8, 6] },
+          { X: 3.8, stroke: isRightOn ? 'rgba(16, 185, 129, 0.45)' : 'rgba(148, 163, 184, 0.15)', dash: [6, 6] },
         ];
 
         laneBoundaries.forEach((lb) => {
@@ -279,41 +285,41 @@ export function DetectionCanvas({
           ctx.stroke();
         });
 
-        // Vạch cự ly nguy hiểm cắt ngang đường (dangerThreshold)
+        // Vạch cự ly nguy hiểm cắt ngang đường (dangerThreshold) - chỉ sáng khi vùng trước bật
         const dZ = dangerThreshold || 4.0;
         const pRedL = project(-1.35, dZ);
         const pRedR = project(1.35, dZ);
         ctx.setLineDash([]);
-        ctx.strokeStyle = 'rgba(239, 68, 68, 0.90)';
-        ctx.lineWidth = 2.5;
+        ctx.strokeStyle = isFrontOn ? 'rgba(239, 68, 68, 0.90)' : 'rgba(148, 163, 184, 0.25)';
+        ctx.lineWidth = isFrontOn ? 2.5 : 1.5;
         ctx.beginPath();
         ctx.moveTo(pRedL[0], pRedL[1]);
         ctx.lineTo(pRedR[0], pRedR[1]);
         ctx.stroke();
 
         ctx.font = 'bold 10px monospace, Inter';
-        ctx.fillStyle = '#EF4444';
-        ctx.fillText(`🚨 ${dZ}m`, pRedR[0] + 6, pRedR[1] + 3);
+        ctx.fillStyle = isFrontOn ? '#EF4444' : 'rgba(148, 163, 184, 0.4)';
+        ctx.fillText(`${isFrontOn ? '🚨 ' : ''}${dZ}m`, pRedR[0] + 6, pRedR[1] + 3);
 
         // Vạch cự ly cảnh báo cắt ngang đường (warnThreshold)
         const wZ = warnThreshold || 8.5;
         const pWarnL = project(-1.35, wZ);
         const pWarnR = project(1.35, wZ);
-        ctx.strokeStyle = 'rgba(245, 158, 11, 0.80)';
+        ctx.strokeStyle = isFrontOn ? 'rgba(245, 158, 11, 0.80)' : 'rgba(148, 163, 184, 0.20)';
         ctx.lineWidth = 2;
         ctx.beginPath();
         ctx.moveTo(pWarnL[0], pWarnL[1]);
         ctx.lineTo(pWarnR[0], pWarnR[1]);
         ctx.stroke();
 
-        ctx.fillStyle = '#F59E0B';
-        ctx.fillText(`⚠ ${wZ}m`, pWarnR[0] + 6, pWarnR[1] + 3);
+        ctx.fillStyle = isFrontOn ? '#F59E0B' : 'rgba(148, 163, 184, 0.4)';
+        ctx.fillText(`${isFrontOn ? '⚠ ' : ''}${wZ}m`, pWarnR[0] + 6, pWarnR[1] + 3);
 
         // Vạch cự ly an toàn (16m)
         const sZ = 16.0;
         const pSafeL = project(-1.35, sZ);
         const pSafeR = project(1.35, sZ);
-        ctx.strokeStyle = 'rgba(16, 185, 129, 0.65)';
+        ctx.strokeStyle = isFrontOn ? 'rgba(16, 185, 129, 0.65)' : 'rgba(148, 163, 184, 0.20)';
         ctx.lineWidth = 1.5;
         ctx.setLineDash([4, 4]);
         ctx.beginPath();
@@ -321,22 +327,22 @@ export function DetectionCanvas({
         ctx.lineTo(pSafeR[0], pSafeR[1]);
         ctx.stroke();
 
-        ctx.fillStyle = '#10B981';
+        ctx.fillStyle = isFrontOn ? '#10B981' : 'rgba(148, 163, 184, 0.4)';
         ctx.fillText(`✓ 16m`, pSafeR[0] + 6, pSafeR[1] + 3);
 
         // Nhãn tên vùng phối cảnh trên mặt đường
         ctx.font = 'bold 10px Inter, sans-serif';
         const pLeftTag = project(-2.5, 6.5);
-        ctx.fillStyle = 'rgba(245, 158, 11, 0.80)';
-        ctx.fillText('VÙNG TRÁI', pLeftTag[0] - 25, pLeftTag[1]);
+        ctx.fillStyle = isLeftOn ? 'rgba(245, 158, 11, 0.85)' : 'rgba(148, 163, 184, 0.40)';
+        ctx.fillText(isLeftOn ? 'VÙNG TRÁI' : 'TRÁI (TẮT)', pLeftTag[0] - 25, pLeftTag[1]);
 
         const pFrontTag = project(0, 10.5);
-        ctx.fillStyle = 'rgba(59, 130, 246, 0.85)';
-        ctx.fillText('PHÍA TRƯỚC', pFrontTag[0] - 28, pFrontTag[1]);
+        ctx.fillStyle = isFrontOn ? 'rgba(59, 130, 246, 0.90)' : 'rgba(148, 163, 184, 0.40)';
+        ctx.fillText(isFrontOn ? 'PHÍA TRƯỚC' : 'TRƯỚC (TẮT)', pFrontTag[0] - 28, pFrontTag[1]);
 
         const pRightTag = project(2.5, 6.5);
-        ctx.fillStyle = 'rgba(16, 185, 129, 0.80)';
-        ctx.fillText('VÙNG PHẢI', pRightTag[0] - 25, pRightTag[1]);
+        ctx.fillStyle = isRightOn ? 'rgba(16, 185, 129, 0.85)' : 'rgba(148, 163, 184, 0.40)';
+        ctx.fillText(isRightOn ? 'VÙNG PHẢI' : 'PHẢI (TẮT)', pRightTag[0] - 25, pRightTag[1]);
 
         ctx.restore();
       }
@@ -456,15 +462,34 @@ export function DetectionCanvas({
             };
           }
 
+          // Lấy thông tin mở rộng từ Radar Engine (TTC, Cự ly lọc mượt EMA, Tạt đầu)
+          const matchTrk = trackedVehicles?.find((t: any) => t.id === v.id);
+          const effectiveDist = matchTrk?.dist ?? v.distance_m;
+          const trkLvl = matchTrk?.lvl;
+          const ttc = matchTrk?.ttc ?? (v as any).ttc;
+          const approachState = matchTrk?.approachState ?? (v as any).approachState;
+          const approachDesc = matchTrk?.approachDesc ?? (v as any).approachDesc;
+
           // Đổi màu cảnh báo cự ly an toàn (ADAS Collision & Distance Reticle)
-          const isDanger = v.distance_status === 'NGUY_HIEM' || (v.distance_m != null && v.distance_m < 4.5);
-          const isWarning = v.distance_status === 'CHU_Y' || (v.distance_m != null && v.distance_m < 10.0);
+          const isDanger =
+            trkLvl === 2 ||
+            v.distance_status === 'NGUY_HIEM' ||
+            (effectiveDist != null && effectiveDist < 4.5) ||
+            (ttc != null && ttc <= 1.8) ||
+            approachState === 'CUT_IN';
+
+          const isWarning =
+            !isDanger &&
+            (trkLvl === 1 ||
+              v.distance_status === 'CHU_Y' ||
+              (effectiveDist != null && effectiveDist < 10.0) ||
+              (ttc != null && ttc <= 3.2));
 
           if (isDanger) {
             theme = {
               stroke: '#EF4444',
               glow: '#F87171',
-              fill: 'rgba(239, 68, 68, 0.15)',
+              fill: 'rgba(239, 68, 68, 0.18)',
               badgeBg: '#DC2626',
               badgeText: '#FFFFFF',
             };
@@ -472,7 +497,7 @@ export function DetectionCanvas({
             theme = {
               stroke: '#F59E0B',
               glow: '#FBBF24',
-              fill: 'rgba(245, 158, 11, 0.12)',
+              fill: 'rgba(245, 158, 11, 0.15)',
               badgeBg: '#D97706',
               badgeText: '#FFFFFF',
             };
@@ -482,12 +507,17 @@ export function DetectionCanvas({
           const isVideo = !isStaticImage;
 
           const title = v.id ? `${displayLabel} #${v.id}` : displayLabel;
-          // Hiển thị cự ly đo được chuẩn xác
-          const distLabel = v.distance_m != null ? `Cự ly: ${v.distance_m}m` : undefined;
+          // Hiển thị cự ly đo được chuẩn xác (qua bộ lọc mượt nếu có)
+          const distLabel = effectiveDist != null ? `Cự ly: ${effectiveDist.toFixed(1)}m` : undefined;
           // TUYỆT ĐỐI KHÔNG HIỂN THỊ TỐC ĐỘ TRÊN ẢNH TĨNH! Vận tốc chỉ đo trên video/camera thời gian thực.
           const speedLabel = isVideo && v.speed_kmh && v.speed_kmh > 0 ? `${Math.round(v.speed_kmh)} km/h` : undefined;
-          const dirTag = v.direction === 'IN' ? ' • ⬇ IN' : v.direction === 'OUT' ? ' • ⬆ OUT' : '';
-          const subtitle = distLabel && speedLabel ? `${distLabel} • ${speedLabel}${dirTag}` : distLabel ? `${distLabel}${dirTag}` : speedLabel ? `${speedLabel}${dirTag}` : undefined;
+          const dirTag = v.direction === 'IN' ? '⬇ IN' : v.direction === 'OUT' ? '⬆ OUT' : '';
+          const ttcLabel = isVideo && ttc != null && ttc > 0 && ttc <= 6.0 ? `TTC: ${ttc.toFixed(1)}s` : undefined;
+          const cutInLabel = approachState === 'CUT_IN' ? '🚨 TẠT ĐẦU' : undefined;
+          const approachTag = cutInLabel || (isVideo && approachDesc ? approachDesc : undefined);
+
+          const parts = [distLabel, speedLabel, dirTag, ttcLabel, approachTag].filter(Boolean);
+          const subtitle = parts.length > 0 ? parts.join(' • ') : undefined;
 
           // Ở tab 'traffic', TUYỆT ĐỐI KHÔNG hiển thị biển số xe để giữ giao diện tách biệt hoàn toàn!
           const rawPlate = activeTab === 'traffic' ? undefined : ((v as any).plate_text || (v as any).license_plate);
@@ -587,14 +617,14 @@ export function DetectionCanvas({
               };
 
           const subtitle = s.time_window
-            ? `Khung giờ: ${s.time_window}`
+            ? `Giờ cấm: ${s.time_window}`
             : s.speed_limit
             ? `Tối đa ${s.speed_limit} km/h`
             : (s.action_required ? s.action_required.slice(0, 36) : undefined);
 
           drawReticleBox(s.bbox, theme, {
             icon: isAuxiliary ? '⏱️' : isProhibitory ? '⛔' : isWarning ? '⚠️' : isMandatory ? 'ℹ️' : '🛣️',
-            title: isAuxiliary && s.time_window ? `${code} • Giờ cấm: ${s.time_window}` : name,
+            title: isAuxiliary ? `${code} • ${s.name || 'Biển phụ'}` : name,
             subtitle,
           });
         });

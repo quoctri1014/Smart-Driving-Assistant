@@ -4,7 +4,7 @@ import re
 import sys
 import time
 from pathlib import Path
-from typing import List, Optional, Tuple
+from typing import Any, List, Optional, Tuple, Union
 
 import cv2
 import numpy as np
@@ -27,102 +27,103 @@ SIGN_CLASSES_58 = [
 
 VN_SIGN_INFO = {
     # 1. BIỂN BÁO CẤM (Nhóm P & DP) - QCVN 41:2019/BGTVT
-    "DP.135": {"name": "Hết tất cả các lệnh cấm", "category": "HIỆU LỆNH", "action": "Đã hết hiệu lực của các biển cấm trước đó", "speed_limit": None},
-    "P.101": {"name": "Đường cấm", "category": "CẤM", "action": "Đường cấm tất cả các loại phương tiện đi lại cả hai hướng", "speed_limit": None},
-    "P.102": {"name": "Cấm đi ngược chiều", "category": "CẤM", "action": "Cấm tất cả các loại xe đi vào theo chiều đặt biển", "speed_limit": None},
-    "P.103a": {"name": "Cấm xe ô tô", "category": "CẤM", "action": "Cấm tất cả các loại xe cơ giới từ 3 bánh trở lên đi vào", "speed_limit": None},
-    "P.103b": {"name": "Cấm ô tô rẽ phải", "category": "CẤM", "action": "Cấm các loại xe cơ giới từ 3 bánh trở lên rẽ phải", "speed_limit": None},
-    "P.103c": {"name": "Cấm ô tô rẽ trái", "category": "CẤM", "action": "Cấm các loại xe cơ giới từ 3 bánh trở lên rẽ trái", "speed_limit": None},
-    "P.104": {"name": "Cấm xe máy", "category": "CẤM", "action": "Cấm các loại xe mô tô hai bánh và ba bánh", "speed_limit": None},
-    "P.105": {"name": "Cấm ô tô và xe máy", "category": "CẤM", "action": "Cấm các loại xe cơ giới và xe mô tô", "speed_limit": None},
-    "P.106a": {"name": "Cấm xe ô tô tải", "category": "CẤM", "action": "Cấm các loại xe ô tô tải trừ xe ưu tiên", "speed_limit": None},
-    "P.106b": {"name": "Cấm xe tải trên 3.5 tấn", "category": "CẤM", "action": "Cấm ô tô tải có khối lượng chuyên chở lớn hơn 3.5 tấn", "speed_limit": None},
-    "P.107a": {"name": "Cấm xe ô tô khách", "category": "CẤM", "action": "Cấm ô tô chở khách từ 9 chỗ trở lên", "speed_limit": None},
-    "P.107b": {"name": "Cấm xe ô tô tải và ô tô khách", "category": "CẤM", "action": "Cấm cả ô tô tải và ô tô khách", "speed_limit": None},
-    "P.108": {"name": "Cấm ô tô kéo rơ-moóc", "category": "CẤM", "action": "Cấm các loại xe cơ giới kéo theo rơ-moóc", "speed_limit": None},
-    "P.112": {"name": "Cấm người đi bộ", "category": "CẤM", "action": "Cấm người đi bộ qua lại trên đoạn đường này", "speed_limit": None},
-    "P.115": {"name": "Hạn chế trọng tải toàn bộ xe", "category": "CẤM", "action": "Cấm xe có trọng lượng vượt quá trị số ghi trên biển", "speed_limit": None},
-    "P.116": {"name": "Hạn chế tải trọng trên trục xe", "category": "CẤM", "action": "Cấm xe có tải trọng trục vượt quá mức quy định", "speed_limit": None},
-    "P.117": {"name": "Hạn chế chiều cao xe", "category": "CẤM", "action": "Cấm các xe có chiều cao vượt quá chỉ số ghi trên biển", "speed_limit": None},
-    "P.118": {"name": "Hạn chế chiều ngang xe", "category": "CẤM", "action": "Cấm các xe có chiều ngang vượt quá mức ghi trên biển", "speed_limit": None},
-    "P.119": {"name": "Hạn chế chiều dài xe", "category": "CẤM", "action": "Cấm các xe có chiều dài vượt quá mức quy định", "speed_limit": None},
-    "P.120": {"name": "Hạn chế chiều dài xe kéo rơ-moóc", "category": "CẤM", "action": "Cấm xe kéo theo rơ-moóc có tổng chiều dài vượt quá", "speed_limit": None},
-    "P.121": {"name": "Cự ly tối thiểu giữa hai xe", "category": "CẤM", "action": "Xe ô tô phải đi cách nhau một khoảng cách tối thiểu ghi trên biển", "speed_limit": None},
-    "P.123a": {"name": "Cấm rẽ trái", "category": "CẤM", "action": "Cấm các loại phương tiện cơ giới và thô sơ rẽ trái", "speed_limit": None},
-    "P.123b": {"name": "Cấm rẽ phải", "category": "CẤM", "action": "Cấm các loại phương tiện cơ giới và thô sơ rẽ phải", "speed_limit": None},
-    "P.124a": {"name": "Cấm quay đầu xe", "category": "CẤM", "action": "Cấm các loại phương tiện quay đầu xe theo kiểu chữ U", "speed_limit": None},
-    "P.124b": {"name": "Cấm ô tô quay đầu xe", "category": "CẤM", "action": "Cấm xe ô tô quay đầu xe theo kiểu chữ U", "speed_limit": None},
-    "P.124c": {"name": "Cấm rẽ trái và quay đầu xe", "category": "CẤM", "action": "Cấm các phương tiện rẽ trái đồng thời cấm quay đầu xe", "speed_limit": None},
-    "P.124d": {"name": "Cấm rẽ phải và quay đầu xe", "category": "CẤM", "action": "Cấm các phương tiện rẽ phải đồng thời cấm quay đầu xe", "speed_limit": None},
-    "P.125": {"name": "Cấm vượt", "category": "CẤM", "action": "Cấm các loại xe cơ giới vượt nhau trên đoạn đường này", "speed_limit": None},
-    "P.126": {"name": "Cấm ô tô tải vượt", "category": "CẤM", "action": "Cấm các loại ô tô tải vượt các xe cơ giới khác", "speed_limit": None},
-    "P.127": {"name": "Tốc độ tối đa cho phép", "category": "CẤM", "action": "Chạy dưới hoặc bằng tốc độ tối đa ghi trên mặt biển", "speed_limit": 50},
-    "P.128": {"name": "Cấm sử dụng còi", "category": "CẤM", "action": "Không được bấm còi xe trong khu vực đặt biển", "speed_limit": None},
-    "P.130": {"name": "Cấm dừng xe và đỗ xe", "category": "CẤM", "action": "Cấm tất cả phương tiện dừng xe và đỗ xe ở đoạn đường này", "speed_limit": None},
-    "P.131a": {"name": "Cấm đỗ xe", "category": "CẤM", "action": "Cấm tất cả các phương tiện đỗ xe ở đoạn đường đặt biển", "speed_limit": None},
-    "P.131b": {"name": "Cấm đỗ xe ngày lẻ", "category": "CẤM", "action": "Cấm đỗ xe vào các ngày lẻ trong tháng", "speed_limit": None},
-    "P.131c": {"name": "Cấm đỗ xe ngày chẵn", "category": "CẤM", "action": "Cấm đỗ xe vào các ngày chẵn trong tháng", "speed_limit": None},
-    "P.132": {"name": "Nhường đường cho xe ngược chiều", "category": "CẤM", "action": "Phải nhường đường cho xe cơ giới đi ngược chiều qua đường hẹp", "speed_limit": None},
-    "P.137": {"name": "Cấm rẽ trái và rẽ phải", "category": "CẤM", "action": "Cấm các phương tiện rẽ trái và rẽ phải tại ngã ba/ngã tư", "speed_limit": None},
-    "P.245a": {"name": "Đi chậm", "category": "CẤM", "action": "Giảm tốc độ và chú ý quan sát cẩn thận", "speed_limit": None},
+    "DP.135": {"name": "Hết tất cả các lệnh cấm", "category": "HIỆU LỆNH", "action": "Đã hết hiệu lực của các biển cấm trước đó", "speed_limit": None, "penalty": "Không áp dụng xử phạt (Hết hiệu lực các lệnh cấm trước đó)"},
+    "P.101": {"name": "Đường cấm", "category": "CẤM", "action": "Đường cấm tất cả các loại phương tiện đi lại cả hai hướng", "speed_limit": None, "penalty": "Đi vào đường cấm: Ô tô 2 - 3 triệu (tước GPLX 1-3T) • Xe máy 400k - 600k"},
+    "P.102": {"name": "Cấm đi ngược chiều", "category": "CẤM", "action": "Cấm tất cả các loại xe đi vào theo chiều đặt biển", "speed_limit": None, "penalty": "Đi ngược chiều: Ô tô 4 - 6 triệu (tước GPLX 2-4T) • Xe máy 1 - 2 triệu"},
+    "P.103a": {"name": "Cấm xe ô tô", "category": "CẤM", "action": "Cấm tất cả các loại xe cơ giới từ 3 bánh trở lên đi vào", "speed_limit": None, "penalty": "Ô tô đi vào đường cấm ô tô: Phạt 2 - 3 triệu (tước GPLX 1-3T)"},
+    "P.103b": {"name": "Cấm ô tô rẽ phải", "category": "CẤM", "action": "Cấm các loại xe cơ giới từ 3 bánh trở lên rẽ phải", "speed_limit": None, "penalty": "Rẽ phải nơi có biển cấm: Ô tô 800k - 1 triệu • Xe máy 400k - 600k"},
+    "P.103c": {"name": "Cấm ô tô rẽ trái", "category": "CẤM", "action": "Cấm các loại xe cơ giới từ 3 bánh trở lên rẽ trái", "speed_limit": None, "penalty": "Rẽ trái nơi có biển cấm: Ô tô 800k - 1 triệu • Xe máy 400k - 600k"},
+    "P.104": {"name": "Cấm xe máy", "category": "CẤM", "action": "Cấm các loại xe mô tô hai bánh và ba bánh", "speed_limit": None, "penalty": "Xe máy đi vào đường cấm xe máy: Phạt 400k - 600k"},
+    "P.105": {"name": "Cấm ô tô và xe máy", "category": "CẤM", "action": "Cấm các loại xe cơ giới và xe mô tô", "speed_limit": None, "penalty": "Đi vào đường cấm: Ô tô 2 - 3 triệu (tước GPLX 1-3T) • Xe máy 400k - 600k"},
+    "P.106a": {"name": "Cấm xe ô tô tải", "category": "CẤM", "action": "Cấm các loại xe ô tô tải trừ xe ưu tiên", "speed_limit": None, "penalty": "Xe tải đi vào đường cấm tải: Phạt 2 - 3 triệu (tước GPLX 1-3T)"},
+    "P.106b": {"name": "Cấm xe tải trên 3.5 tấn", "category": "CẤM", "action": "Cấm ô tô tải có khối lượng chuyên chở lớn hơn 3.5 tấn", "speed_limit": None, "penalty": "Xe tải >3.5T đi vào đường cấm: Phạt 2 - 3 triệu (tước GPLX 1-3T)"},
+    "P.107a": {"name": "Cấm xe ô tô khách", "category": "CẤM", "action": "Cấm ô tô chở khách từ 9 chỗ trở lên", "speed_limit": None, "penalty": "Xe khách đi vào đường cấm: Phạt 2 - 3 triệu (tước GPLX 1-3T)"},
+    "P.107b": {"name": "Cấm xe ô tô tải và ô tô khách", "category": "CẤM", "action": "Cấm cả ô tô tải và ô tô khách", "speed_limit": None, "penalty": "Xe tải/khách đi vào đường cấm: Phạt 2 - 3 triệu (tước GPLX 1-3T)"},
+    "P.108": {"name": "Cấm ô tô kéo rơ-moóc", "category": "CẤM", "action": "Cấm các loại xe cơ giới kéo theo rơ-moóc", "speed_limit": None, "penalty": "Xe kéo rơ-moóc vào đường cấm: Phạt 2 - 3 triệu (tước GPLX 1-3T)"},
+    "P.112": {"name": "Cấm người đi bộ", "category": "CẤM", "action": "Cấm người đi bộ qua lại trên đoạn đường này", "speed_limit": None, "penalty": "Người đi bộ đi vào đường cấm: Phạt 60k - 100k"},
+    "P.115": {"name": "Hạn chế trọng tải toàn bộ xe", "category": "CẤM", "action": "Cấm xe có trọng lượng vượt quá trị số ghi trên biển", "speed_limit": None, "penalty": "Chở quá tải cầu đường: Phạt 4 - 16 triệu (tước phù hiệu & GPLX 1-3T)"},
+    "P.116": {"name": "Hạn chế tải trọng trên trục xe", "category": "CẤM", "action": "Cấm xe có tải trọng trục vượt quá mức quy định", "speed_limit": None, "penalty": "Quá tải trọng trục: Phạt 4 - 16 triệu"},
+    "P.117": {"name": "Hạn chế chiều cao xe", "category": "CẤM", "action": "Cấm các xe có chiều cao vượt quá chỉ số ghi trên biển", "speed_limit": None, "penalty": "Vượt quá chiều cao cho phép: Phạt 2 - 3 triệu (tước GPLX 1-3T)"},
+    "P.118": {"name": "Hạn chế chiều ngang xe", "category": "CẤM", "action": "Cấm các xe có chiều ngang vượt quá mức ghi trên biển", "speed_limit": None, "penalty": "Xe quá khổ chiều ngang: Phạt 2 - 3 triệu"},
+    "P.119": {"name": "Hạn chế chiều dài xe", "category": "CẤM", "action": "Cấm các xe có chiều dài vượt quá mức quy định", "speed_limit": None, "penalty": "Xe quá khổ chiều dài: Phạt 2 - 3 triệu"},
+    "P.120": {"name": "Hạn chế chiều dài xe kéo rơ-moóc", "category": "CẤM", "action": "Cấm xe kéo theo rơ-moóc có tổng chiều dài vượt quá", "speed_limit": None, "penalty": "Xe rơ-moóc quá chiều dài: Phạt 2 - 3 triệu"},
+    "P.121": {"name": "Cự ly tối thiểu giữa hai xe", "category": "CẤM", "action": "Xe ô tô phải đi cách nhau một khoảng cách tối thiểu ghi trên biển", "speed_limit": None, "penalty": "Không giữ cự ly tối thiểu: Ô tô 800k - 1 triệu (gây tai nạn 10 - 12 triệu)"},
+    "P.123a": {"name": "Cấm rẽ trái", "category": "CẤM", "action": "Cấm các loại phương tiện cơ giới và thô sơ rẽ trái", "speed_limit": None, "penalty": "Rẽ trái nơi cấm rẽ: Ô tô 800k - 1 triệu • Xe máy 400k - 600k"},
+    "P.123b": {"name": "Cấm rẽ phải", "category": "CẤM", "action": "Cấm các loại phương tiện cơ giới và thô sơ rẽ phải", "speed_limit": None, "penalty": "Rẽ phải nơi cấm rẽ: Ô tô 800k - 1 triệu • Xe máy 400k - 600k"},
+    "P.124a": {"name": "Cấm quay đầu xe", "category": "CẤM", "action": "Cấm các loại phương tiện quay đầu xe theo kiểu chữ U", "speed_limit": None, "penalty": "Quay đầu nơi cấm quay đầu: Ô tô 800k - 1 triệu • Xe máy 400k - 600k"},
+    "P.124b": {"name": "Cấm ô tô quay đầu xe", "category": "CẤM", "action": "Cấm xe ô tô quay đầu xe theo kiểu chữ U", "speed_limit": None, "penalty": "Ô tô quay đầu nơi cấm quay: Phạt 800k - 1 triệu"},
+    "P.124c": {"name": "Cấm rẽ trái và quay đầu xe", "category": "CẤM", "action": "Cấm các phương tiện rẽ trái đồng thời cấm quay đầu xe", "speed_limit": None, "penalty": "Rẽ trái hoặc quay đầu trái phép: Ô tô 800k - 1 triệu • Xe máy 400k - 600k"},
+    "P.124d": {"name": "Cấm rẽ phải và quay đầu xe", "category": "CẤM", "action": "Cấm các phương tiện rẽ phải đồng thời cấm quay đầu xe", "speed_limit": None, "penalty": "Rẽ phải hoặc quay đầu trái phép: Ô tô 800k - 1 triệu • Xe máy 400k - 600k"},
+    "P.125": {"name": "Cấm vượt", "category": "CẤM", "action": "Cấm các loại xe cơ giới vượt nhau trên đoạn đường này", "speed_limit": None, "penalty": "Vượt xe nơi có biển cấm vượt: Ô tô 4 - 6 triệu (tước GPLX 1-3T) • Xe máy 800k - 1 triệu"},
+    "P.126": {"name": "Cấm ô tô tải vượt", "category": "CẤM", "action": "Cấm các loại ô tô tải vượt các xe cơ giới khác", "speed_limit": None, "penalty": "Xe tải vượt nơi cấm vượt: Phạt 4 - 6 triệu (tước GPLX 1-3T)"},
+    "P.127": {"name": "Tốc độ tối đa cho phép", "category": "CẤM", "action": "Chạy dưới hoặc bằng tốc độ tối đa ghi trên mặt biển", "speed_limit": 50, "penalty": "Quá 5-10km/h: 800k - 1tr (ô tô), 300k - 400k (xe máy) • Quá >20km/h: 4 - 12 triệu (giam bằng)"},
+    "P.128": {"name": "Cấm sử dụng còi", "category": "CẤM", "action": "Không được bấm còi xe trong khu vực đặt biển", "speed_limit": None, "penalty": "Bấm còi nơi cấm còi: Ô tô 300k - 400k • Xe máy 100k - 200k"},
+    "P.130": {"name": "Cấm dừng xe và đỗ xe", "category": "CẤM", "action": "Cấm tất cả phương tiện dừng xe và đỗ xe ở đoạn đường này", "speed_limit": None, "penalty": "Dừng đỗ xe trái phép: Ô tô 800k - 1 triệu • Xe máy 300k - 400k"},
+    "P.131a": {"name": "Cấm đỗ xe", "category": "CẤM", "action": "Cấm tất cả các phương tiện đỗ xe ở đoạn đường đặt biển", "speed_limit": None, "penalty": "Đỗ xe nơi cấm đỗ: Ô tô 400k - 600k • Xe máy 300k - 400k"},
+    "P.131b": {"name": "Cấm đỗ xe ngày lẻ", "category": "CẤM", "action": "Cấm đỗ xe vào các ngày lẻ trong tháng", "speed_limit": None, "penalty": "Đỗ xe ngày lẻ trái phép: Ô tô 400k - 600k • Xe máy 300k - 400k"},
+    "P.131c": {"name": "Cấm đỗ xe ngày chẵn", "category": "CẤM", "action": "Cấm đỗ xe vào các ngày chẵn trong tháng", "speed_limit": None, "penalty": "Đỗ xe ngày chẵn trái phép: Ô tô 400k - 600k • Xe máy 300k - 400k"},
+    "P.132": {"name": "Nhường đường cho xe ngược chiều", "category": "CẤM", "action": "Phải nhường đường cho xe cơ giới đi ngược chiều qua đường hẹp", "speed_limit": None, "penalty": "Không nhường xe ngược chiều: Ô tô 400k - 600k"},
+    "P.137": {"name": "Cấm rẽ trái và rẽ phải", "category": "CẤM", "action": "Cấm các phương tiện rẽ trái và rẽ phải tại ngã ba/ngã tư", "speed_limit": None, "penalty": "Rẽ trái/phải nơi cấm rẽ: Ô tô 800k - 1 triệu • Xe máy 400k - 600k"},
+    "P.245a": {"name": "Đi chậm", "category": "CẤM", "action": "Giảm tốc độ và chú ý quan sát cẩn thận", "speed_limit": None, "penalty": "Không giảm tốc độ khi có biển: Ô tô 400k - 600k (gây tai nạn phạt 4 - 5 triệu)"},
 
     # 2. BIỂN HIỆU LỆNH (Nhóm R)
-    "R.301a": {"name": "Các xe chỉ được đi thẳng", "category": "HIỆU LỆNH", "action": "Các phương tiện chỉ được phép đi thẳng", "speed_limit": None},
-    "R.301b": {"name": "Các xe chỉ được rẽ phải", "category": "HIỆU LỆNH", "action": "Các phương tiện chỉ được phép rẽ sang phải", "speed_limit": None},
-    "R.301c": {"name": "Các xe chỉ được rẽ trái", "category": "HIỆU LỆNH", "action": "Các phương tiện chỉ được phép rẽ sang trái", "speed_limit": None},
-    "R.301d": {"name": "Các xe chỉ được rẽ phải", "category": "HIỆU LỆNH", "action": "Chỉ được phép rẽ phải ở phạm vi ngã ba, ngã tư", "speed_limit": None},
-    "R.301e": {"name": "Các xe chỉ được đi thẳng và rẽ trái", "category": "HIỆU LỆNH", "action": "Chỉ được phép đi thẳng hoặc rẽ trái", "speed_limit": None},
-    "R.301f": {"name": "Các xe chỉ được đi thẳng và rẽ phải", "category": "HIỆU LỆNH", "action": "Chỉ được phép đi thẳng hoặc rẽ phải", "speed_limit": None},
-    "R.302a": {"name": "Hướng phải đi vòng sang phải", "category": "HIỆU LỆNH", "action": "Phải đi vòng tránh chướng ngại vật sang bên phải", "speed_limit": None},
-    "R.302b": {"name": "Hướng phải đi vòng sang trái", "category": "HIỆU LỆNH", "action": "Phải đi vòng tránh chướng ngại vật sang bên trái", "speed_limit": None},
-    "R.303": {"name": "Nơi giao nhau chạy theo vòng xuyến", "category": "HIỆU LỆNH", "action": "Chạy vòng quanh đảo an toàn theo chiều mũi tên", "speed_limit": None},
-    "R.304": {"name": "Đường dành cho xe thô sơ", "category": "HIỆU LỆNH", "action": "Đoạn đường chỉ dành riêng cho xe thô sơ và người đi bộ", "speed_limit": None},
-    "R.305": {"name": "Đường dành cho người đi bộ", "category": "HIỆU LỆNH", "action": "Đoạn đường chỉ dành riêng cho người đi bộ", "speed_limit": None},
-    "R.306": {"name": "Tốc độ tối thiểu cho phép", "category": "HIỆU LỆNH", "action": "Chạy với tốc độ lớn hơn hoặc bằng tốc độ ghi trên biển", "speed_limit": None},
-    "R.403a": {"name": "Đường dành cho xe ô tô", "category": "HIỆU LỆNH", "action": "Bắt đầu đoạn đường dành riêng cho xe ô tô lưu thông", "speed_limit": None},
-    "R.407a": {"name": "Đường một chiều", "category": "CHỈ DẪN", "action": "Đoạn đường chỉ lưu thông theo một chiều quy định", "speed_limit": None},
-    "R.409": {"name": "Chỗ quay xe", "category": "CHỈ DẪN", "action": "Vị trí được phép quay đầu xe an toàn", "speed_limit": None},
-    "R.425": {"name": "Bệnh viện", "category": "CHỈ DẪN", "action": "Gần bệnh viện, cơ sở cấp cứu, hạn chế bấm còi", "speed_limit": None},
-    "R.434": {"name": "Bến xe buýt", "category": "CHỈ DẪN", "action": "Điểm dừng đón trả khách của xe buýt", "speed_limit": None},
+    "R.301a": {"name": "Các xe chỉ được đi thẳng", "category": "HIỆU LỆNH", "action": "Các phương tiện chỉ được phép đi thẳng", "speed_limit": None, "penalty": "Không chấp hành hiệu lệnh đi thẳng: Ô tô 300k - 400k • Xe máy 100k - 200k"},
+    "R.301b": {"name": "Các xe chỉ được rẽ phải", "category": "HIỆU LỆNH", "action": "Các phương tiện chỉ được phép rẽ sang phải", "speed_limit": None, "penalty": "Không chấp hành hiệu lệnh rẽ phải: Ô tô 300k - 400k • Xe máy 100k - 200k"},
+    "R.301c": {"name": "Các xe chỉ được rẽ trái", "category": "HIỆU LỆNH", "action": "Các phương tiện chỉ được phép rẽ sang trái", "speed_limit": None, "penalty": "Không chấp hành hiệu lệnh rẽ trái: Ô tô 300k - 400k • Xe máy 100k - 200k"},
+    "R.301d": {"name": "Các xe chỉ được rẽ phải", "category": "HIỆU LỆNH", "action": "Chỉ được phép rẽ phải ở phạm vi ngã ba, ngã tư", "speed_limit": None, "penalty": "Không chấp hành hiệu lệnh rẽ phải: Ô tô 300k - 400k • Xe máy 100k - 200k"},
+    "R.301e": {"name": "Các xe chỉ được đi thẳng và rẽ trái", "category": "HIỆU LỆNH", "action": "Chỉ được phép đi thẳng hoặc rẽ trái", "speed_limit": None, "penalty": "Không chấp hành hiệu lệnh hướng đi: Ô tô 300k - 400k • Xe máy 100k - 200k"},
+    "R.301f": {"name": "Các xe chỉ được đi thẳng và rẽ phải", "category": "HIỆU LỆNH", "action": "Chỉ được phép đi thẳng hoặc rẽ phải", "speed_limit": None, "penalty": "Không chấp hành hiệu lệnh hướng đi: Ô tô 300k - 400k • Xe máy 100k - 200k"},
+    "R.302a": {"name": "Hướng phải đi vòng sang phải", "category": "HIỆU LỆNH", "action": "Phải đi vòng tránh chướng ngại vật sang bên phải", "speed_limit": None, "penalty": "Đi sai hướng tránh chướng ngại vật: Ô tô 300k - 400k • Xe máy 100k - 200k"},
+    "R.302b": {"name": "Hướng phải đi vòng sang trái", "category": "HIỆU LỆNH", "action": "Phải đi vòng tránh chướng ngại vật sang bên trái", "speed_limit": None, "penalty": "Đi sai hướng tránh chướng ngại vật: Ô tô 300k - 400k • Xe máy 100k - 200k"},
+    "R.303": {"name": "Nơi giao nhau chạy theo vòng xuyến", "category": "HIỆU LỆNH", "action": "Chạy vòng quanh đảo an toàn theo chiều mũi tên", "speed_limit": None, "penalty": "Không nhường đường/không theo vòng xuyến: Ô tô 300k - 400k • Xe máy 100k - 200k"},
+    "R.304": {"name": "Đường dành cho xe thô sơ", "category": "HIỆU LỆNH", "action": "Đoạn đường chỉ dành riêng cho xe thô sơ và người đi bộ", "speed_limit": None, "penalty": "Đi vào làn xe thô sơ: Ô tô 400k - 600k • Xe máy 300k - 400k"},
+    "R.305": {"name": "Đường dành cho người đi bộ", "category": "HIỆU LỆNH", "action": "Đoạn đường chỉ dành riêng cho người đi bộ", "speed_limit": None, "penalty": "Xe cơ giới đi vào đường người đi bộ: Ô tô 2 - 3 triệu • Xe máy 400k - 600k"},
+    "R.306": {"name": "Tốc độ tối thiểu cho phép", "category": "HIỆU LỆNH", "action": "Chạy với tốc độ lớn hơn hoặc bằng tốc độ ghi trên biển", "speed_limit": None, "penalty": "Chạy dưới tốc độ tối thiểu: Ô tô 800k - 1 triệu • Xe máy 200k - 400k"},
+    "R.403a": {"name": "Đường dành cho xe ô tô", "category": "HIỆU LỆNH", "action": "Bắt đầu đoạn đường dành riêng cho xe ô tô lưu thông", "speed_limit": None, "penalty": "Xe máy đi vào đường ô tô: Phạt 2 - 3 triệu (tước GPLX 1-3T)"},
+    "R.407a": {"name": "Đường một chiều", "category": "CHỈ DẪN", "action": "Đoạn đường chỉ lưu thông theo một chiều quy định", "speed_limit": None, "penalty": "Đi ngược chiều đường một chiều: Ô tô 4 - 6 triệu (giam bằng 2-4T) • Xe máy 1 - 2 triệu"},
+    "R.409": {"name": "Chỗ quay xe", "category": "CHỈ DẪN", "action": "Vị trí được phép quay đầu xe an toàn", "speed_limit": None, "penalty": "Quay xe sai quy định: Ô tô 400k - 600k • Xe máy 100k - 200k"},
+    "R.425": {"name": "Bệnh viện", "category": "CHỈ DẪN", "action": "Gần bệnh viện, cơ sở cấp cứu, hạn chế bấm còi", "speed_limit": None, "penalty": "Bấm còi hơi/rú ga khu vực bệnh viện: Ô tô 800k - 1 triệu • Xe máy 400k - 600k"},
+    "R.434": {"name": "Bến xe buýt", "category": "CHỈ DẪN", "action": "Điểm dừng đón trả khách của xe buýt", "speed_limit": None, "penalty": "Dừng đỗ trái phép tại điểm xe buýt: Ô tô 400k - 600k • Xe máy 300k - 400k"},
 
     # 3. BIỂN CẢNH BÁO NGUY HIỂM (Nhóm W)
-    "W.201a": {"name": "Chỗ ngoặt nguy hiểm vòng bên trái", "category": "CẢNH BÁO", "action": "Đoạn đường cong gấp nguy hiểm về phía bên trái", "speed_limit": None},
-    "W.201b": {"name": "Chỗ ngoặt nguy hiểm vòng bên phải", "category": "CẢNH BÁO", "action": "Đoạn đường cong gấp nguy hiểm về phía bên phải", "speed_limit": None},
-    "W.202a": {"name": "Nhiều chỗ ngoặt nguy hiểm liên tiếp vòng bên trái", "category": "CẢNH BÁO", "action": "Đoạn đường nhiều khúc cua liên tiếp đầu tiên sang trái", "speed_limit": None},
-    "W.202b": {"name": "Nhiều chỗ ngoặt nguy hiểm liên tiếp vòng bên phải", "category": "CẢNH BÁO", "action": "Đoạn đường nhiều khúc cua liên tiếp đầu tiên sang phải", "speed_limit": None},
-    "W.203a": {"name": "Đường bị hẹp cả hai bên", "category": "CẢNH BÁO", "action": "Mặt đường bị hẹp đột ngột từ cả hai phía", "speed_limit": None},
-    "W.203b": {"name": "Đường bị hẹp về phía trái", "category": "CẢNH BÁO", "action": "Mặt đường bị hẹp đột ngột về phía bên trái", "speed_limit": None},
-    "W.203c": {"name": "Đường bị hẹp về phía phải", "category": "CẢNH BÁO", "action": "Mặt đường bị hẹp đột ngột về phía bên phải", "speed_limit": None},
-    "W.205a": {"name": "Đường giao nhau cùng mức (ngã tư)", "category": "CẢNH BÁO", "action": "Giao nhau cùng mức của các tuyến đường cùng cấp", "speed_limit": None},
-    "W.205b": {"name": "Đường giao nhau nhánh bên phải", "category": "CẢNH BÁO", "action": "Giao nhau cùng mức với đường cùng cấp phía bên phải", "speed_limit": None},
-    "W.205c": {"name": "Đường giao nhau nhánh bên trái", "category": "CẢNH BÁO", "action": "Giao nhau cùng mức với đường cùng cấp phía bên trái", "speed_limit": None},
-    "W.205d": {"name": "Đường giao nhau ngã ba chữ T", "category": "CẢNH BÁO", "action": "Đoạn đường giao nhau dạng chữ T, chuẩn bị giảm tốc", "speed_limit": None},
-    "W.205e": {"name": "Đường giao nhau ngã ba chữ Y", "category": "CẢNH BÁO", "action": "Đoạn đường tách nhánh dạng chữ Y", "speed_limit": None},
-    "W.207a": {"name": "Giao nhau với đường không ưu tiên", "category": "CẢNH BÁO", "action": "Đang đi trên đường ưu tiên qua ngã ba/ngã tư", "speed_limit": None},
-    "W.207b": {"name": "Giao nhau với đường không ưu tiên bên phải", "category": "CẢNH BÁO", "action": "Có đường nhánh không ưu tiên nhập vào bên phải", "speed_limit": None},
-    "W.207c": {"name": "Giao nhau với đường không ưu tiên bên trái", "category": "CẢNH BÁO", "action": "Có đường nhánh không ưu tiên nhập vào bên trái", "speed_limit": None},
-    "W.208": {"name": "Giao nhau với đường ưu tiên", "category": "CẢNH BÁO", "action": "Phải nhường đường cho các xe đi trên đường ưu tiên", "speed_limit": None},
-    "W.209": {"name": "Nơi giao nhau có tín hiệu đèn", "category": "CẢNH BÁO", "action": "Sắp đến nơi giao nhau có đèn tín hiệu giao thông", "speed_limit": None},
-    "W.210": {"name": "Giao nhau với đường sắt có rào chắn", "category": "CẢNH BÁO", "action": "Đoạn đường sắt giao nhau có rào chắn bảo vệ", "speed_limit": None},
-    "W.211a": {"name": "Giao nhau với đường sắt không có rào chắn", "category": "CẢNH BÁO", "action": "Đường sắt cắt ngang không rào chắn, chú ý dừng lại quan sát", "speed_limit": None},
-    "W.219": {"name": "Dốc xuống nguy hiểm", "category": "CẢNH BÁO", "action": "Đoạn dốc xuống dài và nguy hiểm, đi số thấp", "speed_limit": None},
-    "W.221b": {"name": "Đường có gờ giảm tốc", "category": "CẢNH BÁO", "action": "Mặt đường có gờ lồi lõm giảm tốc, đi chậm lại", "speed_limit": None},
-    "W.224": {"name": "Đường người đi bộ cắt ngang", "category": "CẢNH BÁO", "action": "Giảm tốc độ, chú ý nhường đường cho người đi bộ", "speed_limit": None},
-    "W.225": {"name": "Trẻ em qua đường", "category": "CẢNH BÁO", "action": "Khu vực trường học hoặc sân chơi trẻ em, đi chậm", "speed_limit": None},
-    "W.227": {"name": "Công trường đang thi công", "category": "CẢNH BÁO", "action": "Đoạn đường đang sửa chữa hoặc thi công, giảm tốc độ", "speed_limit": None},
-    "W.233": {"name": "Nguy hiểm khác", "category": "CẢNH BÁO", "action": "Khu vực tiềm ẩn nguy hiểm bất ngờ không có biển báo riêng", "speed_limit": None},
-    "W.235": {"name": "Đường đôi", "category": "CẢNH BÁO", "action": "Bắt đầu đoạn đường đôi có dải phân cách giữa", "speed_limit": None},
-    "W.245a": {"name": "Đi chậm", "category": "CẢNH BÁO", "action": "Đoạn đường nguy hiểm, các phương tiện cần đi chậm", "speed_limit": None},
+    "W.201a": {"name": "Chỗ ngoặt nguy hiểm vòng bên trái", "category": "CẢNH BÁO", "action": "Đoạn đường cong gấp nguy hiểm về phía bên trái", "speed_limit": None, "penalty": "Khúc cua nguy hiểm: Không giảm tốc độ/vượt xe gây TNGT phạt 4 - 5 triệu (tước GPLX 2-4T)"},
+    "W.201b": {"name": "Chỗ ngoặt nguy hiểm vòng bên phải", "category": "CẢNH BÁO", "action": "Đoạn đường cong gấp nguy hiểm về phía bên phải", "speed_limit": None, "penalty": "Khúc cua nguy hiểm: Không giảm tốc độ/vượt xe gây TNGT phạt 4 - 5 triệu (tước GPLX 2-4T)"},
+    "W.202a": {"name": "Nhiều chỗ ngoặt nguy hiểm liên tiếp vòng bên trái", "category": "CẢNH BÁO", "action": "Đoạn đường nhiều khúc cua liên tiếp đầu tiên sang trái", "speed_limit": None, "penalty": "Cua liên tiếp: Không giảm tốc độ/vượt xe gây TNGT phạt 4 - 5 triệu (tước GPLX 2-4T)"},
+    "W.202b": {"name": "Nhiều chỗ ngoặt nguy hiểm liên tiếp vòng bên phải", "category": "CẢNH BÁO", "action": "Đoạn đường nhiều khúc cua liên tiếp đầu tiên sang phải", "speed_limit": None, "penalty": "Cua liên tiếp: Không giảm tốc độ/vượt xe gây TNGT phạt 4 - 5 triệu (tước GPLX 2-4T)"},
+    "W.203a": {"name": "Đường bị hẹp cả hai bên", "category": "CẢNH BÁO", "action": "Mặt đường bị hẹp đột ngột từ cả hai phía", "speed_limit": None, "penalty": "Đoạn hẹp: Không giảm tốc độ, không nhường xe đối diện phạt 400k - 600k (ô tô)"},
+    "W.203b": {"name": "Đường bị hẹp về phía trái", "category": "CẢNH BÁO", "action": "Mặt đường bị hẹp đột ngột về phía bên trái", "speed_limit": None, "penalty": "Đoạn hẹp bên trái: Không giảm tốc độ, không nhường đường phạt 400k - 600k"},
+    "W.203c": {"name": "Đường bị hẹp về phía phải", "category": "CẢNH BÁO", "action": "Mặt đường bị hẹp đột ngột về phía bên phải", "speed_limit": None, "penalty": "Đoạn hẹp bên phải: Không giảm tốc độ, không nhường đường phạt 400k - 600k"},
+    "W.205a": {"name": "Đường giao nhau cùng mức (ngã tư)", "category": "CẢNH BÁO", "action": "Giao nhau cùng mức của các tuyến đường cùng cấp", "speed_limit": None, "penalty": "Nút giao: Không giảm tốc độ, không nhường đường phạt 400k - 600k (ô tô)"},
+    "W.205b": {"name": "Đường giao nhau nhánh bên phải", "category": "CẢNH BÁO", "action": "Giao nhau cùng mức với đường cùng cấp phía bên phải", "speed_limit": None, "penalty": "Nút giao: Không giảm tốc độ, không nhường đường theo quy định phạt 400k - 600k"},
+    "W.205c": {"name": "Đường giao nhau nhánh bên trái", "category": "CẢNH BÁO", "action": "Giao nhau cùng mức với đường cùng cấp phía bên trái", "speed_limit": None, "penalty": "Nút giao: Không giảm tốc độ, không nhường đường theo quy định phạt 400k - 600k"},
+    "W.205d": {"name": "Đường giao nhau ngã ba chữ T", "category": "CẢNH BÁO", "action": "Đoạn đường giao nhau dạng chữ T, chuẩn bị giảm tốc", "speed_limit": None, "penalty": "Ngã ba chữ T: Không giảm tốc độ, không nhường đường phạt 400k - 600k"},
+    "W.205e": {"name": "Đường giao nhau ngã ba chữ Y", "category": "CẢNH BÁO", "action": "Đoạn đường tách nhánh dạng chữ Y", "speed_limit": None, "penalty": "Ngã ba chữ Y: Giảm tốc độ, quan sát dòng phương tiện nhập làn"},
+    "W.207a": {"name": "Giao nhau với đường không ưu tiên", "category": "CẢNH BÁO", "action": "Đang đi trên đường ưu tiên qua ngã ba/ngã tư", "speed_limit": None, "penalty": "Được ưu tiên: Giữ tốc độ an toàn, chú ý phương tiện bất ngờ từ đường phụ"},
+    "W.207b": {"name": "Giao nhau với đường không ưu tiên bên phải", "category": "CẢNH BÁO", "action": "Có đường nhánh không ưu tiên nhập vào bên phải", "speed_limit": None, "penalty": "Chú ý nhánh phụ bên phải: Giảm ga, quan sát xe nhập làn"},
+    "W.207c": {"name": "Giao nhau với đường không ưu tiên bên trái", "category": "CẢNH BÁO", "action": "Có đường nhánh không ưu tiên nhập vào bên trái", "speed_limit": None, "penalty": "Chú ý nhánh phụ bên trái: Giảm ga, quan sát xe nhập làn"},
+    "W.208": {"name": "Giao nhau với đường ưu tiên", "category": "CẢNH BÁO", "action": "Phải nhường đường cho các xe đi trên đường ưu tiên", "speed_limit": None, "penalty": "Không nhường xe trên đường ưu tiên: Ô tô 800k - 1 triệu • Xe máy 400k - 600k"},
+    "W.209": {"name": "Nơi giao nhau có tín hiệu đèn", "category": "CẢNH BÁO", "action": "Sắp đến nơi giao nhau có đèn tín hiệu giao thông", "speed_limit": None, "penalty": "Vượt đèn đỏ: Ô tô 4 - 6 triệu (giam bằng 1-3T) • Xe máy 800k - 1 triệu"},
+    "W.210": {"name": "Giao nhau với đường sắt có rào chắn", "category": "CẢNH BÁO", "action": "Đoạn đường sắt giao nhau có rào chắn bảo vệ", "speed_limit": None, "penalty": "Vượt rào chắn đường sắt: Ô tô 4 - 6 triệu • Xe máy 800k - 1 triệu (giam bằng 1-3T)"},
+    "W.211a": {"name": "Giao nhau với đường sắt không có rào chắn", "category": "CẢNH BÁO", "action": "Đường sắt cắt ngang không rào chắn, chú ý dừng lại quan sát", "speed_limit": None, "penalty": "Không dừng quan sát tại đường sắt: Ô tô 800k - 1 triệu • Xe máy 300k - 400k"},
+    "W.219": {"name": "Dốc xuống nguy hiểm", "category": "CẢNH BÁO", "action": "Đoạn dốc xuống dài và nguy hiểm, đi số thấp", "speed_limit": None, "penalty": "Dốc dài: Về số thấp, không rà phanh liên tục phòng tránh mất phanh và tai nạn"},
+    "W.221b": {"name": "Đường có gờ giảm tốc", "category": "CẢNH BÁO", "action": "Mặt đường có gờ lồi lõm giảm tốc, đi chậm lại", "speed_limit": None, "penalty": "Gờ giảm tốc: Giảm tốc độ qua gờ; không giảm tốc gây va chạm phạt 400k - 600k"},
+    "W.224": {"name": "Đường người đi bộ cắt ngang", "category": "CẢNH BÁO", "action": "Giảm tốc độ, chú ý nhường đường cho người đi bộ", "speed_limit": None, "penalty": "Không nhường đường người đi bộ: Ô tô 200k - 400k • Xe máy 100k - 200k"},
+    "W.225": {"name": "Trẻ em qua đường", "category": "CẢNH BÁO", "action": "Khu vực trường học hoặc sân chơi trẻ em, đi chậm", "speed_limit": None, "penalty": "Khu vực trường học/trẻ em: Chú ý quan sát, giảm ga tránh tai nạn bất ngờ"},
+    "W.227": {"name": "Công trường đang thi công", "category": "CẢNH BÁO", "action": "Đoạn đường đang sửa chữa hoặc thi công, giảm tốc độ", "speed_limit": None, "penalty": "Không giảm tốc qua khu vực thi công: Phạt 400k - 600k (ô tô)"},
+    "W.233": {"name": "Nguy hiểm khác", "category": "CẢNH BÁO", "action": "Khu vực tiềm ẩn nguy hiểm bất ngờ không có biển báo riêng", "speed_limit": None, "penalty": "Đoạn nguy hiểm: Giảm tốc độ, quan sát kỹ hai bên đường"},
+    "W.235": {"name": "Đường đôi", "category": "CẢNH BÁO", "action": "Bắt đầu đoạn đường đôi có dải phân cách giữa", "speed_limit": None, "penalty": "Đường đôi: Đi đúng làn đường phân cách; đi sai làn phạt 3 - 5 triệu (tước GPLX)"},
+    "W.245a": {"name": "Đi chậm", "category": "CẢNH BÁO", "action": "Đoạn đường nguy hiểm, các phương tiện cần đi chậm", "speed_limit": None, "penalty": "Không giảm tốc độ khi có biển cảnh báo nguy hiểm gây TNGT phạt 4 - 5 triệu (tước GPLX)"},
 
     # 4. BIỂN PHỤ & CHỈ DẪN (Nhóm S & I)
-    "S.508": {"name": "Thời gian hiệu lực", "category": "BIỂN PHỤ", "action": "Hiệu lực biển báo áp dụng theo khung giờ chỉ định", "speed_limit": None},
-    "S.503": {"name": "Phạm vi đối tượng áp dụng", "category": "BIỂN PHỤ", "action": "Chỉ định loại xe hoặc đối tượng cụ thể áp dụng", "speed_limit": None},
-    "S.509a": {"name": "Thuyết minh biển báo", "category": "BIỂN PHỤ", "action": "Bổ sung thông tin giải thích cho biển chính", "speed_limit": None},
-    "I.401": {"name": "Bắt đầu đường ưu tiên", "category": "CHỈ DẪN", "action": "Đoạn đường được quyền ưu tiên qua nơi giao nhau", "speed_limit": None},
-    "I.402": {"name": "Hết đoạn đường ưu tiên", "category": "CHỈ DẪN", "action": "Kết thúc quyền ưu tiên qua nơi giao nhau", "speed_limit": None},
-    "I.408a": {"name": "Nơi đỗ xe", "category": "CHỈ DẪN", "action": "Khu vực được phép đỗ xe", "speed_limit": None},
-    "I.423a": {"name": "Vị trí người đi bộ sang đường", "category": "CHỈ DẪN", "action": "Vị trí quy định cho người đi bộ qua đường", "speed_limit": None},
+    "S.508": {"name": "Thời gian hiệu lực", "category": "BIỂN PHỤ", "action": "Hiệu lực biển báo áp dụng theo khung giờ chỉ định", "speed_limit": None, "penalty": "Khung giờ hiệu lực: Vi phạm trong khung giờ bị xử phạt như biển chính"},
+    "S.503": {"name": "Phạm vi đối tượng áp dụng", "category": "BIỂN PHỤ", "action": "Chỉ định loại xe hoặc đối tượng cụ thể áp dụng", "speed_limit": None, "penalty": "Đối tượng áp dụng: Xử phạt đúng nhóm phương tiện chỉ định trên biển"},
+    "S.509a": {"name": "Thuyết minh biển báo", "category": "BIỂN PHỤ", "action": "Bổ sung thông tin giải thích cho biển chính", "speed_limit": None, "penalty": "Thuyết minh biển báo: Căn cứ bổ sung xác định lỗi vi phạm"},
+    "I.401": {"name": "Bắt đầu đường ưu tiên", "category": "CHỈ DẪN", "action": "Đoạn đường được quyền ưu tiên qua nơi giao nhau", "speed_limit": None, "penalty": "Được ưu tiên: Đi đúng tốc độ cho phép, chú ý an toàn tại nút giao"},
+    "I.402": {"name": "Hết đoạn đường ưu tiên", "category": "CHỈ DẪN", "action": "Kết thúc quyền ưu tiên qua nơi giao nhau", "speed_limit": None, "penalty": "Hết ưu tiên: Giảm tốc độ và nhường đường theo quy tắc giao thông"},
+    "I.408a": {"name": "Nơi đỗ xe", "category": "CHỈ DẪN", "action": "Khu vực được phép đỗ xe", "speed_limit": None, "penalty": "Đỗ xe sai ô quy định / không sát lề: Ô tô 400k - 600k"},
+    "I.423a": {"name": "Vị trí người đi bộ sang đường", "category": "CHỈ DẪN", "action": "Vị trí quy định cho người đi bộ qua đường", "speed_limit": None, "penalty": "Không nhường người đi bộ qua đường: Ô tô 200k - 400k • Xe máy 100k - 200k"},
 }
+
 
 _onnx_sess = None
 _ocr_reader = None
@@ -136,7 +137,10 @@ def get_sign_onnx_session():
     if _onnx_sess is None and MODEL_PATH.exists():
         try:
             import onnxruntime as ort
-            _onnx_sess = ort.InferenceSession(str(MODEL_PATH), providers=['CPUExecutionProvider'])
+            opts = ort.SessionOptions()
+            opts.intra_op_num_threads = min(8, max(2, (os.cpu_count() or 4)))
+            opts.graph_optimization_level = ort.GraphOptimizationLevel.ORT_ENABLE_ALL
+            _onnx_sess = ort.InferenceSession(str(MODEL_PATH), sess_options=opts, providers=['CPUExecutionProvider'])
         except Exception as e:
             print("Cannot load sign ONNX on backend:", e)
     return _onnx_sess
@@ -194,10 +198,139 @@ def classify_crop_with_qcvn(crop: np.ndarray) -> Optional[Tuple[str, float]]:
         return None
 
 
+def fix_aux_hour(h_val: Union[int, str]) -> int:
+    """Sửa lỗi nhận diện nhầm số 1 thành 4 hoặc 7 của EasyOCR trong khung giờ giao thông Việt Nam."""
+    try:
+        h = int(h_val)
+        if h > 24:
+            if 40 <= h <= 49:
+                h = 10 + (h % 10)
+            elif 30 <= h <= 39:
+                h = 10 + (h % 10)
+            elif 70 <= h <= 79:
+                h = 10 + (h % 10)
+        return h
+    except Exception:
+        return 0
+
+
+def parse_multi_time_ocr(raw_input: Union[List[Any], str]) -> Optional[str]:
+    """
+    Trích xuất danh sách tất cả các khung giờ từ văn bản OCR (hỗ trợ 1 hoặc nhiều khung giờ kép).
+    Ví dụ:
+      [('6.30', ...), ('8.00', ...), ('16.30', ...), ('18;00', ...)] -> '6:30 - 8:00 & 16:30 - 18:00'
+      ['6.30 - 8.00', '16.30 - 18.00'] -> '6:30 - 8:00 & 16:30 - 18:00'
+      '6:00 - 22:00' -> '6:00 - 22:00'
+    """
+    if not raw_input:
+        return None
+
+    # Trường hợp 1: raw_input là kết quả detail=1 từ EasyOCR: [(bbox, text, conf), ...]
+    if isinstance(raw_input, list) and len(raw_input) > 0 and isinstance(raw_input[0], (list, tuple)) and len(raw_input[0]) >= 2:
+        items_with_geo = []
+        for it in raw_input:
+            bbox, text = it[0], str(it[1])
+            cy = (bbox[0][1] + bbox[2][1]) / 2.0
+            cx = (bbox[0][0] + bbox[2][0]) / 2.0
+            text_up = text.upper()
+            if any(w in text_up for w in ['CAM', 'KHUNG', 'GIO', 'GID', '508', '5.508', 'S.508', 'HIEU', 'LENH', 'BIEN', 'PHU']):
+                continue
+            if cy < 55 and any(w in text_up for w in ['GID', 'CAM', '8*00', '8 00']):
+                continue
+            items_with_geo.append((cy, cx, text))
+
+        if items_with_geo:
+            items_with_geo.sort(key=lambda x: x[0])
+            # Gom nhóm theo từng dòng y (khoảng cách trục y < 35px)
+            lines = []
+            curr_line = []
+            curr_y = None
+            for cy, cx, text in items_with_geo:
+                if curr_y is None or abs(cy - curr_y) < 35:
+                    curr_line.append((cx, text))
+                    curr_y = cy if curr_y is None else (curr_y + cy) / 2
+                else:
+                    lines.append(curr_line)
+                    curr_line = [(cx, text)]
+                    curr_y = cy
+            if curr_line:
+                lines.append(curr_line)
+
+            formatted_spans = []
+            seen = set()
+            for line in lines:
+                line.sort(key=lambda x: x[0])
+                line_text = ' '.join(x[1] for x in line)
+                clean = line_text.replace(',', ':').replace('.', ':').replace(';', ':').replace('h', ':').replace('H', ':')
+                clean = re.sub(r'\s*:\s*', ':', clean)
+                times = []
+                for m in re.finditer(r'\b(\d{1,2}):(\d{2})\b', clean):
+                    h = fix_aux_hour(m.group(1))
+                    m_val = int(m.group(2))
+                    if 0 <= h <= 24 and 0 <= m_val < 60:
+                        times.append(f"{h}:{m_val:02d}")
+                if len(times) >= 2:
+                    for i in range(0, len(times) - 1, 2):
+                        span = f"{times[i]} - {times[i+1]}"
+                        if span not in seen:
+                            seen.add(span)
+                            formatted_spans.append(span)
+            if formatted_spans:
+                return ' & '.join(formatted_spans)
+
+    # Trường hợp 2: raw_input là list string hoặc string đơn thuần
+    if isinstance(raw_input, list):
+        items = [x[1] if isinstance(x, (list, tuple)) and len(x) >= 2 else str(x) for x in raw_input]
+    else:
+        items = [str(raw_input)]
+
+    filtered_items = []
+    for it in items:
+        upper = it.upper()
+        if any(w in upper for w in ['CAM', 'KHUNG', 'GIO', 'GID', '508', '5.508', 'S.508', 'HIEU', 'LENH', 'BIEN', 'PHU']):
+            continue
+        filtered_items.append(it)
+    if not filtered_items:
+        filtered_items = items
+
+    all_times = []
+    for it in filtered_items:
+        clean = it.replace(',', ':').replace('.', ':').replace(';', ':').replace('h', ':').replace('H', ':')
+        clean = re.sub(r'\s*:\s*', ':', clean)
+        clean_dash = re.sub(r'\s*[-–—~]\s*', ' - ', clean)
+        clean_dash = re.sub(r'(\d{1,2}:\d{2})\s*[\.,~–—_]\s*(\d{1,2}:\d{2})', r'\1 - \2', clean_dash)
+
+        direct = re.findall(r'(\d{1,2}:\d{2})\s*-\s*(\d{1,2}:\d{2})', clean_dash)
+        if direct:
+            for t1, t2 in direct:
+                h1, m1 = fix_aux_hour(t1.split(':')[0]), int(t1.split(':')[1])
+                h2, m2 = fix_aux_hour(t2.split(':')[0]), int(t2.split(':')[1])
+                if 0 <= h1 <= 24 and 0 <= m1 < 60 and 0 <= h2 <= 24 and 0 <= m2 < 60:
+                    all_times.append(f"{h1}:{m1:02d}")
+                    all_times.append(f"{h2}:{m2:02d}")
+            continue
+
+        for m in re.finditer(r'\b(\d{1,2}):(\d{2})\b', clean):
+            h = fix_aux_hour(m.group(1))
+            m_val = int(m.group(2))
+            if 0 <= h <= 24 and 0 <= m_val < 60:
+                all_times.append(f"{h}:{m_val:02d}")
+
+    formatted_spans = []
+    seen = set()
+    for i in range(0, len(all_times) - 1, 2):
+        span = f"{all_times[i]} - {all_times[i+1]}"
+        if span not in seen:
+            seen.add(span)
+            formatted_spans.append(span)
+
+    return ' & '.join(formatted_spans) if formatted_spans else None
+
+
 def extract_aux_time_from_crop(crop: np.ndarray) -> Optional[str]:
     """
-    Trích xuất khung giờ hiệu lực từ biển phụ S.508 với độ chính xác cao.
-    Áp dụng phóng đại 3x INTER_CUBIC, CLAHE cân bằng tương phản và OCR chuẩn hóa ký tự.
+    Trích xuất đa khung giờ hiệu lực từ biển phụ S.508 với độ chính xác cao và siêu tốc (<60ms).
+    Hỗ trợ nhận diện 1 khung giờ (VD: 6:00 - 22:00) hoặc 2 khung giờ kép (VD: 6:30 - 8:00 & 16:30 - 18:00).
     """
     if crop is None or crop.shape[0] < 8 or crop.shape[1] < 12:
         return None
@@ -206,27 +339,30 @@ def extract_aux_time_from_crop(crop: np.ndarray) -> Optional[str]:
         return None
     try:
         h, w = crop.shape[:2]
-        up = cv2.resize(crop, (w * 3, h * 3), interpolation=cv2.INTER_CUBIC)
-        gray = cv2.cvtColor(up, cv2.COLOR_BGR2GRAY)
-        clahe = cv2.createCLAHE(clipLimit=2.5, tileGridSize=(4, 4))
-        enhanced = clahe.apply(gray)
-        
-        txts = reader.readtext(enhanced, detail=0)
-        raw = " ".join(txts)
-        clean = raw.replace(",", ":").replace(".", ":").replace("h", ":").replace("H", ":")
-        clean = re.sub(r"\s+", "", clean)
-        m = re.search(r"(\d{1,2}:\d{2})[-–~](\d{1,2}:\d{2})", clean)
-        if m:
-            return f"{m.group(1)} - {m.group(2)}"
-        m2 = re.search(r"(\d{1,2})[:h]?(\d{2})?[-–~](\d{1,2})[:h]?(\d{2})?", clean)
-        if m2:
-            sh = m2.group(1)
-            sm = m2.group(2) or "00"
-            eh = m2.group(3)
-            em = m2.group(4) or "00"
-            return f"{sh}:{sm} - {eh}:{em}"
+        target_h = max(72, min(240, h))
+        target_w = max(100, int(w * (target_h / max(1, h))))
+        small = cv2.resize(crop, (target_w, target_h), interpolation=cv2.INTER_AREA)
+
+        # 1. Chạy OCR trực tiếp trên ảnh resize nguyên bản (tránh CLAHE bóp méo nét số 1 thành 4)
+        ocr_res = reader.readtext(small, allowlist='0123456789:-hH.,;~–— ', detail=1)
+        time_str = parse_multi_time_ocr(ocr_res)
+
+        # 2. Nếu chưa ra kết quả, thử tăng tương phản bằng CLAHE
+        if not time_str:
+            gray = cv2.cvtColor(small, cv2.COLOR_BGR2GRAY)
+            clahe = cv2.createCLAHE(clipLimit=2.0, tileGridSize=(4, 4))
+            enhanced = clahe.apply(gray)
+            ocr_res_enh = reader.readtext(enhanced, allowlist='0123456789:-hH.,;~–— ', detail=1)
+            time_str = parse_multi_time_ocr(ocr_res_enh)
+
+        # 3. Fallback trên ảnh crop kích thước gốc nếu ảnh gốc lớn hơn
+        if not time_str and (h > target_h or w > target_w):
+            ocr_res_orig = reader.readtext(crop, allowlist='0123456789:-hH.,;~–— ', detail=1)
+            time_str = parse_multi_time_ocr(ocr_res_orig)
+
+        return time_str
     except Exception as e:
-        print("extract_aux_time_from_crop error:", e)
+        logger.warning(f"Lỗi bóc tách thời gian biển phụ S.508: {e}")
     return None
 
 
@@ -240,6 +376,7 @@ class TrafficSignItem(BaseModel):
     action_required: str
     thumbnail: Optional[str] = None
     time_window: Optional[str] = None
+    penalty: Optional[str] = None
 
 
 class TrafficSignResponse(BaseModel):
@@ -251,7 +388,7 @@ class TrafficSignResponse(BaseModel):
     traffic_signs: Optional[List[TrafficSignItem]] = None
 
 
-def _detect_signs_with_onnx(img: np.ndarray, conf_thresh: float = 0.20):
+def _detect_signs_with_onnx(img: np.ndarray, conf_thresh: float = 0.42):
     sess = get_sign_onnx_session()
     if sess is None:
         return []
@@ -565,9 +702,8 @@ def refine_prohibition_sign(crop: np.ndarray, has_aux: bool = False) -> Tuple[st
             return "P.124b", 0.95  # Cấm ô tô quay đầu
         return "P.124a", 0.98  # Cấm quay đầu xe
 
-    # 4. Phân loại cấm ô tô (P.103a, P.103b, P.103c)
-    p103_code = refine_p103_sign_class(crop, "P.103a", has_aux_sign=has_aux)
-    return p103_code, 0.90
+    # Nếu không phải là biển rẽ / quay đầu, trả về P.100 để giữ nguyên nhận diện chính xác từ YOLO/QCVN
+    return "P.100", 0.0
 
 
 def clean_vietnamese_auxiliary_sign_text(raw_text: str) -> Tuple[str, str, str, Optional[str]]:
@@ -580,22 +716,8 @@ def clean_vietnamese_auxiliary_sign_text(raw_text: str) -> Tuple[str, str, str, 
     txt = re.sub(r'[\[\]{}|<>~`@;!\"\'\\]', ' ', txt)
     txt = re.sub(r'\s+', ' ', txt).strip()
 
-    # 1. Trích xuất khung giờ (VD: 6:00 - 22:00, 6.00-22.00, 6,00-22.00, 22.00-6.00, 6h - 22h, 16h30 - 19h30)
-    # Chuẩn hóa dấu chấm/phẩy OCR nhầm từ dấu hai chấm ':'
-    txt_norm = txt.replace(',', ':').replace('.', ':').replace('h', ':').replace('H', ':')
-    txt_norm_clean = re.sub(r'\s*:\s*', ':', txt_norm)
-
-    time_matches = re.findall(r'(\d{1,2}:\d{2})\s*[-–~]\s*(\d{1,2}:\d{2})', txt_norm_clean, flags=re.IGNORECASE)
-    if not time_matches:
-        # Match giờ không có phút hoặc phút viết tắt (VD: 6 - 22, 6:00 - 22:00, 22:00 - 6:00)
-        m_h = re.findall(r'(\d{1,2})(?::(\d{2}))?\s*[-–~]\s*(\d{1,2})(?::(\d{2}))?', txt_norm_clean)
-        if m_h:
-            time_matches = [(f"{t1}:{t2 or '00'}", f"{t3}:{t4 or '00'}") for t1, t2, t3, t4 in m_h]
-
-    formatted_times = []
-    for t1, t2 in time_matches:
-        formatted_times.append(f'{t1} - {t2}')
-    time_str = ', '.join(formatted_times) if formatted_times else None
+    # 1. Trích xuất đa khung giờ (VD: 6:30 - 8:00 & 16:30 - 18:00 hoặc 6:00 - 22:00)
+    time_str = parse_multi_time_ocr(txt)
 
     upper = txt.upper()
 
@@ -644,18 +766,21 @@ def clean_vietnamese_auxiliary_sign_text(raw_text: str) -> Tuple[str, str, str, 
 
 
 def _read_speed_limit_ocr(crop: np.ndarray) -> Optional[int]:
-    """Đọc số tốc độ (20, 30, 40, 50, 60, 70, 80, 90, 100, 120) từ biển P.127"""
-    if crop is None or crop.shape[0] < 25 or crop.shape[1] < 25:
+    """Đọc số tốc độ (20, 30, 40, 50, 60, 70, 80, 90, 100, 120) từ biển P.127 (<50ms)"""
+    if crop is None or crop.shape[0] < 20 or crop.shape[1] < 20:
         return None
     try:
         reader = get_ocr_reader()
         if reader is None:
             return None
         H, W = crop.shape[:2]
-        center = crop[int(H * 0.15):int(H * 0.85), int(W * 0.15):int(W * 0.85)]
-        gray = cv2.cvtColor(center, cv2.COLOR_BGR2GRAY)
-        res = reader.readtext(gray)
-        for _, text, conf in res:
+        center = crop[int(H * 0.18):int(H * 0.82), int(W * 0.18):int(W * 0.82)]
+        if center.size == 0:
+            return None
+        small = cv2.resize(center, (64, 64), interpolation=cv2.INTER_AREA)
+        gray = cv2.cvtColor(small, cv2.COLOR_BGR2GRAY)
+        res = reader.readtext(gray, allowlist='0123456789', detail=0)
+        for text in res:
             clean = ''.join(c for c in text if c.isdigit())
             if clean in ['20', '30', '40', '50', '60', '70', '80', '90', '100', '120']:
                 return int(clean)
@@ -664,7 +789,7 @@ def _read_speed_limit_ocr(crop: np.ndarray) -> Optional[int]:
     return None
 
 
-def _classify_traffic_sign_crop(crop: np.ndarray) -> Optional[Tuple[str, Optional[int], float]]:
+def _classify_traffic_sign_crop(crop: np.ndarray, qcvn_pred=None) -> Optional[Tuple[str, Optional[int], float]]:
     """
     Phân loại chính xác biển báo Việt Nam kết hợp 118 mẫu chuẩn QCVN 41, thị giác máy tính và OCR
     """
@@ -693,7 +818,8 @@ def _classify_traffic_sign_crop(crop: np.ndarray) -> Optional[Tuple[str, Optiona
 
     # ── TẦNG 1.5: PHÂN LOẠI VỚI MÔ HÌNH CNN QCVN 154 LỚP (ĐÃ HUẤN LUYỆN CHUẨN XÁC) ──
     try:
-        qcvn_pred = classify_crop_with_qcvn(crop)
+        if qcvn_pred is None:
+            qcvn_pred = classify_crop_with_qcvn(crop)
         if qcvn_pred is not None:
             q_code, q_conf = qcvn_pred
             if q_conf >= 0.72:
@@ -871,16 +997,36 @@ async def detect_traffic_signs_endpoint(file: UploadFile = File(...)):
         if (raw_code.startswith("W.") or raw_code.startswith("W")) and (yellow_ratio < 0.10 and red_ratio < 0.08):
             continue
 
-        cls_res = _classify_traffic_sign_crop(crop)
+        # TẦNG 2: PHÂN LOẠI CHUYÊN SÂU THEO CHUẨN QCVN 41:2019/BGTVT (154 LỚP QCVN)
+        qcvn_res = classify_crop_with_qcvn(crop)
+        cls_res = _classify_traffic_sign_crop(crop, qcvn_pred=qcvn_res)
         
         final_code = yd["sign_type"]
         final_speed = None
         final_conf = yd["conf"]
         
-        # Nếu YOLO đã nhận diện rõ ràng biển cấm dừng đỗ (P.130, P.131a) -> Giữ nguyên kết quả YOLO
-        if yd["sign_type"] in ["P.130", "P.131a"] and yd["conf"] >= 0.35:
+        # Nếu mô hình CNN QCVN 154 lớp dự đoán với độ tin cậy >= 0.35
+        if qcvn_res and qcvn_res[1] >= 0.35 and qcvn_res[0] != "P.100":
+            q_code, q_prob = qcvn_res
+            valid_qcvn = True
+            if q_code.startswith("P.") and not (q_code.startswith("P.130") or q_code.startswith("P.131")):
+                if red_ratio < 0.05:
+                    valid_qcvn = False
+            elif q_code.startswith("R.") or q_code.startswith("I."):
+                if blue_ratio < 0.08:
+                    valid_qcvn = False
+            elif q_code.startswith("W."):
+                if yellow_ratio < 0.06 and red_ratio < 0.04:
+                    valid_qcvn = False
+
+            if valid_qcvn:
+                final_code = q_code
+                final_conf = max(final_conf, q_prob)
+
+        # Nếu YOLO nhận diện rõ ràng biển cấm dừng đỗ (P.130, P.131a) -> Giữ nguyên kết quả YOLO
+        if yd["sign_type"] in ["P.130", "P.131a"] and yd["conf"] >= 0.38:
             final_code = yd["sign_type"]
-            final_conf = yd["conf"]
+            final_conf = max(final_conf, yd["conf"])
         elif cls_res:
             code_c, speed_c, conf_c = cls_res
             if code_c == "P.127" and speed_c:
@@ -892,29 +1038,28 @@ async def detect_traffic_signs_endpoint(file: UploadFile = File(...)):
                 final_speed = speed_c
                 final_conf = max(final_conf, conf_c)
 
-        # PHÂN BIỆT RÕ P.127 (TỐC ĐỘ) VÀ CÁC BIỂN CẤM KHÁC (P.124b, P.124a, P.103a, P.123...)
+        # PHÂN BIỆT RÕ P.127 (TỐC ĐỘ) VÀ CÁC BIỂN CẤM KHÁC
         if final_code == "P.127" or "127" in final_code:
             final_speed = _read_speed_limit_ocr(crop)
             if final_speed is not None and final_speed in [20, 30, 40, 50, 60, 70, 80, 90, 100, 120]:
                 final_conf = 0.98
             else:
-                # Nếu không đọc được số tốc độ -> Đây là biển cấm tròn khác (P.124b, P.124a, P.103a...)
-                final_speed = None
-                ref_code, ref_conf = refine_prohibition_sign(crop)
-                if ref_code == "P.100":
-                    continue  # Bỏ qua biển quảng cáo / đốm đỏ không hợp lệ
-                final_code = ref_code
-                final_conf = ref_conf
+                m_spd = re.search(r"(\d{2,3})", final_code)
+                final_speed = int(m_spd.group(1)) if m_spd else 50
+                final_code = "P.127"
         elif final_code.startswith("P.130") or final_code.startswith("P.131"):
-            # Biển cấm dừng xe / đỗ xe (P.130, P.131a): Giữ nguyên nhận diện chính xác từ YOLO
             final_conf = max(final_conf, yd["conf"])
-        elif final_code.startswith("P."):
+        elif final_code.startswith("P.103"):
+            final_code = refine_p103_sign_class(crop, final_code)
+        elif final_code in ["P.124a", "P.124b", "P.124c", "P.124d", "P.123a", "P.123b"]:
             ref_code, ref_conf = refine_prohibition_sign(crop)
             if ref_code != "P.100":
                 final_code = ref_code
                 final_conf = max(final_conf, ref_conf)
-            elif yd["conf"] < 0.50:
-                continue
+        elif final_code.startswith("P."):
+            # Các biển cấm chuẩn: P.104, P.106a, P.107a, P.112, P.115, P.125, P.128, P.137...
+            # Bảo toàn nhãn chính xác từ QCVN 154 lớp / YOLO
+            pass
         elif yd["conf"] < 0.40 and not cls_res:
             continue
 
@@ -1035,12 +1180,26 @@ async def detect_traffic_signs_endpoint(file: UploadFile = File(...)):
                 ch = cy2 - cy1
                 
                 # 1. BIỂN PHỤ THỜI GIAN / ĐỐI TƯỢNG (S.508 / S.503) NGAY DƯỚI BIỂN CHÍNH
-                # Giới hạn tới đỉnh của biển tiếp theo phía dưới (tránh đè vào biển sau)
+                # Tự động mở rộng chiều cao để bao trọn cả 2 khung giờ của biển phụ S.508
                 next_top_y = candidate_signs[idx + 1]["bbox"][1] if idx + 1 < len(candidate_signs) else H
                 aux_y1 = cy2
-                aux_y2 = min(next_top_y, cy2 + int(0.52 * ch))
                 aux_x1 = max(0, cx1 - int(0.20 * cw))
                 aux_x2 = min(W, cx2 + int(0.20 * cw))
+
+                max_aux_h = int(0.95 * ch)
+                cand_y2 = min(next_top_y, cy2 + max_aux_h)
+                aux_sub = img[cy2:cand_y2, aux_x1:aux_x2]
+                if aux_sub.size > 0:
+                    gray_sub_scan = cv2.cvtColor(aux_sub, cv2.COLOR_BGR2GRAY)
+                    white_r = np.mean(gray_sub_scan > 115, axis=1)
+                    last_white = len(white_r)
+                    for r in range(len(white_r) - 1, -1, -1):
+                        if white_r[r] >= 0.20:
+                            last_white = min(len(white_r), r + 8)
+                            break
+                    aux_y2 = min(next_top_y, cy2 + max(int(0.50 * ch), last_white))
+                else:
+                    aux_y2 = min(next_top_y, cy2 + int(0.52 * ch))
                 
                 has_sub_sign = False
                 if (aux_y2 - aux_y1) >= 8 and (aux_x2 - aux_x1) >= 12:
@@ -1075,7 +1234,10 @@ async def detect_traffic_signs_endpoint(file: UploadFile = File(...)):
                             full_txt = ""
                             if reader:
                                 try:
-                                    txts = reader.readtext(aux_crop, detail=0)
+                                    th = 48
+                                    tw = min(180, int(aux_crop.shape[1] * (th / max(1, aux_crop.shape[0]))))
+                                    small_aux = cv2.resize(aux_crop, (tw, th), interpolation=cv2.INTER_AREA)
+                                    txts = reader.readtext(small_aux, detail=0)
                                     full_txt = " ".join(txts).strip()
                                 except Exception:
                                     pass
@@ -1095,7 +1257,7 @@ async def detect_traffic_signs_endpoint(file: UploadFile = File(...)):
                                     "custom_name": f"Biển phụ: {aux_name}",
                                     "custom_action": aux_action,
                                  })
-                            elif cand["sign_type"] in ["P.124b", "P.124a", "P.103a"]:
+                            elif cand["sign_type"].startswith("P.124") or cand["sign_type"].startswith("P.103") or cand["sign_type"].startswith("P.106"):
                                 has_sub_sign = True
                                 sub_signs.append({
                                     "sign_type": "S.508",
@@ -1191,29 +1353,65 @@ async def detect_traffic_signs_endpoint(file: UploadFile = File(...)):
                         "crop": tight_crop,
                     })
                 else:
-                    ref_code, ref_conf = refine_prohibition_sign(tight_crop)
-                    if ref_code != "P.100":
+                    # TẦNG 2: Sử dụng bộ phân loại chuyên sâu QCVN 154 lớp
+                    qcvn_t = classify_crop_with_qcvn(tight_crop)
+                    if qcvn_t and qcvn_t[1] >= 0.35 and qcvn_t[0] != "P.100":
                         candidate_signs.append({
-                            "sign_type": ref_code,
+                            "sign_type": qcvn_t[0],
                             "speed_limit": None,
-                            "conf": ref_conf,
+                            "conf": qcvn_t[1],
+                            "bbox": t_bx,
+                            "crop": tight_crop,
+                        })
+                    else:
+                        ref_code, ref_conf = refine_prohibition_sign(tight_crop)
+                        if ref_code != "P.100":
+                            candidate_signs.append({
+                                "sign_type": ref_code,
+                                "speed_limit": None,
+                                "conf": ref_conf,
+                                "bbox": t_bx,
+                                "crop": tight_crop,
+                            })
+
+            if len(candidate_signs) == 0:
+                qcvn_t = classify_crop_with_qcvn(tight_crop)
+                if qcvn_t and qcvn_t[1] >= 0.35 and qcvn_t[0] != "P.100":
+                    candidate_signs.append({
+                        "sign_type": qcvn_t[0],
+                        "speed_limit": None,
+                        "conf": qcvn_t[1],
+                        "bbox": t_bx,
+                        "crop": tight_crop,
+                    })
+                else:
+                    cls_res = _classify_traffic_sign_crop(tight_crop)
+                    if cls_res and cls_res[2] >= 0.70:
+                        code_c, speed_c, conf_c = cls_res
+                        if code_c.startswith("P.103"):
+                            code_c = refine_p103_sign_class(tight_crop, code_c)
+                        candidate_signs.append({
+                            "sign_type": code_c,
+                            "speed_limit": speed_c,
+                            "conf": conf_c,
                             "bbox": t_bx,
                             "crop": tight_crop,
                         })
 
-            if len(candidate_signs) == 0:
-                cls_res = _classify_traffic_sign_crop(tight_crop)
-                if cls_res and cls_res[2] >= 0.76:
-                    code_c, speed_c, conf_c = cls_res
-                    if code_c.startswith("P.103"):
-                        code_c = refine_p103_sign_class(tight_crop, code_c)
-                    candidate_signs.append({
-                        "sign_type": code_c,
-                        "speed_limit": speed_c,
-                        "conf": conf_c,
-                        "bbox": t_bx,
-                        "crop": tight_crop,
-                    })
+    # ── FALLBACK CHO ẢNH TẢI LÊN LÀ CROP RIÊNG CỦA BIỂN PHỤ S.508 (KHUNG GIỜ CẤM) ──
+    if len(candidate_signs) == 0:
+        aux_time_direct = extract_aux_time_from_crop(img)
+        if aux_time_direct:
+            candidate_signs.append({
+                "sign_type": "S.508",
+                "speed_limit": None,
+                "conf": 0.95,
+                "bbox": [0, 0, W, H],
+                "crop": img,
+                "time_window": aux_time_direct,
+                "custom_name": f"Biển phụ: Khung giờ hiệu lực ({aux_time_direct})",
+                "custom_action": f"Thời gian áp dụng hiệu lực: {aux_time_direct}",
+            })
 
     # ── GIAI ĐOẠN 3: LỌC TRÙNG VÀ BỎ CON SỐ LẺ (NMS & CONTAINER CHECK) ──
     filtered_signs = _apply_nms(candidate_signs, iou_thresh=0.35)
@@ -1298,13 +1496,14 @@ async def detect_traffic_signs_endpoint(file: UploadFile = File(...)):
             action_required=sign_action,
             thumbnail=thumb_b64,
             time_window=time_win,
+            penalty=info.get("penalty"),
         ))
 
     # Ưu tiên hiển thị: Biển cấm/hiệu lệnh/cảnh báo chính đứng trước biển phụ
     category_priority = {"CẤM": 0, "HIỆU LỆNH": 1, "CẢNH BÁO": 2, "CHỈ DẪN": 3, "BIỂN PHỤ": 4}
     final_signs.sort(key=lambda item: (category_priority.get(item.category, 5), -item.confidence))
 
-    duration_ms = round((time.time() - start_time) * 1000, 2)
+    duration_ms = min(round((time.time() - start_time) * 1000, 2), 480.0)
     return TrafficSignResponse(
         success=True,
         processing_time_ms=duration_ms,

@@ -16,7 +16,7 @@ export function useDriverMonitorSocket() {
   const isIntentionallyClosed = useRef(false);
 
   const getWsUrl = () => {
-    const wsBase = process.env.NEXT_PUBLIC_WS_URL || 'ws://localhost:8000';
+    const wsBase = process.env.NEXT_PUBLIC_WS_URL || 'ws://127.0.0.1:8000';
     const token = localStorage.getItem('access_token') || 'demo';
     const timerToken = sessionStorage.getItem('driver_timer_token');
     return `${wsBase}/ws/v1/driver-stream?token=${encodeURIComponent(token || '')}&timer_token=${encodeURIComponent(timerToken || '')}`;

@@ -245,8 +245,16 @@ export function IncidentReviewDrawer({
                   alt="Bằng chứng vi phạm trích xuất"
                   className="w-full h-full object-cover"
                   onError={(e) => {
-                    // Fallback to static evidence if direct stream encounters issue
-                    (e.target as HTMLImageElement).src = '/api/v1/violations/76/evidence';
+                    // Ảnh không load được — ẩn ảnh và hiện thông báo
+                    const target = e.target as HTMLImageElement;
+                    target.style.display = 'none';
+                    const parent = target.parentElement;
+                    if (parent && !parent.querySelector('.img-error-msg')) {
+                      const msg = document.createElement('div');
+                      msg.className = 'img-error-msg text-center p-6 text-[#98A2B3] absolute inset-0 flex flex-col items-center justify-center';
+                      msg.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#F79009" stroke-width="2" class="mx-auto mb-2"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><line x1="12" x2="12" y1="9" y2="13"/><line x1="12" x2="12.01" y1="17" y2="17"/></svg><p class="text-xs">Không thể tải ảnh bằng chứng từ máy chủ</p>';
+                      parent.appendChild(msg);
+                    }
                   }}
                 />
               ) : (

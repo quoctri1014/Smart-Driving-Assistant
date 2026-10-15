@@ -18,6 +18,10 @@ export interface VehicleDetection {
   thumbnail?: string;
   plate_text?: string | null;
   plate_status?: string | null;
+  ttc?: number | null;
+  rel_speed_kmh?: number | null;
+  approach_state?: string | null;
+  approach_desc?: string | null;
 }
 
 export interface LineCrossingData {
@@ -83,6 +87,7 @@ export interface TrafficSign {
   last_seen?: number;
   action_required?: string;
   time_window?: string | null;
+  penalty?: string; // Mức xử phạt vi phạm theo Nghị định 100/2019/NĐ-CP & 123/2021/NĐ-CP
 }
 
 export interface DetectionResult {

@@ -232,8 +232,8 @@ class DrowsinessDetector:
         # Hệ thống phát hiện nhắm mắt kéo dài (DMS) State Machine
         self.eyes_closed_monitor = EyesClosedMonitor(
             cfg=EyesClosedConfig(
-                warn_s=2.0,
-                critical_s=5.0,
+                warn_s=1.5,
+                critical_s=3.0,
                 gap_tolerance_s=0.3,
                 min_blink_s=0.5,
                 calib_s=10.0,
@@ -254,8 +254,8 @@ class DrowsinessDetector:
         self.perclos_samples.clear()
         self.eyes_closed_monitor = EyesClosedMonitor(
             cfg=EyesClosedConfig(
-                warn_s=2.0,
-                critical_s=5.0,
+                warn_s=1.5,
+                critical_s=3.0,
                 gap_tolerance_s=0.3,
                 min_blink_s=0.5,
                 calib_s=10.0,

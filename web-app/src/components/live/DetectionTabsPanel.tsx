@@ -21,6 +21,14 @@ import {
   Activity,
   Gauge,
   Radio,
+  Camera,
+  ZoomIn,
+  Eye,
+  X,
+  FileText,
+  Download,
+  Gavel,
+  ShieldCheck,
 } from 'lucide-react';
 import {
   PlateDetection,
@@ -55,6 +63,126 @@ export interface DetectionTabsPanelProps {
   className?: string;
 }
 
+const SIGN_PENALTY_MAP: Record<string, string> = {
+  // Nhóm P & DP (Biển cấm)
+  'DP.135': 'Không áp dụng xử phạt (Hết hiệu lực các lệnh cấm trước đó)',
+  'P.101': 'Đi vào đường cấm: Ô tô 2 - 3 triệu (tước GPLX 1-3T) • Xe máy 400k - 600k',
+  'P.102': 'Đi ngược chiều: Ô tô 4 - 6 triệu (tước GPLX 2-4T) • Xe máy 1 - 2 triệu',
+  'P.103a': 'Ô tô đi vào đường cấm ô tô: Phạt 2 - 3 triệu (tước GPLX 1-3T)',
+  'P.103b': 'Rẽ phải nơi có biển cấm: Ô tô 800k - 1 triệu • Xe máy 400k - 600k',
+  'P.103c': 'Rẽ trái nơi có biển cấm: Ô tô 800k - 1 triệu • Xe máy 400k - 600k',
+  'P.104': 'Xe máy đi vào đường cấm xe máy: Phạt 400k - 600k',
+  'P.105': 'Đi vào đường cấm: Ô tô 2 - 3 triệu • Xe máy 400k - 600k',
+  'P.106a': 'Xe tải đi vào đường cấm tải: Phạt 2 - 3 triệu (tước GPLX 1-3T)',
+  'P.106b': 'Xe tải >3.5T đi vào đường cấm: Phạt 2 - 3 triệu (tước GPLX 1-3T)',
+  'P.107a': 'Xe khách đi vào đường cấm: Phạt 2 - 3 triệu (tước GPLX 1-3T)',
+  'P.107b': 'Xe tải/khách đi vào đường cấm: Phạt 2 - 3 triệu (tước GPLX 1-3T)',
+  'P.108': 'Xe kéo rơ-moóc vào đường cấm: Phạt 2 - 3 triệu (tước GPLX 1-3T)',
+  'P.112': 'Người đi bộ đi vào đường cấm: Phạt 60k - 100k',
+  'P.115': 'Chở quá tải cầu đường: Phạt 4 - 16 triệu (tước phù hiệu & GPLX 1-3T)',
+  'P.116': 'Quá tải trọng trục: Phạt 4 - 16 triệu',
+  'P.117': 'Vượt quá chiều cao cho phép: Phạt 2 - 3 triệu (tước GPLX 1-3T)',
+  'P.118': 'Xe quá khổ chiều ngang: Phạt 2 - 3 triệu',
+  'P.119': 'Xe quá khổ chiều dài: Phạt 2 - 3 triệu',
+  'P.120': 'Xe rơ-moóc quá chiều dài: Phạt 2 - 3 triệu',
+  'P.121': 'Không giữ cự ly tối thiểu: Ô tô 800k - 1 triệu (gây tai nạn 10 - 12 triệu)',
+  'P.123a': 'Rẽ trái nơi cấm rẽ: Ô tô 800k - 1 triệu • Xe máy 400k - 600k',
+  'P.123b': 'Rẽ phải nơi cấm rẽ: Ô tô 800k - 1 triệu • Xe máy 400k - 600k',
+  'P.124a': 'Quay đầu nơi cấm quay đầu: Ô tô 800k - 1 triệu • Xe máy 400k - 600k',
+  'P.124b': 'Ô tô quay đầu nơi cấm quay: Phạt 800k - 1 triệu',
+  'P.124c': 'Rẽ trái hoặc quay đầu trái phép: Ô tô 800k - 1 triệu • Xe máy 400k - 600k',
+  'P.124d': 'Rẽ phải hoặc quay đầu trái phép: Ô tô 800k - 1 triệu • Xe máy 400k - 600k',
+  'P.125': 'Vượt xe nơi có biển cấm vượt: Ô tô 4 - 6 triệu (tước GPLX 1-3T) • Xe máy 800k - 1 triệu',
+  'P.126': 'Xe tải vượt nơi cấm vượt: Phạt 4 - 6 triệu (tước GPLX 1-3T)',
+  'P.127': 'Quá 5-10km/h: 800k - 1tr (ô tô), 300k - 400k (xe máy) • Quá >20km/h: 4 - 12 triệu (giam bằng)',
+  'P.128': 'Bấm còi nơi cấm còi: Ô tô 300k - 400k • Xe máy 100k - 200k',
+  'P.130': 'Dừng đỗ xe trái phép: Ô tô 800k - 1 triệu • Xe máy 300k - 400k',
+  'P.131a': 'Đỗ xe nơi cấm đỗ: Ô tô 400k - 600k • Xe máy 300k - 400k',
+  'P.131b': 'Đỗ xe ngày lẻ trái phép: Ô tô 400k - 600k • Xe máy 300k - 400k',
+  'P.131c': 'Đỗ xe ngày chẵn trái phép: Ô tô 400k - 600k • Xe máy 300k - 400k',
+  'P.132': 'Không nhường xe ngược chiều: Ô tô 400k - 600k',
+  'P.137': 'Rẽ trái/phải nơi cấm rẽ: Ô tô 800k - 1 triệu • Xe máy 400k - 600k',
+  'P.245a': 'Không giảm tốc độ khi có biển: Ô tô 400k - 600k (gây tai nạn phạt 4 - 5 triệu)',
+
+  // Nhóm R (Biển hiệu lệnh)
+  'R.301a': 'Không chấp hành hiệu lệnh đi thẳng: Ô tô 300k - 400k • Xe máy 100k - 200k',
+  'R.301b': 'Không chấp hành hiệu lệnh rẽ phải: Ô tô 300k - 400k • Xe máy 100k - 200k',
+  'R.301c': 'Không chấp hành hiệu lệnh rẽ trái: Ô tô 300k - 400k • Xe máy 100k - 200k',
+  'R.301d': 'Không chấp hành hiệu lệnh rẽ phải: Ô tô 300k - 400k • Xe máy 100k - 200k',
+  'R.301e': 'Không chấp hành hiệu lệnh hướng đi: Ô tô 300k - 400k • Xe máy 100k - 200k',
+  'R.301f': 'Không chấp hành hiệu lệnh hướng đi: Ô tô 300k - 400k • Xe máy 100k - 200k',
+  'R.302a': 'Đi sai hướng tránh chướng ngại vật: Ô tô 300k - 400k • Xe máy 100k - 200k',
+  'R.302b': 'Đi sai hướng tránh chướng ngại vật: Ô tô 300k - 400k • Xe máy 100k - 200k',
+  'R.303': 'Không nhường đường/không theo vòng xuyến: Ô tô 300k - 400k • Xe máy 100k - 200k',
+  'R.304': 'Đi vào làn xe thô sơ: Ô tô 400k - 600k • Xe máy 300k - 400k',
+  'R.305': 'Xe cơ giới đi vào đường người đi bộ: Ô tô 2 - 3 triệu • Xe máy 400k - 600k',
+  'R.306': 'Chạy dưới tốc độ tối thiểu: Ô tô 800k - 1 triệu • Xe máy 200k - 400k',
+  'R.403a': 'Xe máy đi vào đường ô tô: Phạt 2 - 3 triệu (tước GPLX 1-3T)',
+  'R.407a': 'Đi ngược chiều đường một chiều: Ô tô 4 - 6 triệu (giam bằng 2-4T) • Xe máy 1 - 2 triệu',
+  'R.409': 'Quay xe sai quy định: Ô tô 400k - 600k • Xe máy 100k - 200k',
+  'R.425': 'Bấm còi hơi/rú ga khu vực bệnh viện: Ô tô 800k - 1 triệu • Xe máy 400k - 600k',
+  'R.434': 'Dừng đỗ trái phép tại điểm xe buýt: Ô tô 400k - 600k • Xe máy 300k - 400k',
+
+  // Nhóm W (Biển cảnh báo nguy hiểm)
+  'W.201a': 'Khúc cua nguy hiểm: Không giảm tốc độ/vượt xe gây TNGT phạt 4 - 5 triệu (tước GPLX 2-4T)',
+  'W.201b': 'Khúc cua nguy hiểm: Không giảm tốc độ/vượt xe gây TNGT phạt 4 - 5 triệu (tước GPLX 2-4T)',
+  'W.202a': 'Cua liên tiếp: Không giảm tốc độ/vượt xe gây TNGT phạt 4 - 5 triệu (tước GPLX 2-4T)',
+  'W.202b': 'Cua liên tiếp: Không giảm tốc độ/vượt xe gây TNGT phạt 4 - 5 triệu (tước GPLX 2-4T)',
+  'W.203a': 'Đoạn hẹp: Không giảm tốc độ, không nhường xe đối diện phạt 400k - 600k (ô tô)',
+  'W.203b': 'Đoạn hẹp bên trái: Không giảm tốc độ, không nhường đường phạt 400k - 600k',
+  'W.203c': 'Đoạn hẹp bên phải: Không giảm tốc độ, không nhường đường phạt 400k - 600k',
+  'W.205a': 'Nút giao: Không giảm tốc độ, không nhường đường phạt 400k - 600k (ô tô)',
+  'W.205b': 'Nút giao: Không giảm tốc độ, không nhường đường theo quy định phạt 400k - 600k',
+  'W.205c': 'Nút giao: Không giảm tốc độ, không nhường đường theo quy định phạt 400k - 600k',
+  'W.205d': 'Ngã ba chữ T: Không giảm tốc độ, không nhường đường phạt 400k - 600k',
+  'W.205e': 'Ngã ba chữ Y: Giảm tốc độ, quan sát dòng phương tiện nhập làn',
+  'W.207a': 'Được ưu tiên: Giữ tốc độ an toàn, chú ý phương tiện bất ngờ từ đường phụ',
+  'W.207b': 'Chú ý nhánh phụ bên phải: Giảm ga, quan sát xe nhập làn',
+  'W.207c': 'Chú ý nhánh phụ bên trái: Giảm ga, quan sát xe nhập làn',
+  'W.208': 'Không nhường xe trên đường ưu tiên: Ô tô 800k - 1 triệu • Xe máy 400k - 600k',
+  'W.209': 'Vượt đèn đỏ: Ô tô 4 - 6 triệu (giam bằng 1-3T) • Xe máy 800k - 1 triệu',
+  'W.210': 'Vượt rào chắn đường sắt: Ô tô 4 - 6 triệu • Xe máy 800k - 1 triệu (giam bằng 1-3T)',
+  'W.211a': 'Không dừng quan sát tại đường sắt: Ô tô 800k - 1 triệu • Xe máy 300k - 400k',
+  'W.219': 'Dốc dài: Về số thấp, không rà phanh liên tục phòng tránh mất phanh và tai nạn',
+  'W.221b': 'Gờ giảm tốc: Giảm tốc độ qua gờ; không giảm tốc gây va chạm phạt 400k - 600k',
+  'W.224': 'Không nhường đường người đi bộ: Ô tô 200k - 400k • Xe máy 100k - 200k',
+  'W.225': 'Khu vực trường học/trẻ em: Chú ý quan sát, giảm ga tránh tai nạn bất ngờ',
+  'W.227': 'Không giảm tốc qua khu vực thi công: Phạt 400k - 600k (ô tô)',
+  'W.233': 'Đoạn nguy hiểm: Giảm tốc độ, quan sát kỹ hai bên đường',
+  'W.235': 'Đường đôi: Đi đúng làn đường phân cách; đi sai làn phạt 3 - 5 triệu (tước GPLX)',
+  'W.245a': 'Không giảm tốc độ khi có biển cảnh báo nguy hiểm gây TNGT phạt 4 - 5 triệu (tước GPLX)',
+
+  // Nhóm S & I (Biển phụ & Chỉ dẫn)
+  'S.508': 'Khung giờ hiệu lực: Vi phạm trong khung giờ bị xử phạt như biển chính',
+  'S.503': 'Đối tượng áp dụng: Xử phạt đúng nhóm phương tiện chỉ định trên biển',
+  'S.509a': 'Thuyết minh biển báo: Căn cứ bổ sung xác định lỗi vi phạm',
+  'I.401': 'Được ưu tiên: Đi đúng tốc độ cho phép, chú ý an toàn tại nút giao',
+  'I.402': 'Hết ưu tiên: Giảm tốc độ và nhường đường theo quy tắc giao thông',
+  'I.408a': 'Đỗ xe sai ô quy định / không sát lề: Ô tô 400k - 600k',
+  'I.423a': 'Không nhường người đi bộ qua đường: Ô tô 200k - 400k • Xe máy 100k - 200k',
+};
+
+function getSignPenalty(signType?: string, category?: string): string {
+  if (!signType) return 'Tuân thủ quy định theo Nghị định 100/2019/NĐ-CP & 123/2021/NĐ-CP';
+  const norm = signType.trim();
+  if (SIGN_PENALTY_MAP[norm]) return SIGN_PENALTY_MAP[norm];
+  const found = Object.keys(SIGN_PENALTY_MAP).find(
+    (k) => k.toLowerCase() === norm.toLowerCase() || k.replace(/\./g, '').toLowerCase() === norm.replace(/\./g, '').toLowerCase()
+  );
+  if (found) return SIGN_PENALTY_MAP[found];
+
+  if (category === 'CẤM' || norm.startsWith('P') || norm.startsWith('p')) {
+    return 'Vi phạm hiệu lực biển cấm: Ô tô 800.000đ - 3.000.000đ (có thể tước GPLX) • Xe máy 300.000đ - 1.000.000đ';
+  }
+  if (category === 'CẢNH BÁO' || norm.startsWith('W') || norm.startsWith('w')) {
+    return 'Không giảm tốc độ khi gặp biển cảnh báo gây tai nạn: Phạt 4.000.000đ - 5.000.000đ (tước GPLX)';
+  }
+  if (category === 'HIỆU LỆNH' || norm.startsWith('R') || norm.startsWith('r')) {
+    return 'Không chấp hành hiệu lệnh biển báo: Ô tô 300.000đ - 400.000đ • Xe máy 100.000đ - 200.000đ';
+  }
+  return 'Tuân thủ quy tắc giao thông theo Nghị định 100/2019/NĐ-CP & 123/2021/NĐ-CP';
+}
+
 export const DetectionTabsPanel = memo(function DetectionTabsPanel({
   plates = [],
   vehicles = [],
@@ -75,6 +203,7 @@ export const DetectionTabsPanel = memo(function DetectionTabsPanel({
 }: DetectionTabsPanelProps) {
   const [internalTab, setInternalTab] = useState<DetectionTabType>('plates');
   const [showRadarView, setShowRadarView] = useState(false);
+  const [selectedHelmetEvidence, setSelectedHelmetEvidence] = useState<HelmetViolation | null>(null);
   const activeTab = controlledActiveTab !== undefined ? controlledActiveTab : internalTab;
   const effectiveCrossings = lineCrossings || trafficEngine?.lineCrossings;
   const handleResetCrossings = onResetLineCrossings || trafficEngine?.onResetLineCrossings;
@@ -773,6 +902,28 @@ export const DetectionTabsPanel = memo(function DetectionTabsPanel({
                               {s.count && s.count > 1 ? `• Phát hiện ${s.count} lần` : '• Đang có hiệu lực'}
                             </span>
                           </p>
+
+                          {(() => {
+                            const penaltyText = s.penalty || getSignPenalty(s.sign_type, s.category);
+                            if (!penaltyText) return null;
+                            const isProhib = isSpeedLimit || isProhibitory;
+                            return (
+                              <div
+                                className={`mt-2 flex items-start gap-1.5 p-1.5 px-2.5 rounded-md border text-[11px] sm:text-xs leading-relaxed ${
+                                  isProhib
+                                    ? 'bg-[#FEE4E2]/80 border-[#FECDCA] text-[#912018]'
+                                    : isWarning
+                                    ? 'bg-[#FEF0C7]/80 border-[#FEDF89] text-[#8C3B05]'
+                                    : isMandatory
+                                    ? 'bg-[#E0F2FE]/80 border-[#BAE6FD] text-[#025682]'
+                                    : 'bg-white/80 border-[#D0D5DD] text-[#344054]'
+                                }`}
+                              >
+                                <span className="font-bold shrink-0">⚖️ Mức phạt:</span>
+                                <span className="font-medium break-words">{penaltyText}</span>
+                              </div>
+                            );
+                          })()}
                         </div>
                       </div>
 
@@ -800,50 +951,293 @@ export const DetectionTabsPanel = memo(function DetectionTabsPanel({
         {activeTab === 'helmets' && (
           <div>
             {uniqueHelmets.length === 0 ? (
-              <div className="flex flex-col items-center justify-center py-7 text-center text-[#98A2B3]">
-                <HardHat className="w-8 h-8 mb-1.5 stroke-[1.5] text-[#12B76A]" />
-                <p className="text-xs font-semibold text-[#027A48]">
-                  Không phát hiện vi phạm quy định mũ bảo hiểm
+              <div className="flex flex-col items-center justify-center py-12 text-center text-[#98A2B3] bg-gradient-to-b from-[#F0FDF4]/50 to-white rounded-xl border border-[#D1FADF]">
+                <div className="w-14 h-14 rounded-2xl bg-[#ECFDF3] border border-[#A6F4C5] flex items-center justify-center mb-3 shadow-xs">
+                  <ShieldCheck className="w-7 h-7 stroke-[1.8] text-[#12B76A]" />
+                </div>
+                <h4 className="text-sm font-bold text-[#027A48]">
+                  100% Tuân thủ quy định Mũ bảo hiểm
+                </h4>
+                <p className="text-xs text-[#475467] mt-1.5 max-w-md leading-relaxed">
+                  Tất cả người điều khiển xe hai bánh trong tầm nhìn camera đều đội mũ bảo hiểm đạt chuẩn QCVN 2:2008/BKHCN (hoặc không có xe máy trong luồng).
                 </p>
-                <p className="text-[11px] text-[#98A2B3] mt-0.5 max-w-md">
-                  Người điều khiển xe hai bánh trong khung nhìn tuân thủ quy định an toàn (hoặc không có xe máy trong tầm quan sát).
-                </p>
+                <div className="mt-3 inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#ECFDF3] text-[11px] font-semibold text-[#027A48] border border-[#ABEFC6]">
+                  <CheckCircle2 className="w-3.5 h-3.5 text-[#12B76A]" />
+                  Hệ thống AI giám sát liên tục 24/7
+                </div>
               </div>
             ) : (
-              <div className="flex flex-col gap-2.5">
+              <div className="flex flex-col gap-3.5">
+                {/* THANH TỔNG HỢP VI PHẠM CAO CẤP */}
+                <div className="p-3 px-4 rounded-xl bg-gradient-to-r from-[#FFF1F3] via-[#FFE4E6] to-[#FFF1F3] border border-[#FDA4AF] flex flex-wrap items-center justify-between gap-3 text-xs shadow-xs">
+                  <div className="flex items-center gap-2.5">
+                    <span className="relative flex h-3 w-3 shrink-0">
+                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#F43F5E] opacity-75" />
+                      <span className="relative inline-flex rounded-full h-3 w-3 bg-[#E11D48]" />
+                    </span>
+                    <div>
+                      <span className="font-extrabold text-[#9F1239] text-xs sm:text-sm">
+                        Phát hiện {uniqueHelmets.length} trường hợp vi phạm quy định mũ bảo hiểm
+                      </span>
+                      <p className="text-[11px] text-[#BE123C] font-medium hidden sm:block">
+                        Hệ thống tự động ghi nhận bằng chứng hình ảnh và đối soát biển số xe
+                      </p>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className="text-[11px] font-bold text-[#9F1239] bg-white/95 px-3 py-1 rounded-lg border border-[#FDA4AF] shadow-2xs shrink-0 flex items-center gap-1.5">
+                      <Gavel className="w-3.5 h-3.5 text-[#E11D48]" />
+                      Phạt 400.000đ – 600.000đ / vụ
+                    </span>
+                  </div>
+                </div>
+
+                {/* DANH SÁCH THẺ VI PHẠM REDESIGNED */}
                 {uniqueHelmets.map((h, idx) => (
                   <div
                     key={idx}
-                    className="p-3 rounded-[10px] border border-[#FECDCA] bg-[#FEF3F2] flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-2xs hover:border-[#F04438] transition-colors"
+                    className="rounded-xl border border-[#FDA4AF]/70 border-l-4 border-l-[#E11D48] bg-white shadow-xs hover:shadow-md hover:border-[#F43F5E] transition-all overflow-hidden flex flex-col group"
                   >
-                    <div className="flex items-start gap-3 min-w-0 flex-1">
-                      <div className="w-9 h-9 rounded-full bg-[#F04438] text-white flex items-center justify-center font-bold text-sm shrink-0 mt-0.5 shadow-xs">
-                        !
-                      </div>
-                      <div className="min-w-0 flex-1">
-                        <span className="text-xs sm:text-sm font-bold text-[#B42318] block leading-snug break-words">
-                          Không đội mũ bảo hiểm khi lái xe máy
+                    {/* DẢI STATUS / METADATA TRÊN CÙNG CỦA THẺ */}
+                    <div className="px-3.5 py-2 bg-[#FFF1F2] border-b border-[#FFE4E6] flex items-center justify-between gap-2 flex-wrap text-[11px]">
+                      <div className="flex items-center gap-2">
+                        <span className="px-2 py-0.5 rounded-md font-black tracking-wide text-[10px] bg-[#E11D48] text-white shadow-2xs">
+                          VI PHẠM NGHỊ ĐỊNH 123
                         </span>
-                        <span className="text-xs text-[#667085] font-mono block mt-1 leading-relaxed break-words">
-                          Người điều khiển #{h.track_id} {h.plate_text ? `• Biển số xe: ${h.plate_text}` : ''} {h.count && h.count > 1 ? `• Ghi nhận ${h.count} lần` : ''}
+                        <span className="font-mono font-bold text-[#881337] bg-white px-2 py-0.5 rounded border border-[#FECDD3]">
+                          #NGƯỜI_LÁI_{h.track_id}
+                        </span>
+                      </div>
+
+                      <div className="flex items-center gap-2.5 text-[#9F1239]">
+                        <span className="flex items-center gap-1 font-semibold text-[#047857] bg-[#ECFDF5] px-2 py-0.5 rounded border border-[#A7F3D0]">
+                          <CheckCircle2 className="w-3 h-3 text-[#10B981]" />
+                          AI đã xác thực
+                        </span>
+                        <span className="text-[#FDA4AF]">•</span>
+                        <span className="font-medium text-[#4B5563]">
+                          {h.count && h.count > 1 ? `Ghi nhận ${h.count} khung hình` : 'Ghi nhận trực tiếp'}
                         </span>
                       </div>
                     </div>
 
-                    <div className="flex items-center gap-2.5 shrink-0 self-end sm:self-center pl-12 sm:pl-0">
-                      {h.thumbnail && (
-                        <img
-                          src={h.thumbnail}
-                          alt="Vi phạm mũ bảo hiểm"
-                          className="w-11 h-11 rounded-lg border border-[#FECDCA] object-cover bg-white shadow-2xs"
-                        />
-                      )}
-                      <span className="px-2.5 py-1 rounded-md text-[11px] font-extrabold uppercase bg-[#F04438] text-white shadow-xs shrink-0 whitespace-nowrap">
-                        Vi phạm NĐ 100
-                      </span>
+                    {/* NỘI DUNG CHÍNH CỦA THẺ */}
+                    <div className="p-3.5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3.5">
+                      {/* CỘT TRÁI: ICON + MÔ TẢ VI PHẠM + BIỂN SỐ XE + KHUNG PHẠT */}
+                      <div className="flex items-start gap-3 flex-1 min-w-0">
+                        {/* ICON MŨ BẢO HIỂM VI PHẠM HI-TECH */}
+                        <div className="relative w-11 h-11 rounded-xl bg-gradient-to-br from-[#F43F5E] to-[#BE123C] text-white flex items-center justify-center shadow-xs shrink-0 mt-0.5">
+                          <HardHat className="w-5 h-5 stroke-[2] opacity-95" />
+                          <div className="absolute -bottom-1 -right-1 w-4 h-4 rounded-full bg-[#881337] text-white flex items-center justify-center text-[10px] font-black border-2 border-white">
+                            ✕
+                          </div>
+                        </div>
+
+                        <div className="flex-1 min-w-0 space-y-2">
+                          {/* TIÊU ĐỀ HÀNH VI VI PHẠM */}
+                          <div>
+                            <h4 className="text-xs sm:text-sm font-bold text-[#1F2937] leading-snug">
+                              Không đội mũ bảo hiểm khi lái xe máy
+                            </h4>
+                            <p className="text-[11px] text-[#6B7280] mt-0.5">
+                              Người điều khiển mô tô, xe gắn máy không đội mũ bảo hiểm hoặc đội mũ không cài quai đúng cách
+                            </p>
+                          </div>
+
+                          {/* KHỐI BIỂN SỐ XE KIỂU VIỆT NAM THỰC TẾ */}
+                          <div className="flex items-center gap-2 flex-wrap">
+                            <span className="text-[11px] font-semibold text-[#4B5563]">Phương tiện:</span>
+                            {h.plate_text ? (
+                              <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded bg-white border-2 border-[#1E293B] font-mono font-black text-xs text-[#0F172A] shadow-xs tracking-wider">
+                                <span className="w-1.5 h-1.5 rounded-full bg-[#3B82F6]" />
+                                <span>{h.plate_text}</span>
+                              </div>
+                            ) : (
+                              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[11px] font-medium bg-[#F3F4F6] text-[#6B7280] border border-dashed border-[#D1D5DB]">
+                                <Search className="w-3 h-3 text-[#9CA3AF]" />
+                                Chưa gắn kết biển số xe
+                              </span>
+                            )}
+                          </div>
+
+                          {/* KHUNG MỨC XỬ PHẠT CHUẨN NGHỊ ĐỊNH 100/123 */}
+                          <div className="p-2 px-3 rounded-lg bg-gradient-to-r from-[#FFF1F2] to-white border border-[#FECDD3] text-[11px] sm:text-xs text-[#881337] flex items-start gap-2">
+                            <Gavel className="w-4 h-4 text-[#E11D48] shrink-0 mt-0.5" />
+                            <div className="leading-relaxed">
+                              <span className="font-bold text-[#BE123C]">Mức xử phạt: </span>
+                              <strong className="text-[#E11D48] text-xs sm:text-sm font-black">
+                                400.000đ – 600.000đ
+                              </strong>
+                              <span className="text-[#9F1239] block sm:inline sm:ml-1 text-[11px]">
+                                (Điểm b Khoản 4 Điều 2 Nghị định 123/2021/NĐ-CP sửa đổi NĐ 100)
+                              </span>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* CỘT PHẢI: BẰNG CHỨNG HÌNH ẢNH CÓ THỂ PHÓNG TO + NÚT XEM CHI TIẾT */}
+                      <div className="flex sm:flex-col items-center sm:items-end justify-between sm:justify-center gap-2 shrink-0 self-end sm:self-center w-full sm:w-auto pt-2 sm:pt-0 border-t sm:border-t-0 border-[#FECDD3]/50">
+                        {h.thumbnail ? (
+                          <button
+                            type="button"
+                            onClick={() => setSelectedHelmetEvidence(h)}
+                            className="relative group/thumb rounded-xl overflow-hidden border-2 border-[#FDA4AF] hover:border-[#E11D48] bg-slate-900 shadow-xs transition-all focus:outline-hidden"
+                            title="Bấm để phóng to và xem trích xuất bằng chứng"
+                          >
+                            <img
+                              src={h.thumbnail}
+                              alt="Bằng chứng vi phạm mũ bảo hiểm"
+                              className="w-16 h-16 sm:w-20 sm:h-20 object-cover bg-white group-hover/thumb:scale-105 transition-transform duration-200"
+                            />
+                            {/* OVERLAY KHI HOVER */}
+                            <div className="absolute inset-0 bg-black/50 opacity-0 group-hover/thumb:opacity-100 transition-opacity flex flex-col items-center justify-center text-white text-[10px] font-bold gap-0.5">
+                              <ZoomIn className="w-4 h-4" />
+                              <span>Phóng to</span>
+                            </div>
+                            <span className="absolute bottom-0 inset-x-0 bg-gradient-to-t from-black/80 to-transparent text-white text-[9px] font-extrabold text-center py-0.5 tracking-tight">
+                              BẰNG CHỨNG
+                            </span>
+                          </button>
+                        ) : (
+                          <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-xl border-2 border-dashed border-[#FDA4AF] bg-[#FFF1F2] flex flex-col items-center justify-center text-[#E11D48] p-1 text-center">
+                            <Camera className="w-5 h-5 mb-0.5 opacity-60" />
+                            <span className="text-[9px] font-bold leading-tight">Khung ảnh</span>
+                          </div>
+                        )}
+
+                        <button
+                          type="button"
+                          onClick={() => setSelectedHelmetEvidence(h)}
+                          className="px-3 py-1.5 rounded-lg text-xs font-bold bg-[#E11D48] hover:bg-[#BE123C] text-white shadow-xs hover:shadow transition-all flex items-center gap-1.5 shrink-0"
+                        >
+                          <Eye className="w-3.5 h-3.5" />
+                          <span>Chi tiết vi phạm</span>
+                        </button>
+                      </div>
                     </div>
                   </div>
                 ))}
+              </div>
+            )}
+
+            {/* MODAL TRÍCH XUẤT BẰNG CHỨNG VI PHẠM */}
+            {selectedHelmetEvidence && (
+              <div
+                className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-xs animate-in fade-in duration-150"
+                onClick={() => setSelectedHelmetEvidence(null)}
+              >
+                <div
+                  className="bg-white rounded-2xl max-w-lg w-full overflow-hidden shadow-2xl border border-slate-200 flex flex-col"
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  {/* HEADER MODAL */}
+                  <div className="px-5 py-3.5 bg-gradient-to-r from-[#9F1239] to-[#E11D48] text-white flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <ShieldAlert className="w-5 h-5 text-rose-200" />
+                      <div>
+                        <h3 className="text-sm font-extrabold uppercase tracking-wide">
+                          Trích Xuất Bằng Chứng Vi Phạm
+                        </h3>
+                        <span className="text-[11px] text-rose-100 font-mono">
+                          Mã hồ sơ: #HS-MBH-{selectedHelmetEvidence.track_id}
+                        </span>
+                      </div>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => setSelectedHelmetEvidence(null)}
+                      className="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 text-white flex items-center justify-center transition-colors"
+                      title="Đóng cửa sổ"
+                    >
+                      <X className="w-4 h-4" />
+                    </button>
+                  </div>
+
+                  {/* NỘI DUNG MODAL */}
+                  <div className="p-5 space-y-4 max-h-[75vh] overflow-y-auto">
+                    {/* HÌNH ẢNH BẰNG CHỨNG PHÓNG TO */}
+                    <div className="relative rounded-xl overflow-hidden border-2 border-slate-900 bg-slate-950 flex items-center justify-center min-h-[200px]">
+                      {selectedHelmetEvidence.thumbnail ? (
+                        <img
+                          src={selectedHelmetEvidence.thumbnail}
+                          alt="Ảnh bằng chứng vi phạm mũ bảo hiểm"
+                          className="max-h-[260px] w-auto object-contain"
+                        />
+                      ) : (
+                        <div className="py-10 text-center text-slate-400 text-xs">
+                          <Camera className="w-8 h-8 mx-auto mb-2 opacity-50" />
+                          Không có ảnh trích xuất trực tiếp
+                        </div>
+                      )}
+                      <div className="absolute top-2 left-2 px-2 py-0.5 rounded bg-black/70 text-white font-mono text-[10px] font-bold">
+                        AI TRACKING #{selectedHelmetEvidence.track_id}
+                      </div>
+                      <div className="absolute bottom-2 right-2 px-2 py-0.5 rounded bg-[#E11D48] text-white text-[10px] font-extrabold uppercase tracking-wide">
+                        BẰNG CHỨNG HỢP LỆ
+                      </div>
+                    </div>
+
+                    {/* BẢNG THÔNG TIN CHI TIẾT */}
+                    <div className="space-y-2 text-xs">
+                      <div className="flex items-center justify-between p-2 rounded-lg bg-slate-50 border border-slate-100">
+                        <span className="text-slate-500 font-medium">Hành vi vi phạm:</span>
+                        <span className="font-bold text-slate-900 text-right">
+                          Không đội mũ bảo hiểm cho người đi mô tô, xe máy
+                        </span>
+                      </div>
+
+                      <div className="flex items-center justify-between p-2 rounded-lg bg-slate-50 border border-slate-100">
+                        <span className="text-slate-500 font-medium">Biển kiểm soát:</span>
+                        {selectedHelmetEvidence.plate_text ? (
+                          <span className="font-mono font-black text-sm text-slate-900 px-2 py-0.5 rounded bg-white border border-slate-800">
+                            {selectedHelmetEvidence.plate_text}
+                          </span>
+                        ) : (
+                          <span className="italic text-slate-500">Chưa gắn kết biển số xe</span>
+                        )}
+                      </div>
+
+                      <div className="flex items-center justify-between p-2 rounded-lg bg-slate-50 border border-slate-100">
+                        <span className="text-slate-500 font-medium">Căn cứ pháp lý:</span>
+                        <span className="font-semibold text-[#9F1239] text-right">
+                          Điểm b Khoản 4 Điều 2 Nghị định 123/2021/NĐ-CP (sửa đổi NĐ 100/2019/NĐ-CP)
+                        </span>
+                      </div>
+
+                      <div className="flex items-center justify-between p-2.5 rounded-lg bg-rose-50 border border-rose-200">
+                        <span className="text-rose-900 font-bold flex items-center gap-1.5">
+                          <Gavel className="w-4 h-4 text-rose-600" />
+                          Mức xử phạt tài chính:
+                        </span>
+                        <span className="font-black text-base text-rose-600">
+                          400.000đ – 600.000đ
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* FOOTER MODAL */}
+                  <div className="px-5 py-3 bg-slate-50 border-t border-slate-100 flex items-center justify-end gap-2.5">
+                    <button
+                      type="button"
+                      onClick={() => setSelectedHelmetEvidence(null)}
+                      className="px-4 py-2 text-xs font-semibold text-slate-700 bg-white border border-slate-300 hover:bg-slate-100 rounded-lg transition-colors"
+                    >
+                      Đóng
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        window.print();
+                      }}
+                      className="px-4 py-2 text-xs font-bold text-white bg-slate-900 hover:bg-slate-800 rounded-lg transition-colors flex items-center gap-1.5 shadow-xs"
+                    >
+                      <FileText className="w-3.5 h-3.5" />
+                      <span>In phiếu ghi nhận</span>
+                    </button>
+                  </div>
+                </div>
               </div>
             )}
           </div>

@@ -4,11 +4,24 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import { VehicleDetection, LineCrossingData } from '../types/detection';
 import { soundEngine } from '../lib/soundEngine';
 
+export interface ActiveZones {
+  L: boolean; // Vùng Trái
+  F: boolean; // Phía Trước
+  R: boolean; // Vùng Phải
+}
+
+export type DrivingProfile = 'auto' | 'urban' | 'highway';
+
 export interface ZoneStatus {
   dist: number | null;
   lvl: 0 | 1 | 2; // 0 = Safe, 1 = Warn, 2 = Danger
   cls?: string;
   vn?: string;
+  disabled?: boolean;
+  ttc?: number | null; // Time To Collision in seconds
+  relSpeedKmh?: number; // Vận tốc tiếp cận (+: đang lao tới, -: đang nới xa)
+  approachState?: 'CLOSING_IN' | 'MAINTAINING' | 'PULLING_AWAY' | 'CUT_IN' | 'STOPPED';
+  approachDesc?: string;
 }
 
 export interface TrackedVehicle {
@@ -26,6 +39,10 @@ export interface TrackedVehicle {
   y2: number;
   inside: boolean;
   direction?: 'IN' | 'OUT' | 'IDLE';
+  ttc?: number | null;
+  relSpeedKmh?: number;
+  approachState?: 'CLOSING_IN' | 'MAINTAINING' | 'PULLING_AWAY' | 'CUT_IN' | 'STOPPED';
+  approachDesc?: string;
 }
 
 export interface LineCrossingStats {
@@ -65,6 +82,8 @@ export interface UseTrafficDistanceEngineProps {
   isStreaming?: boolean;
   isPaused?: boolean;
   sourceMode?: 'video' | 'webcam' | 'image';
+  currentSpeed?: number | null;
+  speedLimit?: number | null;
 }
 
 const CLS_MAP: Record<string, { h: number; w: number; c: string; vn: string }> = {
@@ -85,6 +104,8 @@ export function useTrafficDistanceEngine({
   isStreaming = false,
   isPaused = false,
   sourceMode = 'video',
+  currentSpeed = null,
+  speedLimit = null,
 }: UseTrafficDistanceEngineProps) {
   // Configurable thresholds
   const [warnThreshold, setWarnThreshold] = useState<number>(8);
@@ -94,10 +115,71 @@ export function useTrafficDistanceEngine({
   const [soundEnabled, setSoundEnabled] = useState<boolean>(false);
   const [simMode, setSimMode] = useState<boolean>(false);
 
+  // ADAS Driving Profile: 'auto' (thông minh theo tốc độ) | 'urban' (đô thị phố đông) | 'highway' (cao tốc / đường trường)
+  const [drivingProfile, setDrivingProfile] = useState<DrivingProfile>(() => {
+    if (typeof window !== 'undefined') {
+      try {
+        const saved = localStorage.getItem('traffic_guard_driving_profile');
+        if (saved && (saved === 'auto' || saved === 'urban' || saved === 'highway')) {
+          return saved as DrivingProfile;
+        }
+      } catch (e) {}
+    }
+    return 'auto';
+  });
+
+  const setDrivingProfileSafe = useCallback((profile: DrivingProfile) => {
+    setDrivingProfile(profile);
+    if (typeof window !== 'undefined') {
+      try {
+        localStorage.setItem('traffic_guard_driving_profile', profile);
+      } catch (e) {}
+    }
+  }, []);
+
+  // Active Zones State (Độc lập bật/tắt 1, 2 hoặc 3 phía L - F - R)
+  const [activeZones, setActiveZones] = useState<ActiveZones>(() => {
+    if (typeof window !== 'undefined') {
+      try {
+        const saved = localStorage.getItem('traffic_guard_active_zones');
+        if (saved) {
+          const parsed = JSON.parse(saved);
+          return {
+            L: parsed.L !== false,
+            F: parsed.F !== false,
+            R: parsed.R !== false,
+          };
+        }
+      } catch (e) {}
+    }
+    return { L: true, F: true, R: true };
+  });
+
+  const toggleZone = useCallback((zone: 'L' | 'F' | 'R') => {
+    setActiveZones((prev) => {
+      const next = { ...prev, [zone]: !prev[zone] };
+      if (typeof window !== 'undefined') {
+        try {
+          localStorage.setItem('traffic_guard_active_zones', JSON.stringify(next));
+        } catch (e) {}
+      }
+      return next;
+    });
+  }, []);
+
+  const setAllZones = useCallback((zones: ActiveZones) => {
+    setActiveZones(zones);
+    if (typeof window !== 'undefined') {
+      try {
+        localStorage.setItem('traffic_guard_active_zones', JSON.stringify(zones));
+      } catch (e) {}
+    }
+  }, []);
+
   // 3-Zone states
-  const [zoneLeft, setZoneLeft] = useState<ZoneStatus>({ dist: null, lvl: 0 });
-  const [zoneFront, setZoneFront] = useState<ZoneStatus>({ dist: null, lvl: 0 });
-  const [zoneRight, setZoneRight] = useState<ZoneStatus>({ dist: null, lvl: 0 });
+  const [zoneLeft, setZoneLeft] = useState<ZoneStatus>({ dist: null, lvl: 0, disabled: !activeZones.L });
+  const [zoneFront, setZoneFront] = useState<ZoneStatus>({ dist: null, lvl: 0, disabled: !activeZones.F });
+  const [zoneRight, setZoneRight] = useState<ZoneStatus>({ dist: null, lvl: 0, disabled: !activeZones.R });
 
   // List of active tracked vehicles
   const [trackedVehicles, setTrackedVehicles] = useState<TrackedVehicle[]>([]);
@@ -167,13 +249,26 @@ export function useTrafficDistanceEngine({
       lineYRatio: 0.60,
       recentList: [],
     });
-    fetch('http://localhost:8000/api/v1/traffic-density/reset-line-crossings?session_id=live_stream', { method: 'POST' }).catch(() => {});
+    fetch('http://127.0.0.1:8000/api/v1/traffic-density/reset-line-crossings?session_id=live_stream', { method: 'POST' }).catch(() => {});
   }, []);
 
   // Simulation state
   const simObjsRef = useRef<any[]>([]);
   const nextIdRef = useRef<number>(1);
-  const trackHistoryRef = useRef<Record<number, { d: number; v: number; seen: number }>>({});
+  const trackHistoryRef = useRef<
+    Record<
+      number,
+      {
+        d: number;
+        v: number;
+        u: number;
+        prevZone: 'L' | 'F' | 'R';
+        seen: number;
+        cutInFrames: number;
+        lvl: 0 | 1 | 2;
+      }
+    >
+  >({});
   const lastBeepRef = useRef<number>(0);
   const lastTimeRef = useRef<number>(performance.now());
   const lastUiRef = useRef<number>(0);
@@ -320,9 +415,9 @@ export function useTrafficDistanceEngine({
       if (list.length === 0) {
         if (now - lastUiRef.current >= 100) {
           lastUiRef.current = now;
-          setZoneLeft({ dist: null, lvl: 0 });
-          setZoneFront({ dist: null, lvl: 0 });
-          setZoneRight({ dist: null, lvl: 0 });
+          setZoneLeft({ dist: null, lvl: 0, disabled: !activeZones.L });
+          setZoneFront({ dist: null, lvl: 0, disabled: !activeZones.F });
+          setZoneRight({ dist: null, lvl: 0, disabled: !activeZones.R });
           setTrackedVehicles([]);
           setAlertBanner(null);
         }
@@ -330,11 +425,37 @@ export function useTrafficDistanceEngine({
         return;
       }
 
-      // Analyze vehicles in 3 zones
+      // ── SMART SPEED-AWARE & DRIVING PROFILE THRESHOLDS ──
+      const egoSpeed = currentSpeed !== null && currentSpeed !== undefined ? currentSpeed : 45;
+      const speedMs = Math.max(0, egoSpeed) / 3.6;
+      // 2-second international rule for safe following distance
+      const dynamic2SecDist = Math.max(4.0, speedMs * 2.0);
+
+      const effectiveProfile: 'urban' | 'highway' =
+        drivingProfile === 'highway' ? 'highway' : drivingProfile === 'urban' ? 'urban' : egoSpeed > 55 ? 'highway' : 'urban';
+
+      let effectiveWarnDist = warnThreshold;
+      let effectiveDangerDist = dangerThreshold;
+
+      if (egoSpeed < 8) {
+        // Dừng đèn đỏ hoặc kẹt xe (Stop & Go Traffic): thu nhỏ ngưỡng để chống báo ảo!
+        effectiveWarnDist = Math.min(warnThreshold, 3.8);
+        effectiveDangerDist = Math.min(dangerThreshold, 1.8);
+      } else if (effectiveProfile === 'highway') {
+        // Cao tốc / đường trường: tự động nới rộng cự ly cảnh báo sớm 25-50m
+        effectiveWarnDist = Math.max(warnThreshold, Math.min(65, dynamic2SecDist * 0.9));
+        effectiveDangerDist = Math.max(dangerThreshold, Math.min(28, dynamic2SecDist * 0.45));
+      } else {
+        // Đô thị: cân bằng linh hoạt theo tốc độ phố 25-50 km/h
+        effectiveWarnDist = Math.max(warnThreshold, Math.min(22, dynamic2SecDist * 0.85));
+        effectiveDangerDist = Math.max(dangerThreshold, Math.min(9, dynamic2SecDist * 0.4));
+      }
+
+      // Analyze vehicles in 3 zones (tôn trọng cài đặt BẬT/TẮT của từng vùng)
       const newZs: { L: ZoneStatus; F: ZoneStatus; R: ZoneStatus } = {
-        L: { dist: null, lvl: 0 },
-        F: { dist: null, lvl: 0 },
-        R: { dist: null, lvl: 0 },
+        L: { dist: null, lvl: 0, disabled: !activeZones.L },
+        F: { dist: null, lvl: 0, disabled: !activeZones.F },
+        R: { dist: null, lvl: 0, disabled: !activeZones.R },
       };
 
       const computedTracked: TrackedVehicle[] = [];
@@ -344,24 +465,124 @@ export function useTrafficDistanceEngine({
       list.forEach((d) => {
         const c = CLS_MAP[d.cls] || CLS_MAP.car;
         const hpx = Math.max(1, d.y2 - d.y1);
-        const dist = d.distance_m != null ? d.distance_m : Math.max(1.5, Math.min(80, (F0 * c.h) / hpx));
+        const rawDist = d.distance_m != null ? d.distance_m : Math.max(1.5, Math.min(80, (F0 * c.h) / hpx));
         const xc = (d.x1 + d.x2) / 2;
         const hw = RH * (d.y2 - HZ) / CAMH;
         const u = hw !== 0 ? (xc - CX) / hw : 0;
         const inside = d.y2 >= top && d.y2 <= bot && Math.abs(u) <= 1.25;
         const zKey: 'L' | 'F' | 'R' = u < -0.33 ? 'L' : u > 0.33 ? 'R' : 'F';
+        const isZoneActive = activeZones[zKey];
 
         let tr = trackHistoryRef.current[d.id];
-        if (!tr) tr = trackHistoryRef.current[d.id] = { d: dist, v: 0, seen: now };
-        if (dt > 0) {
-          const v = -(dist - tr.d) / dt;
-          tr.v = tr.v * 0.9 + v * 0.1;
-        }
-        tr.d = dist;
-        tr.seen = now;
+        let dist = rawDist;
+        let v_rel = 0;
+        let isCutIn = false;
 
-        const lvl: 0 | 1 | 2 = dist <= dangerThreshold ? 2 : dist <= warnThreshold ? 1 : 0;
-        const speedKmh = Math.abs(tr.v * 3.6);
+        if (!tr) {
+          dist = rawDist;
+          v_rel = 0;
+          tr = trackHistoryRef.current[d.id] = {
+            d: dist,
+            v: 0,
+            u,
+            prevZone: zKey,
+            seen: now,
+            cutInFrames: 0,
+            lvl: 0,
+          };
+        } else {
+          // Adaptive dual-rate EMA smoothing:
+          // Nếu biến thiên cự ly rất lớn (|deltaD| > 3.0m do phanh gấp): phản ứng nhanh (alpha = 0.80)
+          // Khi di chuyển bình thường: làm mượt cao (alpha = 0.35) để loại bỏ 100% rung lắc frame
+          const deltaD = rawDist - tr.d;
+          const alpha = Math.abs(deltaD) > 3.0 ? 0.80 : 0.35;
+          dist = alpha * rawDist + (1 - alpha) * tr.d;
+
+          if (dt > 0.005) {
+            // Khi khoảng cách giảm dần (d giảm) -> vận tốc tiếp cận v_instant dương
+            const v_instant = -(dist - tr.d) / dt;
+            v_rel = tr.v * 0.75 + v_instant * 0.25;
+          } else {
+            v_rel = tr.v;
+          }
+
+          // Phát hiện xe tạt đầu (Cut-in detection):
+          // Xe đang ở vùng trước F nhưng trong 1.5s trước vừa ở bên Trái hoặc Phải và có vận tốc ngang dịch chuyển
+          const lateralSpeed = Math.abs(u - tr.u) / Math.max(0.01, dt);
+          if (zKey === 'F' && tr.prevZone !== 'F' && lateralSpeed > 0.30) {
+            tr.cutInFrames = 15; // Duy trì trạng thái tạt đầu trong ~500ms
+          } else if (tr.cutInFrames > 0) {
+            tr.cutInFrames -= 1;
+          }
+          isCutIn = tr.cutInFrames > 0;
+
+          tr.d = dist;
+          tr.v = v_rel;
+          tr.u = u;
+          tr.prevZone = zKey;
+          tr.seen = now;
+        }
+
+        const relSpeedKmh = v_rel * 3.6;
+        const absSpeedKmh = Math.abs(tr.v * 3.6);
+
+        // Phân loại trạng thái chuyển động thông minh (Approach State)
+        let approachState: 'CLOSING_IN' | 'MAINTAINING' | 'PULLING_AWAY' | 'CUT_IN' | 'STOPPED' = 'MAINTAINING';
+        let approachDesc = 'Ổn định';
+
+        if (isCutIn) {
+          approachState = 'CUT_IN';
+          approachDesc = 'Tạt đầu vào làn';
+        } else if (relSpeedKmh > 3.0) {
+          approachState = 'CLOSING_IN';
+          approachDesc = `Áp sát (+${Math.round(relSpeedKmh)} km/h)`;
+        } else if (relSpeedKmh < -3.0) {
+          approachState = 'PULLING_AWAY';
+          approachDesc = `Nới xa (${Math.round(relSpeedKmh)} km/h)`;
+        } else if (egoSpeed < 8 && Math.abs(relSpeedKmh) <= 3.0) {
+          approachState = 'STOPPED';
+          approachDesc = 'Dừng / Chờ đèn';
+        }
+
+        // Time-To-Collision (TTC) - Thời gian dự tính va chạm nếu duy trì tốc độ tiếp cận
+        let ttc: number | null = null;
+        if (v_rel > 0.4) {
+          ttc = Math.max(0.1, dist / v_rel);
+        }
+
+        // Hệ số an toàn theo loại xe (VRU: người/xe máy phản ứng nhạy hơn 15%, xe tải/buýt nới rộng cự ly 25%)
+        const vruMultiplier = (d.cls === 'motorbike' || d.cls === 'person') ? 1.15 : (d.cls === 'truck' || d.cls === 'bus') ? 1.25 : 1.0;
+        const objWarnDist = effectiveWarnDist * vruMultiplier;
+        const objDangerDist = effectiveDangerDist * vruMultiplier;
+
+        // Phân cấp cảnh báo đa yếu tố (Multi-factor Smart Danger Level)
+        let lvl: 0 | 1 | 2 = 0;
+        if (isZoneActive) {
+          // Mức 2 (DANGER - PHANH GẤP):
+          // 1. TTC nguy kịch (TTC <= 1.8s) khi đang áp sát
+          // 2. Cự ly rơi vào vùng phanh khẩn cấp (objDangerDist) và KHÔNG phải đang đi xa dần
+          // 3. Hoặc xe tạt đầu ở cự ly gần (< dangerDist * 1.5)
+          const isTtcCritical = ttc !== null && ttc <= 1.8 && dist <= objWarnDist * 1.2;
+          const isProximityCritical = dist <= objDangerDist && approachState !== 'PULLING_AWAY';
+          const isCutInCritical = isCutIn && dist <= objDangerDist * 1.5;
+
+          if (isTtcCritical || isProximityCritical || isCutInCritical) {
+            lvl = 2;
+          } else {
+            // Mức 1 (WARN - CHÚ Ý):
+            // 1. TTC cận an toàn (TTC <= 3.2s)
+            // 2. Cự ly trong ngưỡng cảnh báo objWarnDist và không phải đang nới xa
+            // 3. Hoặc phương tiện đang tạt đầu
+            const isTtcWarn = ttc !== null && ttc <= 3.2 && dist <= objWarnDist * 1.3;
+            const isProximityWarn = dist <= objWarnDist && approachState !== 'PULLING_AWAY';
+
+            if (isTtcWarn || isProximityWarn || isCutIn) {
+              lvl = 1;
+            } else {
+              lvl = 0;
+            }
+          }
+        }
 
         // ── LINE CROSSING DETECTION (VẠCH ĐẾM LƯU LƯỢNG IN / OUT TẠI 60% CHIỀU CAO) ──
         const lineY = H * 0.60;
@@ -379,7 +600,7 @@ export function useTrafficDistanceEngine({
                 totalCount: prev.totalCount + 1,
                 inByClass: { ...prev.inByClass, [mapKey]: (prev.inByClass[mapKey] || 0) + 1 },
                 recentList: [
-                  { id: d.id, cls: d.cls, vn: c.vn, speed: Math.round(speedKmh), dir: 'IN', time: Date.now() },
+                  { id: d.id, cls: d.cls, vn: c.vn, speed: Math.round(absSpeedKmh), dir: 'IN', time: Date.now() },
                   ...prev.recentList.slice(0, 14),
                 ],
               }));
@@ -395,7 +616,7 @@ export function useTrafficDistanceEngine({
                 totalCount: prev.totalCount + 1,
                 outByClass: { ...prev.outByClass, [mapKey]: (prev.outByClass[mapKey] || 0) + 1 },
                 recentList: [
-                  { id: d.id, cls: d.cls, vn: c.vn, speed: Math.round(speedKmh), dir: 'OUT', time: Date.now() },
+                  { id: d.id, cls: d.cls, vn: c.vn, speed: Math.round(absSpeedKmh), dir: 'OUT', time: Date.now() },
                   ...prev.recentList.slice(0, 14),
                 ],
               }));
@@ -411,7 +632,7 @@ export function useTrafficDistanceEngine({
           dist,
           zone: ZN_MAP[zKey],
           zoneKey: zKey,
-          speed: speedKmh,
+          speed: absSpeedKmh,
           lvl,
           x1: d.x1,
           y1: d.y1,
@@ -419,14 +640,23 @@ export function useTrafficDistanceEngine({
           y2: d.y2,
           inside,
           direction,
+          ttc,
+          relSpeedKmh,
+          approachState,
+          approachDesc,
         });
 
-        if (inside && (!newZs[zKey].dist || dist < newZs[zKey].dist!)) {
+        if (inside && isZoneActive && (!newZs[zKey].dist || dist < newZs[zKey].dist!)) {
           newZs[zKey] = {
             dist,
             lvl,
             cls: d.cls,
             vn: c.vn,
+            disabled: false,
+            ttc,
+            relSpeedKmh,
+            approachState,
+            approachDesc,
           };
         }
       });
@@ -447,9 +677,19 @@ export function useTrafficDistanceEngine({
         setZoneRight(newZs.R);
         setTrackedVehicles(computedTracked);
 
-        // Determine worst alert for top banner
-        let worst: { dist: number; lvl: 1 | 2; cls: string; vn: string; zoneKey: 'L' | 'F' | 'R' } | null = null;
-        (['L', 'F', 'R'] as const).forEach((k) => {
+        // Determine worst alert for top banner (CHỈ XÉT CÁC VÙNG ĐANG BẬT)
+        let worst: {
+          dist: number;
+          lvl: 1 | 2;
+          cls: string;
+          vn: string;
+          zoneKey: 'L' | 'F' | 'R';
+          ttc?: number | null;
+          approachState?: string;
+          relSpeedKmh?: number;
+        } | null = null;
+
+        ((['L', 'F', 'R'] as const).filter((k) => activeZones[k])).forEach((k) => {
           const z = newZs[k];
           if (z.dist && z.lvl > 0) {
             if (!worst || z.dist < worst.dist) {
@@ -459,25 +699,46 @@ export function useTrafficDistanceEngine({
                 cls: z.cls || 'car',
                 vn: z.vn || 'Ô tô',
                 zoneKey: k,
+                ttc: z.ttc,
+                approachState: z.approachState,
+                relSpeedKmh: z.relSpeedKmh,
               };
             }
           }
         });
 
         if (worst) {
-          const prefix = (worst as any).lvl === 2 ? 'NGUY HIỂM: ' : 'Chú ý: ';
+          const isCrit = (worst as any).lvl === 2;
+          const prefix = isCrit ? '🚨 NGUY HIỂM: ' : '⚠ Chú ý: ';
           const zoneStr = (worst as any).zoneKey === 'F' ? 'phía trước' : (worst as any).zoneKey === 'L' ? 'bên trái' : 'bên phải';
+          const objVn = (worst as any).vn.toLowerCase();
+          const distStr = `${(worst as any).dist.toFixed(1)}m`;
+
+          let extraInfo = '';
+          if ((worst as any).approachState === 'CUT_IN') {
+            extraInfo = ' (Tạt đầu vào làn!)';
+          } else if ((worst as any).ttc !== null && (worst as any).ttc <= 3.0) {
+            extraInfo = ` (TTC: ${(worst as any).ttc.toFixed(1)}s)`;
+          } else if ((worst as any).approachState === 'CLOSING_IN') {
+            extraInfo = ' (Đang áp sát nhanh)';
+          }
+
+          const actionStr = isCrit ? ' Phanh gấp!' : '';
+
           setAlertBanner({
-            text: `${prefix}${(worst as any).vn.toLowerCase()} ${zoneStr} ${(worst as any).dist.toFixed(1)} m`,
+            text: `${prefix}${objVn} ${zoneStr} ${distStr}${extraInfo}.${actionStr}`,
             lvl: (worst as any).lvl,
           });
 
-          // Trigger Audio beep & voice alert if enabled
-          if (soundEnabled) {
-            const gap = (worst as any).lvl === 2 ? 350 : 900;
+          // Trigger Audio beep nếu bật âm thanh VÀ xe không đang dừng đèn đỏ (egoSpeed >= 5)
+          if (soundEnabled && egoSpeed >= 5) {
+            // Tần suất bíp thông minh: TTC càng ngắn (hoặc level 2) bíp càng nhanh
+            const gap = isCrit
+              ? ((worst as any).ttc && (worst as any).ttc < 1.2 ? 220 : 350)
+              : 850;
             if (now - lastBeepRef.current > gap) {
               lastBeepRef.current = now;
-              playBeep((worst as any).lvl === 2 ? 900 : 520);
+              playBeep(isCrit ? 950 : 540);
             }
           }
         } else {
@@ -493,7 +754,7 @@ export function useTrafficDistanceEngine({
     return () => {
       cancelAnimationFrame(animId);
     };
-  }, [realVehicles, simMode, isStreaming, isPaused, warnThreshold, dangerThreshold, focalLength, soundEnabled, playBeep]);
+  }, [realVehicles, simMode, isStreaming, isPaused, warnThreshold, dangerThreshold, focalLength, soundEnabled, playBeep, activeZones, currentSpeed, drivingProfile]);
 
   return {
     warnThreshold,
@@ -508,6 +769,12 @@ export function useTrafficDistanceEngine({
     setSoundEnabled,
     simMode,
     setSimMode,
+    drivingProfile,
+    setDrivingProfile: setDrivingProfileSafe,
+    activeZones,
+    setActiveZones,
+    toggleZone,
+    setAllZones,
     zoneLeft,
     zoneFront,
     zoneRight,

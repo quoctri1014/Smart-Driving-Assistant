@@ -78,7 +78,7 @@ export function AppHeader() {
     let mounted = true;
     const checkBackend = async () => {
       try {
-        const res = await fetch('http://localhost:8000/health').catch(() => null);
+        const res = await fetch('http://127.0.0.1:8000/health').catch(() => null);
         if (mounted) {
           setApiStatus(res && res.ok ? 'online' : 'offline');
         }

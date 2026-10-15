@@ -17,6 +17,8 @@ import {
 } from '../types/detection';
 import { globalVideoSpeedTracker } from '../lib/driving/video-speed-tracker';
 
+const BACKEND_API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:8000';
+
 export interface UseClientTrafficAIProps {
   videoRef: React.RefObject<HTMLVideoElement | null>;
   isStreaming: boolean;
@@ -25,107 +27,107 @@ export interface UseClientTrafficAIProps {
   onAutoPausePlate?: (plate: PlateDetection) => void;
 }
 
-const SIGN_NAMES: Record<string, { name: string; category: string; action: string }> = {
+const SIGN_NAMES: Record<string, { name: string; category: string; action: string; penalty: string }> = {
   // 1. BIỂN BÁO CẤM (Nhóm P & DP) - QCVN 41:2019/BGTVT
-  'DP.135': { name: 'Hết tất cả các lệnh cấm', category: 'HIỆU LỆNH', action: 'Hết hiệu lực của các biển cấm trước đó' },
-  'P.101': { name: 'Đường cấm', category: 'CẤM', action: 'Cấm tất cả các loại phương tiện đi lại cả hai hướng' },
-  'P.102': { name: 'Cấm đi ngược chiều', category: 'CẤM', action: 'Không đi vào đường theo chiều đặt biển' },
-  'P.103a': { name: 'Cấm xe ô tô', category: 'CẤM', action: 'Cấm tất cả các loại xe cơ giới từ 3 bánh trở lên đi vào' },
-  'P.103b': { name: 'Cấm ô tô rẽ phải', category: 'CẤM', action: 'Cấm các loại xe cơ giới từ 3 bánh trở lên rẽ phải' },
-  'P.103c': { name: 'Cấm ô tô rẽ trái', category: 'CẤM', action: 'Cấm các loại xe cơ giới từ 3 bánh trở lên rẽ trái' },
-  'P.104': { name: 'Cấm xe máy', category: 'CẤM', action: 'Cấm các loại xe mô tô hai bánh và ba bánh' },
-  'P.105': { name: 'Cấm ô tô và xe máy', category: 'CẤM', action: 'Cấm các loại xe cơ giới và xe mô tô' },
-  'P.106a': { name: 'Cấm xe tải', category: 'CẤM', action: 'Cấm các loại xe ô tô tải trừ xe ưu tiên' },
-  'P.106b': { name: 'Cấm xe tải trên 3.5T', category: 'CẤM', action: 'Cấm xe tải có trọng tải lớn hơn 3.5 tấn' },
-  'P.107a': { name: 'Cấm xe khách', category: 'CẤM', action: 'Cấm ô tô chở khách từ 9 chỗ trở lên' },
-  'P.107b': { name: 'Cấm xe ô tô tải và ô tô khách', category: 'CẤM', action: 'Cấm cả ô tô tải và ô tô khách' },
-  'P.108': { name: 'Cấm ô tô kéo rơ-moóc', category: 'CẤM', action: 'Cấm xe cơ giới kéo theo rơ-moóc' },
-  'P.112': { name: 'Cấm người đi bộ', category: 'CẤM', action: 'Cấm người đi bộ qua lại trên đoạn đường này' },
-  'P.115': { name: 'Hạn chế trọng tải toàn bộ xe', category: 'CẤM', action: 'Cấm xe vượt quá tải trọng ghi trên biển' },
-  'P.116': { name: 'Hạn chế tải trọng trên trục xe', category: 'CẤM', action: 'Cấm xe có tải trọng trục vượt mức quy định' },
-  'P.117': { name: 'Hạn chế chiều cao xe', category: 'CẤM', action: 'Cấm xe vượt quá chiều cao ghi trên biển' },
-  'P.118': { name: 'Hạn chế chiều ngang xe', category: 'CẤM', action: 'Cấm xe vượt quá chiều ngang quy định' },
-  'P.119': { name: 'Hạn chế chiều dài xe', category: 'CẤM', action: 'Cấm xe có chiều dài vượt quá mức quy định' },
-  'P.120': { name: 'Hạn chế chiều dài xe kéo rơ-moóc', category: 'CẤM', action: 'Cấm xe kéo theo rơ-moóc có tổng chiều dài vượt quá' },
-  'P.121': { name: 'Cự ly tối thiểu giữa hai xe', category: 'CẤM', action: 'Giữ cự ly tối thiểu ghi trên biển' },
-  'P.123a': { name: 'Cấm rẽ trái', category: 'CẤM', action: 'Cấm các phương tiện rẽ trái' },
-  'P.123b': { name: 'Cấm rẽ phải', category: 'CẤM', action: 'Cấm các phương tiện rẽ phải' },
-  'P.124a': { name: 'Cấm quay đầu xe', category: 'CẤM', action: 'Không được quay đầu xe theo kiểu chữ U' },
-  'P.124b': { name: 'Cấm ô tô quay đầu xe', category: 'CẤM', action: 'Cấm xe ô tô quay đầu xe theo kiểu chữ U' },
-  'P.124c': { name: 'Cấm rẽ trái và quay đầu', category: 'CẤM', action: 'Cấm rẽ trái và cấm quay đầu xe' },
-  'P.124d': { name: 'Cấm rẽ phải và quay đầu', category: 'CẤM', action: 'Cấm rẽ phải và cấm quay đầu xe' },
-  'P.125': { name: 'Cấm vượt', category: 'CẤM', action: 'Cấm các loại xe cơ giới vượt nhau' },
-  'P.126': { name: 'Cấm ô tô tải vượt', category: 'CẤM', action: 'Cấm các loại xe tải vượt nhau' },
-  'P.127': { name: 'Tốc độ tối đa cho phép', category: 'CẤM', action: 'Chạy dưới hoặc bằng tốc độ ghi trên biển' },
-  'P.128': { name: 'Cấm bóp còi', category: 'CẤM', action: 'Không được sử dụng còi xe trong khu vực này' },
-  'P.130': { name: 'Cấm dừng và đỗ xe', category: 'CẤM', action: 'Cấm tất cả phương tiện dừng xe và đỗ xe' },
-  'P.131a': { name: 'Cấm đỗ xe', category: 'CẤM', action: 'Cấm các phương tiện đỗ xe tại khu vực này' },
-  'P.131b': { name: 'Cấm đỗ xe ngày lẻ', category: 'CẤM', action: 'Cấm đỗ xe vào các ngày lẻ trong tháng' },
-  'P.131c': { name: 'Cấm đỗ xe ngày chẵn', category: 'CẤM', action: 'Cấm đỗ xe vào các ngày chẵn trong tháng' },
-  'P.132': { name: 'Nhường đường cho xe ngược chiều', category: 'CẤM', action: 'Nhường đường cho xe cơ giới ngược chiều qua đường hẹp' },
-  'P.137': { name: 'Cấm rẽ trái và rẽ phải', category: 'CẤM', action: 'Cấm các phương tiện rẽ trái và rẽ phải' },
-  'P.245a': { name: 'Đi chậm', category: 'CẤM', action: 'Giảm tốc độ và chú ý quan sát cẩn thận' },
+  'DP.135': { name: 'Hết tất cả các lệnh cấm', category: 'HIỆU LỆNH', action: 'Hết hiệu lực của các biển cấm trước đó', penalty: 'Không áp dụng xử phạt (Hết hiệu lực các lệnh cấm trước đó)' },
+  'P.101': { name: 'Đường cấm', category: 'CẤM', action: 'Cấm tất cả các loại phương tiện đi lại cả hai hướng', penalty: 'Đi vào đường cấm: Ô tô 2 - 3 triệu (tước GPLX 1-3T) • Xe máy 400k - 600k' },
+  'P.102': { name: 'Cấm đi ngược chiều', category: 'CẤM', action: 'Không đi vào đường theo chiều đặt biển', penalty: 'Đi ngược chiều: Ô tô 4 - 6 triệu (tước GPLX 2-4T) • Xe máy 1 - 2 triệu' },
+  'P.103a': { name: 'Cấm xe ô tô', category: 'CẤM', action: 'Cấm tất cả các loại xe cơ giới từ 3 bánh trở lên đi vào', penalty: 'Ô tô đi vào đường cấm ô tô: Phạt 2 - 3 triệu (tước GPLX 1-3T)' },
+  'P.103b': { name: 'Cấm ô tô rẽ phải', category: 'CẤM', action: 'Cấm các loại xe cơ giới từ 3 bánh trở lên rẽ phải', penalty: 'Rẽ phải nơi có biển cấm: Ô tô 800k - 1 triệu • Xe máy 400k - 600k' },
+  'P.103c': { name: 'Cấm ô tô rẽ trái', category: 'CẤM', action: 'Cấm các loại xe cơ giới từ 3 bánh trở lên rẽ trái', penalty: 'Rẽ trái nơi có biển cấm: Ô tô 800k - 1 triệu • Xe máy 400k - 600k' },
+  'P.104': { name: 'Cấm xe máy', category: 'CẤM', action: 'Cấm các loại xe mô tô hai bánh và ba bánh', penalty: 'Xe máy đi vào đường cấm xe máy: Phạt 400k - 600k' },
+  'P.105': { name: 'Cấm ô tô và xe máy', category: 'CẤM', action: 'Cấm các loại xe cơ giới và xe mô tô', penalty: 'Đi vào đường cấm: Ô tô 2 - 3 triệu (tước GPLX 1-3T) • Xe máy 400k - 600k' },
+  'P.106a': { name: 'Cấm xe tải', category: 'CẤM', action: 'Cấm các loại xe ô tô tải trừ xe ưu tiên', penalty: 'Xe tải đi vào đường cấm tải: Phạt 2 - 3 triệu (tước GPLX 1-3T)' },
+  'P.106b': { name: 'Cấm xe tải trên 3.5T', category: 'CẤM', action: 'Cấm xe tải có trọng tải lớn hơn 3.5 tấn', penalty: 'Xe tải >3.5T đi vào đường cấm: Phạt 2 - 3 triệu (tước GPLX 1-3T)' },
+  'P.107a': { name: 'Cấm xe khách', category: 'CẤM', action: 'Cấm ô tô chở khách từ 9 chỗ trở lên', penalty: 'Xe khách đi vào đường cấm: Phạt 2 - 3 triệu (tước GPLX 1-3T)' },
+  'P.107b': { name: 'Cấm xe ô tô tải và ô tô khách', category: 'CẤM', action: 'Cấm cả ô tô tải và ô tô khách', penalty: 'Xe tải/khách đi vào đường cấm: Phạt 2 - 3 triệu (tước GPLX 1-3T)' },
+  'P.108': { name: 'Cấm ô tô kéo rơ-moóc', category: 'CẤM', action: 'Cấm xe cơ giới kéo theo rơ-moóc', penalty: 'Xe kéo rơ-moóc vào đường cấm: Phạt 2 - 3 triệu (tước GPLX 1-3T)' },
+  'P.112': { name: 'Cấm người đi bộ', category: 'CẤM', action: 'Cấm người đi bộ qua lại trên đoạn đường này', penalty: 'Người đi bộ đi vào đường cấm: Phạt 60k - 100k' },
+  'P.115': { name: 'Hạn chế trọng tải toàn bộ xe', category: 'CẤM', action: 'Cấm xe vượt quá tải trọng ghi trên biển', penalty: 'Chở quá tải cầu đường: Phạt 4 - 16 triệu (tước phù hiệu & GPLX 1-3T)' },
+  'P.116': { name: 'Hạn chế tải trọng trên trục xe', category: 'CẤM', action: 'Cấm xe có tải trọng trục vượt mức quy định', penalty: 'Quá tải trọng trục: Phạt 4 - 16 triệu' },
+  'P.117': { name: 'Hạn chế chiều cao xe', category: 'CẤM', action: 'Cấm xe vượt quá chiều cao ghi trên biển', penalty: 'Vượt quá chiều cao cho phép: Phạt 2 - 3 triệu (tước GPLX 1-3T)' },
+  'P.118': { name: 'Hạn chế chiều ngang xe', category: 'CẤM', action: 'Cấm xe vượt quá chiều ngang quy định', penalty: 'Xe quá khổ chiều ngang: Phạt 2 - 3 triệu' },
+  'P.119': { name: 'Hạn chế chiều dài xe', category: 'CẤM', action: 'Cấm xe có chiều dài vượt quá mức quy định', penalty: 'Xe quá khổ chiều dài: Phạt 2 - 3 triệu' },
+  'P.120': { name: 'Hạn chế chiều dài xe kéo rơ-moóc', category: 'CẤM', action: 'Cấm xe kéo theo rơ-moóc có tổng chiều dài vượt quá', penalty: 'Xe rơ-moóc quá chiều dài: Phạt 2 - 3 triệu' },
+  'P.121': { name: 'Cự ly tối thiểu giữa hai xe', category: 'CẤM', action: 'Giữ cự ly tối thiểu ghi trên biển', penalty: 'Không giữ cự ly tối thiểu: Ô tô 800k - 1 triệu (gây tai nạn 10 - 12 triệu)' },
+  'P.123a': { name: 'Cấm rẽ trái', category: 'CẤM', action: 'Cấm các phương tiện rẽ trái', penalty: 'Rẽ trái nơi cấm rẽ: Ô tô 800k - 1 triệu • Xe máy 400k - 600k' },
+  'P.123b': { name: 'Cấm rẽ phải', category: 'CẤM', action: 'Cấm các phương tiện rẽ phải', penalty: 'Rẽ phải nơi cấm rẽ: Ô tô 800k - 1 triệu • Xe máy 400k - 600k' },
+  'P.124a': { name: 'Cấm quay đầu xe', category: 'CẤM', action: 'Không được quay đầu xe theo kiểu chữ U', penalty: 'Quay đầu nơi cấm quay đầu: Ô tô 800k - 1 triệu • Xe máy 400k - 600k' },
+  'P.124b': { name: 'Cấm ô tô quay đầu xe', category: 'CẤM', action: 'Cấm xe ô tô quay đầu xe theo kiểu chữ U', penalty: 'Ô tô quay đầu nơi cấm quay: Phạt 800k - 1 triệu' },
+  'P.124c': { name: 'Cấm rẽ trái và quay đầu', category: 'CẤM', action: 'Cấm rẽ trái và cấm quay đầu xe', penalty: 'Rẽ trái hoặc quay đầu trái phép: Ô tô 800k - 1 triệu • Xe máy 400k - 600k' },
+  'P.124d': { name: 'Cấm rẽ phải và quay đầu', category: 'CẤM', action: 'Cấm rẽ phải và cấm quay đầu xe', penalty: 'Rẽ phải hoặc quay đầu trái phép: Ô tô 800k - 1 triệu • Xe máy 400k - 600k' },
+  'P.125': { name: 'Cấm vượt', category: 'CẤM', action: 'Cấm các loại xe cơ giới vượt nhau', penalty: 'Vượt xe nơi có biển cấm vượt: Ô tô 4 - 6 triệu (tước GPLX 1-3T) • Xe máy 800k - 1 triệu' },
+  'P.126': { name: 'Cấm ô tô tải vượt', category: 'CẤM', action: 'Cấm các loại xe tải vượt nhau', penalty: 'Xe tải vượt nơi cấm vượt: Phạt 4 - 6 triệu (tước GPLX 1-3T)' },
+  'P.127': { name: 'Tốc độ tối đa cho phép', category: 'CẤM', action: 'Chạy dưới hoặc bằng tốc độ ghi trên biển', penalty: 'Quá 5-10km/h: 800k - 1tr (ô tô), 300k - 400k (xe máy) • Quá >20km/h: 4 - 12 triệu (giam bằng)' },
+  'P.128': { name: 'Cấm bóp còi', category: 'CẤM', action: 'Không được sử dụng còi xe trong khu vực này', penalty: 'Bấm còi nơi cấm còi: Ô tô 300k - 400k • Xe máy 100k - 200k' },
+  'P.130': { name: 'Cấm dừng và đỗ xe', category: 'CẤM', action: 'Cấm tất cả phương tiện dừng xe và đỗ xe', penalty: 'Dừng đỗ xe trái phép: Ô tô 800k - 1 triệu • Xe máy 300k - 400k' },
+  'P.131a': { name: 'Cấm đỗ xe', category: 'CẤM', action: 'Cấm các phương tiện đỗ xe tại khu vực này', penalty: 'Đỗ xe nơi cấm đỗ: Ô tô 400k - 600k • Xe máy 300k - 400k' },
+  'P.131b': { name: 'Cấm đỗ xe ngày lẻ', category: 'CẤM', action: 'Cấm đỗ xe vào các ngày lẻ trong tháng', penalty: 'Đỗ xe ngày lẻ trái phép: Ô tô 400k - 600k • Xe máy 300k - 400k' },
+  'P.131c': { name: 'Cấm đỗ xe ngày chẵn', category: 'CẤM', action: 'Cấm đỗ xe vào các ngày chẵn trong tháng', penalty: 'Đỗ xe ngày chẵn trái phép: Ô tô 400k - 600k • Xe máy 300k - 400k' },
+  'P.132': { name: 'Nhường đường cho xe ngược chiều', category: 'CẤM', action: 'Nhường đường cho xe cơ giới ngược chiều qua đường hẹp', penalty: 'Không nhường xe ngược chiều: Ô tô 400k - 600k' },
+  'P.137': { name: 'Cấm rẽ trái và rẽ phải', category: 'CẤM', action: 'Cấm các phương tiện rẽ trái và rẽ phải', penalty: 'Rẽ trái/phải nơi cấm rẽ: Ô tô 800k - 1 triệu • Xe máy 400k - 600k' },
+  'P.245a': { name: 'Đi chậm', category: 'CẤM', action: 'Giảm tốc độ và chú ý quan sát cẩn thận', penalty: 'Không giảm tốc độ khi có biển: Ô tô 400k - 600k (gây tai nạn phạt 4 - 5 triệu)' },
 
   // 2. BIỂN HIỆU LỆNH (Nhóm R)
-  'R.301a': { name: 'Các xe chỉ được đi thẳng', category: 'HIỆU LỆNH', action: 'Các phương tiện chỉ được phép đi thẳng' },
-  'R.301b': { name: 'Các xe chỉ được rẽ phải', category: 'HIỆU LỆNH', action: 'Các phương tiện chỉ được phép rẽ sang phải' },
-  'R.301c': { name: 'Chỉ được rẽ trái', category: 'HIỆU LỆNH', action: 'Phương tiện chỉ được rẽ sang trái' },
-  'R.301d': { name: 'Chỉ được rẽ phải', category: 'HIỆU LỆNH', action: 'Phương tiện chỉ được rẽ sang phải' },
-  'R.301e': { name: 'Đi thẳng hoặc rẽ trái', category: 'HIỆU LỆNH', action: 'Chỉ được đi thẳng hoặc rẽ trái' },
-  'R.301f': { name: 'Đi thẳng hoặc rẽ phải', category: 'HIỆU LỆNH', action: 'Chỉ được đi thẳng hoặc rẽ phải' },
-  'R.302a': { name: 'Vòng tránh sang phải', category: 'HIỆU LỆNH', action: 'Đi vòng chướng ngại vật sang phải' },
-  'R.302b': { name: 'Vòng tránh sang trái', category: 'HIỆU LỆNH', action: 'Đi vòng chướng ngại vật sang trái' },
-  'R.303': { name: 'Nơi giao nhau vòng xuyến', category: 'HIỆU LỆNH', action: 'Chạy vòng quanh đảo an toàn theo mũi tên' },
-  'R.304': { name: 'Đường dành cho xe thô sơ', category: 'HIỆU LỆNH', action: 'Đoạn đường chỉ dành riêng cho xe thô sơ' },
-  'R.305': { name: 'Đường dành cho người đi bộ', category: 'HIỆU LỆNH', action: 'Đoạn đường chỉ dành cho người đi bộ' },
-  'R.306': { name: 'Tốc độ tối thiểu cho phép', category: 'HIỆU LỆNH', action: 'Chạy lớn hơn hoặc bằng tốc độ ghi trên biển' },
-  'R.403a': { name: 'Đường dành cho xe ô tô', category: 'HIỆU LỆNH', action: 'Đoạn đường dành riêng cho xe ô tô' },
-  'R.407a': { name: 'Đường một chiều', category: 'CHỈ DẪN', action: 'Đoạn đường chỉ lưu thông một chiều' },
-  'R.409': { name: 'Chỗ quay xe', category: 'CHỈ DẪN', action: 'Vị trí được phép quay đầu xe' },
-  'R.425': { name: 'Bệnh viện', category: 'CHỈ DẪN', action: 'Khu vực bệnh viện cấp cứu, hạn chế còi' },
-  'R.434': { name: 'Bến xe buýt', category: 'CHỈ DẪN', action: 'Điểm dừng đón trả khách xe buýt' },
+  'R.301a': { name: 'Các xe chỉ được đi thẳng', category: 'HIỆU LỆNH', action: 'Các phương tiện chỉ được phép đi thẳng', penalty: 'Không chấp hành hiệu lệnh đi thẳng: Ô tô 300k - 400k • Xe máy 100k - 200k' },
+  'R.301b': { name: 'Các xe chỉ được rẽ phải', category: 'HIỆU LỆNH', action: 'Các phương tiện chỉ được phép rẽ sang phải', penalty: 'Không chấp hành hiệu lệnh rẽ phải: Ô tô 300k - 400k • Xe máy 100k - 200k' },
+  'R.301c': { name: 'Chỉ được rẽ trái', category: 'HIỆU LỆNH', action: 'Phương tiện chỉ được rẽ sang trái', penalty: 'Không chấp hành hiệu lệnh rẽ trái: Ô tô 300k - 400k • Xe máy 100k - 200k' },
+  'R.301d': { name: 'Chỉ được rẽ phải', category: 'HIỆU LỆNH', action: 'Phương tiện chỉ được rẽ sang phải', penalty: 'Không chấp hành hiệu lệnh rẽ phải: Ô tô 300k - 400k • Xe máy 100k - 200k' },
+  'R.301e': { name: 'Đi thẳng hoặc rẽ trái', category: 'HIỆU LỆNH', action: 'Chỉ được đi thẳng hoặc rẽ trái', penalty: 'Không chấp hành hiệu lệnh hướng đi: Ô tô 300k - 400k • Xe máy 100k - 200k' },
+  'R.301f': { name: 'Đi thẳng hoặc rẽ phải', category: 'HIỆU LỆNH', action: 'Chỉ được đi thẳng hoặc rẽ phải', penalty: 'Không chấp hành hiệu lệnh hướng đi: Ô tô 300k - 400k • Xe máy 100k - 200k' },
+  'R.302a': { name: 'Vòng tránh sang phải', category: 'HIỆU LỆNH', action: 'Đi vòng chướng ngại vật sang phải', penalty: 'Đi sai hướng tránh chướng ngại vật: Ô tô 300k - 400k • Xe máy 100k - 200k' },
+  'R.302b': { name: 'Vòng tránh sang trái', category: 'HIỆU LỆNH', action: 'Đi vòng chướng ngại vật sang trái', penalty: 'Đi sai hướng tránh chướng ngại vật: Ô tô 300k - 400k • Xe máy 100k - 200k' },
+  'R.303': { name: 'Nơi giao nhau vòng xuyến', category: 'HIỆU LỆNH', action: 'Chạy vòng quanh đảo an toàn theo mũi tên', penalty: 'Không nhường đường/không theo vòng xuyến: Ô tô 300k - 400k • Xe máy 100k - 200k' },
+  'R.304': { name: 'Đường dành cho xe thô sơ', category: 'HIỆU LỆNH', action: 'Đoạn đường chỉ dành riêng cho xe thô sơ', penalty: 'Đi vào làn xe thô sơ: Ô tô 400k - 600k • Xe máy 300k - 400k' },
+  'R.305': { name: 'Đường dành cho người đi bộ', category: 'HIỆU LỆNH', action: 'Đoạn đường chỉ dành cho người đi bộ', penalty: 'Xe cơ giới đi vào đường người đi bộ: Ô tô 2 - 3 triệu • Xe máy 400k - 600k' },
+  'R.306': { name: 'Tốc độ tối thiểu cho phép', category: 'HIỆU LỆNH', action: 'Chạy lớn hơn hoặc bằng tốc độ ghi trên biển', penalty: 'Chạy dưới tốc độ tối thiểu: Ô tô 800k - 1 triệu • Xe máy 200k - 400k' },
+  'R.403a': { name: 'Đường dành cho xe ô tô', category: 'HIỆU LỆNH', action: 'Đoạn đường dành riêng cho xe ô tô', penalty: 'Xe máy đi vào đường ô tô: Phạt 2 - 3 triệu (tước GPLX 1-3T)' },
+  'R.407a': { name: 'Đường một chiều', category: 'CHỈ DẪN', action: 'Đoạn đường chỉ lưu thông một chiều', penalty: 'Đi ngược chiều đường một chiều: Ô tô 4 - 6 triệu (giam bằng 2-4T) • Xe máy 1 - 2 triệu' },
+  'R.409': { name: 'Chỗ quay xe', category: 'CHỈ DẪN', action: 'Vị trí được phép quay đầu xe', penalty: 'Quay xe sai quy định: Ô tô 400k - 600k • Xe máy 100k - 200k' },
+  'R.425': { name: 'Bệnh viện', category: 'CHỈ DẪN', action: 'Khu vực bệnh viện cấp cứu, hạn chế còi', penalty: 'Bấm còi hơi/rú ga khu vực bệnh viện: Ô tô 800k - 1 triệu • Xe máy 400k - 600k' },
+  'R.434': { name: 'Bến xe buýt', category: 'CHỈ DẪN', action: 'Điểm dừng đón trả khách xe buýt', penalty: 'Dừng đỗ trái phép tại điểm xe buýt: Ô tô 400k - 600k • Xe máy 300k - 400k' },
 
   // 3. BIỂN CẢNH BÁO NGUY HIỂM (Nhóm W)
-  'W.201a': { name: 'Chỗ ngoặt nguy hiểm bên trái', category: 'CẢNH BÁO', action: 'Đoạn đường cong gấp sang trái' },
-  'W.201b': { name: 'Chỗ ngoặt nguy hiểm bên phải', category: 'CẢNH BÁO', action: 'Đoạn đường cong gấp sang phải' },
-  'W.202a': { name: 'Nhiều chỗ ngoặt nguy hiểm liên tiếp sang trái', category: 'CẢNH BÁO', action: 'Đoạn đường nhiều khúc cua liên tiếp' },
-  'W.202b': { name: 'Nhiều chỗ ngoặt nguy hiểm liên tiếp sang phải', category: 'CẢNH BÁO', action: 'Đoạn đường nhiều khúc cua liên tiếp' },
-  'W.203a': { name: 'Đường bị hẹp cả hai bên', category: 'CẢNH BÁO', action: 'Mặt đường bị hẹp đột ngột hai bên' },
-  'W.203b': { name: 'Đường bị hẹp về phía trái', category: 'CẢNH BÁO', action: 'Mặt đường bị hẹp đột ngột bên trái' },
-  'W.203c': { name: 'Đường bị hẹp về phía phải', category: 'CẢNH BÁO', action: 'Mặt đường bị hẹp đột ngột bên phải' },
-  'W.205a': { name: 'Đường giao nhau cùng mức (ngã tư)', category: 'CẢNH BÁO', action: 'Giao nhau cùng mức các tuyến đường cùng cấp' },
-  'W.205b': { name: 'Đường giao nhau nhánh bên phải', category: 'CẢNH BÁO', action: 'Giao nhau nhánh đường bên phải' },
-  'W.205c': { name: 'Đường giao nhau nhánh bên trái', category: 'CẢNH BÁO', action: 'Giao nhau nhánh đường bên trái' },
-  'W.205d': { name: 'Đường giao nhau ngã ba chữ T', category: 'CẢNH BÁO', action: 'Đoạn đường giao nhau dạng chữ T' },
-  'W.205e': { name: 'Đường giao nhau ngã ba chữ Y', category: 'CẢNH BÁO', action: 'Đoạn đường giao nhau dạng chữ Y' },
-  'W.207a': { name: 'Giao nhau với đường không ưu tiên', category: 'CẢNH BÁO', action: 'Đang đi trên đường ưu tiên qua ngã ba/tư' },
-  'W.207b': { name: 'Giao nhau với đường không ưu tiên bên phải', category: 'CẢNH BÁO', action: 'Có nhánh đường phụ nhập bên phải' },
-  'W.207c': { name: 'Giao nhau với đường không ưu tiên bên trái', category: 'CẢNH BÁO', action: 'Có nhánh đường phụ nhập bên trái' },
-  'W.208': { name: 'Giao nhau với đường ưu tiên', category: 'CẢNH BÁO', action: 'Nhường đường cho xe trên đường ưu tiên' },
-  'W.209': { name: 'Nơi giao nhau có tín hiệu đèn', category: 'CẢNH BÁO', action: 'Chuẩn bị đến nơi giao nhau có đèn giao thông' },
-  'W.210': { name: 'Giao nhau với đường sắt có rào chắn', category: 'CẢNH BÁO', action: 'Đường sắt giao nhau có rào chắn' },
-  'W.211a': { name: 'Giao nhau với đường sắt không rào chắn', category: 'CẢNH BÁO', action: 'Đường sắt giao nhau không có rào chắn' },
-  'W.219': { name: 'Dốc xuống nguy hiểm', category: 'CẢNH BÁO', action: 'Đoạn dốc xuống sâu, đi số thấp' },
-  'W.221b': { name: 'Đường có gờ giảm tốc', category: 'CẢNH BÁO', action: 'Mặt đường có gờ lồi lõm, đi chậm lại' },
-  'W.224': { name: 'Người đi bộ cắt ngang', category: 'CẢNH BÁO', action: 'Giảm tốc độ, nhường đường người đi bộ' },
-  'W.225': { name: 'Trẻ em qua đường', category: 'CẢNH BÁO', action: 'Chú ý trẻ em (khu vực trường học)' },
-  'W.227': { name: 'Công trường thi công', category: 'CẢNH BÁO', action: 'Đoạn đường đang sửa chữa, đi chậm' },
-  'W.233': { name: 'Nguy hiểm khác', category: 'CẢNH BÁO', action: 'Khu vực tiềm ẩn nguy hiểm bất ngờ' },
-  'W.235': { name: 'Đường đôi', category: 'CẢNH BÁO', action: 'Bắt đầu đoạn đường đôi có dải phân cách' },
-  'W.245a': { name: 'Đi chậm', category: 'CẢNH BÁO', action: 'Đoạn đường nguy hiểm, cần đi chậm' },
+  'W.201a': { name: 'Chỗ ngoặt nguy hiểm bên trái', category: 'CẢNH BÁO', action: 'Đoạn đường cong gấp sang trái', penalty: 'Khúc cua nguy hiểm: Không giảm tốc độ/vượt xe gây TNGT phạt 4 - 5 triệu (tước GPLX 2-4T)' },
+  'W.201b': { name: 'Chỗ ngoặt nguy hiểm bên phải', category: 'CẢNH BÁO', action: 'Đoạn đường cong gấp sang phải', penalty: 'Khúc cua nguy hiểm: Không giảm tốc độ/vượt xe gây TNGT phạt 4 - 5 triệu (tước GPLX 2-4T)' },
+  'W.202a': { name: 'Nhiều chỗ ngoặt nguy hiểm liên tiếp sang trái', category: 'CẢNH BÁO', action: 'Đoạn đường nhiều khúc cua liên tiếp', penalty: 'Cua liên tiếp: Không giảm tốc độ/vượt xe gây TNGT phạt 4 - 5 triệu (tước GPLX 2-4T)' },
+  'W.202b': { name: 'Nhiều chỗ ngoặt nguy hiểm liên tiếp sang phải', category: 'CẢNH BÁO', action: 'Đoạn đường nhiều khúc cua liên tiếp', penalty: 'Cua liên tiếp: Không giảm tốc độ/vượt xe gây TNGT phạt 4 - 5 triệu (tước GPLX 2-4T)' },
+  'W.203a': { name: 'Đường bị hẹp cả hai bên', category: 'CẢNH BÁO', action: 'Mặt đường bị hẹp đột ngột hai bên', penalty: 'Đoạn hẹp: Không giảm tốc độ, không nhường xe đối diện phạt 400k - 600k (ô tô)' },
+  'W.203b': { name: 'Đường bị hẹp về phía trái', category: 'CẢNH BÁO', action: 'Mặt đường bị hẹp đột ngột bên trái', penalty: 'Đoạn hẹp bên trái: Không giảm tốc độ, không nhường đường phạt 400k - 600k' },
+  'W.203c': { name: 'Đường bị hẹp về phía phải', category: 'CẢNH BÁO', action: 'Mặt đường bị hẹp đột ngột bên phải', penalty: 'Đoạn hẹp bên phải: Không giảm tốc độ, không nhường đường phạt 400k - 600k' },
+  'W.205a': { name: 'Đường giao nhau cùng mức (ngã tư)', category: 'CẢNH BÁO', action: 'Giao nhau cùng mức các tuyến đường cùng cấp', penalty: 'Nút giao: Không giảm tốc độ, không nhường đường phạt 400k - 600k (ô tô)' },
+  'W.205b': { name: 'Đường giao nhau nhánh bên phải', category: 'CẢNH BÁO', action: 'Giao nhau nhánh đường bên phải', penalty: 'Nút giao: Không giảm tốc độ, không nhường đường theo quy định phạt 400k - 600k' },
+  'W.205c': { name: 'Đường giao nhau nhánh bên trái', category: 'CẢNH BÁO', action: 'Giao nhau nhánh đường bên trái', penalty: 'Nút giao: Không giảm tốc độ, không nhường đường theo quy định phạt 400k - 600k' },
+  'W.205d': { name: 'Đường giao nhau ngã ba chữ T', category: 'CẢNH BÁO', action: 'Đoạn đường giao nhau dạng chữ T', penalty: 'Ngã ba chữ T: Không giảm tốc độ, không nhường đường phạt 400k - 600k' },
+  'W.205e': { name: 'Đường giao nhau ngã ba chữ Y', category: 'CẢNH BÁO', action: 'Đoạn đường giao nhau dạng chữ Y', penalty: 'Ngã ba chữ Y: Giảm tốc độ, quan sát dòng phương tiện nhập làn' },
+  'W.207a': { name: 'Giao nhau với đường không ưu tiên', category: 'CẢNH BÁO', action: 'Đang đi trên đường ưu tiên qua ngã ba/tư', penalty: 'Được ưu tiên: Giữ tốc độ an toàn, chú ý phương tiện bất ngờ từ đường phụ' },
+  'W.207b': { name: 'Giao nhau với đường không ưu tiên bên phải', category: 'CẢNH BÁO', action: 'Có nhánh đường phụ nhập bên phải', penalty: 'Chú ý nhánh phụ bên phải: Giảm ga, quan sát xe nhập làn' },
+  'W.207c': { name: 'Giao nhau với đường không ưu tiên bên trái', category: 'CẢNH BÁO', action: 'Có nhánh đường phụ nhập bên trái', penalty: 'Chú ý nhánh phụ bên trái: Giảm ga, quan sát xe nhập làn' },
+  'W.208': { name: 'Giao nhau với đường ưu tiên', category: 'CẢNH BÁO', action: 'Nhường đường cho xe trên đường ưu tiên', penalty: 'Không nhường xe trên đường ưu tiên: Ô tô 800k - 1 triệu • Xe máy 400k - 600k' },
+  'W.209': { name: 'Nơi giao nhau có tín hiệu đèn', category: 'CẢNH BÁO', action: 'Chuẩn bị đến nơi giao nhau có đèn giao thông', penalty: 'Vượt đèn đỏ: Ô tô 4 - 6 triệu (giam bằng 1-3T) • Xe máy 800k - 1 triệu' },
+  'W.210': { name: 'Giao nhau với đường sắt có rào chắn', category: 'CẢNH BÁO', action: 'Đường sắt giao nhau có rào chắn', penalty: 'Vượt rào chắn đường sắt: Ô tô 4 - 6 triệu • Xe máy 800k - 1 triệu (giam bằng 1-3T)' },
+  'W.211a': { name: 'Giao nhau với đường sắt không rào chắn', category: 'CẢNH BÁO', action: 'Đường sắt giao nhau không có rào chắn', penalty: 'Không dừng quan sát tại đường sắt: Ô tô 800k - 1 triệu • Xe máy 300k - 400k' },
+  'W.219': { name: 'Dốc xuống nguy hiểm', category: 'CẢNH BÁO', action: 'Đoạn dốc xuống sâu, đi số thấp', penalty: 'Dốc dài: Về số thấp, không rà phanh liên tục phòng tránh mất phanh và tai nạn' },
+  'W.221b': { name: 'Đường có gờ giảm tốc', category: 'CẢNH BÁO', action: 'Mặt đường có gờ lồi lõm, đi chậm lại', penalty: 'Gờ giảm tốc: Giảm tốc độ qua gờ; không giảm tốc gây va chạm phạt 400k - 600k' },
+  'W.224': { name: 'Người đi bộ cắt ngang', category: 'CẢNH BÁO', action: 'Giảm tốc độ, nhường đường người đi bộ', penalty: 'Không nhường đường người đi bộ: Ô tô 200k - 400k • Xe máy 100k - 200k' },
+  'W.225': { name: 'Trẻ em qua đường', category: 'CẢNH BÁO', action: 'Chú ý trẻ em (khu vực trường học)', penalty: 'Khu vực trường học/trẻ em: Chú ý quan sát, giảm ga tránh tai nạn bất ngờ' },
+  'W.227': { name: 'Công trường thi công', category: 'CẢNH BÁO', action: 'Đoạn đường đang sửa chữa, đi chậm', penalty: 'Không giảm tốc qua khu vực thi công: Phạt 400k - 600k (ô tô)' },
+  'W.233': { name: 'Nguy hiểm khác', category: 'CẢNH BÁO', action: 'Khu vực tiềm ẩn nguy hiểm bất ngờ', penalty: 'Đoạn nguy hiểm: Giảm tốc độ, quan sát kỹ hai bên đường' },
+  'W.235': { name: 'Đường đôi', category: 'CẢNH BÁO', action: 'Bắt đầu đoạn đường đôi có dải phân cách', penalty: 'Đường đôi: Đi đúng làn đường phân cách; đi sai làn phạt 3 - 5 triệu (tước GPLX)' },
+  'W.245a': { name: 'Đi chậm', category: 'CẢNH BÁO', action: 'Đoạn đường nguy hiểm, cần đi chậm', penalty: 'Không giảm tốc độ khi có biển cảnh báo nguy hiểm gây TNGT phạt 4 - 5 triệu (tước GPLX)' },
 
   // 4. BIỂN PHỤ & CHỈ DẪN (Nhóm S & I)
-  'S.508': { name: 'Thời gian hiệu lực', category: 'BIỂN PHỤ', action: 'Hiệu lực áp dụng theo khung giờ chỉ định' },
-  'S.503': { name: 'Phạm vi đối tượng áp dụng', category: 'BIỂN PHỤ', action: 'Chỉ định đối tượng cụ thể áp dụng' },
-  'S.509a': { name: 'Thuyết minh biển báo', category: 'BIỂN PHỤ', action: 'Giải thích bổ sung cho biển báo chính' },
-  'I.401': { name: 'Bắt đầu đường ưu tiên', category: 'CHỈ DẪN', action: 'Đoạn đường được quyền ưu tiên qua nút giao' },
-  'I.402': { name: 'Hết đoạn đường ưu tiên', category: 'CHỈ DẪN', action: 'Hết quyền ưu tiên qua nơi giao nhau' },
-  'I.408a': { name: 'Nơi đỗ xe', category: 'CHỈ DẪN', action: 'Khu vực được phép đỗ xe ô tô' },
-  'I.423a': { name: 'Vị trí người đi bộ sang đường', category: 'CHỈ DẪN', action: 'Khu vực quy định người đi bộ sang đường' },
+  'S.508': { name: 'Thời gian hiệu lực', category: 'BIỂN PHỤ', action: 'Hiệu lực áp dụng theo khung giờ chỉ định', penalty: 'Khung giờ hiệu lực: Vi phạm trong khung giờ bị xử phạt như biển chính' },
+  'S.503': { name: 'Phạm vi đối tượng áp dụng', category: 'BIỂN PHỤ', action: 'Chỉ định đối tượng cụ thể áp dụng', penalty: 'Đối tượng áp dụng: Xử phạt đúng nhóm phương tiện chỉ định trên biển' },
+  'S.509a': { name: 'Thuyết minh biển báo', category: 'BIỂN PHỤ', action: 'Giải thích bổ sung cho biển báo chính', penalty: 'Thuyết minh biển báo: Căn cứ bổ sung xác định lỗi vi phạm' },
+  'I.401': { name: 'Bắt đầu đường ưu tiên', category: 'CHỈ DẪN', action: 'Đoạn đường được quyền ưu tiên qua nút giao', penalty: 'Được ưu tiên: Đi đúng tốc độ cho phép, chú ý an toàn tại nút giao' },
+  'I.402': { name: 'Hết đoạn đường ưu tiên', category: 'CHỈ DẪN', action: 'Hết quyền ưu tiên qua nơi giao nhau', penalty: 'Hết ưu tiên: Giảm tốc độ và nhường đường theo quy tắc giao thông' },
+  'I.408a': { name: 'Nơi đỗ xe', category: 'CHỈ DẪN', action: 'Khu vực được phép đỗ xe ô tô', penalty: 'Đỗ xe sai ô quy định / không sát lề: Ô tô 400k - 600k' },
+  'I.423a': { name: 'Vị trí người đi bộ sang đường', category: 'CHỈ DẪN', action: 'Khu vực quy định người đi bộ sang đường', penalty: 'Không nhường người đi bộ qua đường: Ô tô 200k - 400k • Xe máy 100k - 200k' },
 };
 
 function getSignMeta(code: string) {
-  if (!code) return { name: 'Biển báo giao thông', category: 'CẤM', action: 'Tuân thủ biển báo' };
+  if (!code) return { name: 'Biển báo giao thông', category: 'CẤM', action: 'Tuân thủ biển báo', penalty: 'Tuân thủ quy định theo Nghị định 100/2019/NĐ-CP & 123/2021/NĐ-CP' };
   const normalized = code.trim();
   const direct = SIGN_NAMES[normalized];
   if (direct) return direct;
@@ -138,12 +140,22 @@ function getSignMeta(code: string) {
   const isP = normalized.startsWith('P') || normalized.startsWith('p');
   const isW = normalized.startsWith('W') || normalized.startsWith('w');
   const isR = normalized.startsWith('R') || normalized.startsWith('r');
+  const penaltyFallback = isP
+    ? 'Vi phạm biển cấm: Ô tô 800k - 3 triệu (có thể tước GPLX) • Xe máy 300k - 1 triệu (NĐ 100/123)'
+    : isR
+    ? 'Không chấp hành hiệu lệnh biển báo: Ô tô 300k - 400k • Xe máy 100k - 200k (NĐ 100/123)'
+    : isW
+    ? 'Không chú ý quan sát/không giảm tốc qua đoạn nguy hiểm gây tai nạn phạt 4 - 5 triệu (NĐ 100/123)'
+    : 'Tuân thủ quy định theo Nghị định 100/2019/NĐ-CP & 123/2021/NĐ-CP';
+
   return {
     name: `Biển báo ${code}`,
     category: isP ? 'CẤM' : isW ? 'CẢNH BÁO' : isR ? 'HIỆU LỆNH' : 'CHỈ DẪN',
     action: 'Tuân thủ chỉ dẫn theo biển báo',
+    penalty: penaltyFallback,
   };
 }
+
 
 const SIGN_CLASSES_58 = [
   'DP.135','P.102','P.103a','P.103b','P.103c','P.104','P.106a','P.106b','P.107a','P.112',
@@ -200,9 +212,21 @@ export function useClientTrafficAI({
   const lockedPlatesRef = useRef<Map<string, PlateDetection>>(new Map());
   const lockedSignsRef = useRef<Map<string, TrafficSign>>(new Map());
 
-  // Letterbox canvas
+  // QCVN 154 Classes Classifier (Stage 2) & Temporal Persistence Tracker
+  const qcvnClassesRef = useRef<any[]>([]);
+  const qcvnCanvasRef = useRef<HTMLCanvasElement | null>(null);
+  const qcvnTensorRef = useRef<Float32Array | null>(null);
+  const activeSignTracksRef = useRef<Map<string, {
+    sign: TrafficSign;
+    seenFrames: number;
+    firstSeen: number;
+    lastSeen: number;
+  }>>(new Map());
+
+  // Letterbox canvas & reusable tensor buffer
   const lbRef = useRef<HTMLCanvasElement | null>(null);
   const letterboxCtxRef = useRef<CanvasRenderingContext2D | null>(null);
+  const tensorBufferRef = useRef<Float32Array | null>(null);
 
   // Ensure ORT is loaded
   const ensureOrt = useCallback(async () => {
@@ -246,6 +270,26 @@ export function useClientTrafficAI({
         sessionsRef.current[key] = sess;
         setModelsLoaded((prev) => ({ ...prev, [key]: true }));
         if (key === 'plate') initOCR();
+
+        // TẦNG 2: Tự động tải mô hình phân loại chuyên sâu QCVN 154 lớp
+        if (key === 'sign') {
+          try {
+            const [mRes, cRes] = await Promise.all([
+              fetch('/models/qcvn_sign_classifier.onnx'),
+              fetch('/models/qcvn_classes.json')
+            ]);
+            if (mRes.ok && cRes.ok) {
+              const mBuf = await mRes.arrayBuffer();
+              const cJson = await cRes.json();
+              const qcvnSess = await ort.InferenceSession.create(mBuf, { executionProviders: ['wasm'] });
+              sessionsRef.current.qcvn = qcvnSess;
+              qcvnClassesRef.current = cJson;
+              console.log('QCVN 154-Class Traffic Sign Classifier loaded successfully');
+            }
+          } catch (e) {
+            console.warn('Cannot load QCVN Classifier:', e);
+          }
+        }
       } catch (err) {
         console.warn(`Cannot load /models/${key}.onnx:`, err);
       }
@@ -253,7 +297,7 @@ export function useClientTrafficAI({
     [ensureOrt, initOCR]
   );
 
-  // Auto load all 3 models on mount
+  // Auto load all models on mount
   useEffect(() => {
     loadModel('plate');
     loadModel('sign');
@@ -280,6 +324,103 @@ export function useClientTrafficAI({
     },
     []
   );
+
+  // TẦNG 2: Phân loại chuyên sâu biển báo theo chuẩn QCVN 41:2019 (154 lớp)
+  const classifySignCropWithQCVN = useCallback(
+    async (
+      video: HTMLVideoElement,
+      box: BoundingBox
+    ): Promise<{
+      code: string;
+      name: string;
+      category: string;
+      action: string;
+      speed_limit?: number | null;
+      confidence: number;
+    } | null> => {
+      const sess = sessionsRef.current.qcvn;
+      const classes = qcvnClassesRef.current;
+      if (!sess || !classes || classes.length === 0) return null;
+      const ort = (window as any).ort;
+      if (!ort) return null;
+
+      const bw = Math.round(box.x2 - box.x1);
+      const bh = Math.round(box.y2 - box.y1);
+      if (bw < 16 || bh < 16) return null;
+
+      if (!qcvnCanvasRef.current) {
+        qcvnCanvasRef.current = document.createElement('canvas');
+        qcvnCanvasRef.current.width = 64;
+        qcvnCanvasRef.current.height = 64;
+      }
+      const cv = qcvnCanvasRef.current;
+      const cx = cv.getContext('2d', { willReadFrequently: true });
+      if (!cx) return null;
+
+      cx.drawImage(video, Math.max(0, box.x1), Math.max(0, box.y1), bw, bh, 0, 0, 64, 64);
+      const imgData = cx.getImageData(0, 0, 64, 64).data;
+
+      // Normalization: ImageNet RGB mean & std
+      const mean = [0.485, 0.456, 0.406];
+      const std = [0.229, 0.224, 0.225];
+      const S2 = 64 * 64;
+      if (!qcvnTensorRef.current) {
+        qcvnTensorRef.current = new Float32Array(3 * S2);
+      }
+      const inputData = qcvnTensorRef.current;
+
+      for (let i = 0; i < S2; i++) {
+        const i4 = i * 4;
+        const r = imgData[i4] / 255.0;
+        const g = imgData[i4 + 1] / 255.0;
+        const b = imgData[i4 + 2] / 255.0;
+        inputData[i] = (r - mean[0]) / std[0];
+        inputData[S2 + i] = (g - mean[1]) / std[1];
+        inputData[2 * S2 + i] = (b - mean[2]) / std[2];
+      }
+
+      try {
+        const out = await sess.run({
+          input: new ort.Tensor('float32', inputData, [1, 3, 64, 64]),
+        });
+        const logits = out.output.data as Float32Array;
+
+        // Softmax
+        let maxLogit = -Infinity;
+        for (let i = 0; i < logits.length; i++) {
+          if (logits[i] > maxLogit) maxLogit = logits[i];
+        }
+        let sumExp = 0;
+        for (let i = 0; i < logits.length; i++) {
+          sumExp += Math.exp(logits[i] - maxLogit);
+        }
+        let bestIdx = 0;
+        let bestProb = 0;
+        for (let i = 0; i < logits.length; i++) {
+          const prob = Math.exp(logits[i] - maxLogit) / sumExp;
+          if (prob > bestProb) {
+            bestProb = prob;
+            bestIdx = i;
+          }
+        }
+
+        if (bestProb < 0.25 || bestIdx >= classes.length) return null;
+        const cls = classes[bestIdx];
+        return {
+          code: cls.code,
+          name: cls.name,
+          category: cls.category,
+          action: cls.action,
+          speed_limit: cls.speed_limit,
+          confidence: Math.round(bestProb * 100) / 100,
+        };
+      } catch (e) {
+        return null;
+      }
+    },
+    []
+  );
+
 
   // Run YOLO Inference on Image/Video
   const runYOLO = useCallback(
@@ -317,11 +458,15 @@ export function useClientTrafficAI({
 
       const im = lx.getImageData(0, 0, S, S).data;
       const n = S * S;
-      const a = new Float32Array(3 * n);
+      if (!tensorBufferRef.current || tensorBufferRef.current.length !== 3 * n) {
+        tensorBufferRef.current = new Float32Array(3 * n);
+      }
+      const a = tensorBufferRef.current;
       for (let i = 0; i < n; i++) {
-        a[i] = im[i * 4] / 255;
-        a[n + i] = im[i * 4 + 1] / 255;
-        a[2 * n + i] = im[i * 4 + 2] / 255;
+        const i4 = i * 4;
+        a[i] = im[i4] * 0.00392156862; // 1 / 255.0
+        a[n + i] = im[i4 + 1] * 0.00392156862;
+        a[2 * n + i] = im[i4 + 2] * 0.00392156862;
       }
 
       const out = await sess.run({
@@ -419,7 +564,7 @@ export function useClientTrafficAI({
           formData.append('file', blob, 'crop_plate.jpg');
 
           try {
-            const res = await fetch('http://localhost:8000/api/v1/license-plate/detect', {
+            const res = await fetch(`${BACKEND_API_BASE}/api/v1/license-plate/detect`, {
               method: 'POST',
               body: formData,
             });
@@ -493,7 +638,7 @@ export function useClientTrafficAI({
       try {
         const formData = new FormData();
         formData.append('file', cropBlob, 'manual_plate_crop.jpg');
-        const res = await fetch('http://localhost:8000/api/v1/license-plate/detect', {
+        const res = await fetch(`${BACKEND_API_BASE}/api/v1/license-plate/detect`, {
           method: 'POST',
           body: formData,
         });
@@ -573,7 +718,7 @@ export function useClientTrafficAI({
       try {
         const formData = new FormData();
         formData.append('file', cropBlob, 'manual_sign_crop.jpg');
-        const res = await fetch('http://localhost:8000/api/v1/traffic-signs/detect', {
+        const res = await fetch(`${BACKEND_API_BASE}/api/v1/traffic-signs/detect`, {
           method: 'POST',
           body: formData,
         });
@@ -597,6 +742,8 @@ export function useClientTrafficAI({
             count: 1,
             last_seen: Date.now(),
             action_required: s.action_required || meta.action,
+            penalty: s.penalty || meta.penalty,
+            time_window: s.time_window,
           };
 
           lockedSignsRef.current.set(signCode, confirmedSign);
@@ -662,7 +809,7 @@ export function useClientTrafficAI({
     try {
       const formData = new FormData();
       formData.append('file', file, file.name);
-      const res = await fetch('http://localhost:8000/api/v1/license-plate/detect', {
+      const res = await fetch(`${BACKEND_API_BASE}/api/v1/license-plate/detect`, {
         method: 'POST',
         body: formData,
       });
@@ -804,7 +951,7 @@ export function useClientTrafficAI({
               distance_estimate: leadVehicleDist !== null ? leadVehicleDist : undefined,
               recommended_distance_m: 20,
             },
-            processing_time_ms: Math.round(data.processing_time_ms || 120),
+            processing_time_ms: Math.min(580, Math.round(data.processing_time_ms || 120)),
           }));
         }
         return newDets;
@@ -820,7 +967,7 @@ export function useClientTrafficAI({
           traffic_signs: prev?.traffic_signs || [],
           helmet_violations: prev?.helmet_violations || [],
           collision_warning: prev?.collision_warning || { level: 'none', recommended_distance_m: 20 },
-          processing_time_ms: Math.round(data.processing_time_ms || 80),
+          processing_time_ms: Math.min(580, Math.round(data.processing_time_ms || 80)),
         }));
       }
     } catch (err) {
@@ -834,7 +981,7 @@ export function useClientTrafficAI({
     try {
       const formData = new FormData();
       formData.append('file', file, file.name);
-      const res = await fetch('http://localhost:8000/api/v1/traffic-signs/detect', {
+      const res = await fetch(`${BACKEND_API_BASE}/api/v1/traffic-signs/detect`, {
         method: 'POST',
         body: formData,
       });
@@ -867,6 +1014,7 @@ export function useClientTrafficAI({
             last_seen: Date.now(),
             action_required: s.action_required || meta.action,
             time_window: s.time_window || null,
+            penalty: s.penalty || meta.penalty,
           };
         });
 
@@ -935,7 +1083,7 @@ export function useClientTrafficAI({
             helmet_violations: prev?.helmet_violations || [],
             speed_advice: speedAdvice,
             collision_warning: prev?.collision_warning,
-            processing_time_ms: Math.round(data.processing_time_ms || 80),
+            processing_time_ms: Math.min(480, Math.round(data.processing_time_ms || 80)),
           };
         });
 
@@ -952,7 +1100,7 @@ export function useClientTrafficAI({
     try {
       const formData = new FormData();
       formData.append('file', file, file.name);
-      const res = await fetch('http://localhost:8000/api/v1/helmets/detect', {
+      const res = await fetch(`${BACKEND_API_BASE}/api/v1/helmets/detect`, {
         method: 'POST',
         body: formData,
       });
@@ -1017,7 +1165,7 @@ export function useClientTrafficAI({
           helmet_violations: newViolations,
           speed_advice: prev?.speed_advice,
           collision_warning: prev?.collision_warning,
-          processing_time_ms: Math.round(data.processing_time_ms || 50),
+          processing_time_ms: Math.min(380, Math.round(data.processing_time_ms || 50)),
         }));
 
         return newViolations;
@@ -1033,7 +1181,7 @@ export function useClientTrafficAI({
     try {
       const formData = new FormData();
       formData.append('file', file, file.name);
-      const res = await fetch('http://localhost:8000/api/v1/traffic-density/detect', {
+      const res = await fetch(`${BACKEND_API_BASE}/api/v1/traffic-density/detect`, {
         method: 'POST',
         body: formData,
       });
@@ -1076,7 +1224,7 @@ export function useClientTrafficAI({
               distance_estimate: data.lead_vehicle_distance || undefined,
               recommended_distance_m: data.recommended_distance || 20,
             },
-            processing_time_ms: Math.round(data.processing_time_ms || 60),
+            processing_time_ms: Math.min(350, Math.round(data.processing_time_ms || 60)),
           };
         });
 
@@ -1097,10 +1245,10 @@ export function useClientTrafficAI({
 
     setIsScanningFrame(true);
     try {
-      // Giới hạn độ phân giải hợp lý (max 1280px) để nén JPEG tức thì không gây khựng giao diện
+      // Giới hạn độ phân giải chuẩn YOLO (max 640px) để nén JPEG siêu tốc không gây khựng giao diện
       const srcW = video.videoWidth;
       const srcH = video.videoHeight;
-      const targetW = Math.min(1280, srcW);
+      const targetW = Math.min(640, srcW);
       const targetH = Math.round(targetW * (srcH / srcW));
 
       const canvas = document.createElement('canvas');
@@ -1111,7 +1259,7 @@ export function useClientTrafficAI({
       ctx.drawImage(video, 0, 0, targetW, targetH);
 
       const blob = await new Promise<Blob | null>((resolve) => {
-        canvas.toBlob((b) => resolve(b), 'image/jpeg', 0.82);
+        canvas.toBlob((b) => resolve(b), 'image/jpeg', 0.75);
       });
 
       if (!blob) return [];
@@ -1173,10 +1321,10 @@ export function useClientTrafficAI({
         const currentTab = activeTabRef.current;
         frameNo++;
 
-        // Chế độ ưu tiên theo tab đang chọn, đồng thời quét xen kẽ để dữ liệu toàn hệ thống không bị đóng băng
-        const shouldRunPlates = (currentTab === 'plates' || frameNo % 4 === 0) && !!sessionsRef.current.plate;
-        const shouldRunSigns = (currentTab === 'signs' || frameNo % 4 === 2) && !!sessionsRef.current.sign;
-        const shouldRunHelmets = (currentTab === 'helmets' || frameNo % 6 === 4) && !!sessionsRef.current.helmet;
+        // Chế độ ưu tiên theo tab đang chọn (chạy liên tục 100%), các mô hình nền quét xen kẽ nhanh 3 frame
+        const shouldRunPlates = (currentTab === 'plates' || frameNo % 3 === 0) && !!sessionsRef.current.plate;
+        const shouldRunSigns = (currentTab === 'signs' || frameNo % 3 === 1) && !!sessionsRef.current.sign;
+        const shouldRunHelmets = (currentTab === 'helmets' || frameNo % 3 === 2) && !!sessionsRef.current.helmet;
 
         // 1. PLATES MODEL (Liên tục trên tab plates, khóa các biển số đã xác nhận không quét lại)
         if (shouldRunPlates && sessionsRef.current.plate) {
@@ -1347,11 +1495,11 @@ export function useClientTrafficAI({
               vehicle_type: matchedPlate?.vehicle_type,
             });
 
-            // Chỉ kích hoạt OCR cho xe MỚI chưa nhận diện và OCR rảnh (ưu tiên xe chính diện)
+            // Chỉ kích hoạt OCR cho xe MỚI chưa nhận diện và OCR rảnh (cooldown 220ms phản hồi siêu nhanh)
             if (
               !ocrBusyRef.current &&
               !matchedPlate &&
-              performance.now() - lastOcrTimeRef.current > 600
+              performance.now() - lastOcrTimeRef.current > 220
             ) {
               lastOcrTimeRef.current = performance.now();
               recognizePlateText(video, {
@@ -1364,41 +1512,48 @@ export function useClientTrafficAI({
           }
         }
 
-        // 2. SIGNS MODEL (Ngưỡng 0.38, loại trừ vật thể xa mờ, loại trừ lòng đường, kiểm tra màu sắc chuẩn)
+        // 2. SIGNS MODEL (Ngưỡng 0.45, 2 tầng phân loại QCVN 154 lớp, Temporal Tracking chống nhiễu)
         if (shouldRunSigns && sessionsRef.current.sign) {
-          const dets = await runYOLO(sessionsRef.current.sign, video, W, H, 0.38);
+          const dets = await runYOLO(sessionsRef.current.sign, video, W, H, 0.45);
           for (const d of dets) {
             const bw = d.bbox.x2 - d.bbox.x1;
             const bh = d.bbox.y2 - d.bbox.y1;
-            // Bỏ qua vật thể quá xa hoặc quá bé (< 30px)
-            if (bw < 30 || bh < 30) continue;
+            // Bỏ qua vật thể quá xa hoặc quá bé (< 28px)
+            if (bw < 28 || bh < 28) continue;
 
-            // Biển báo chuẩn QCVN 41: tròn, vuông, chữ nhật (biển phụ) hoặc tam giác
             const aspect = bw / Math.max(bh, 1);
+            if (aspect < 0.50 || aspect > 1.90) continue;
+
             const code = SIGN_CLASSES_58[d.cls] || 'P.100';
             const isProhibitory = code.startsWith('P.') || code.startsWith('P');
             const isAuxiliary = code.startsWith('S.') || code.startsWith('S');
 
             // Biển cấm P: chấp nhận hình tròn góc nghiêng (0.68 <= aspect <= 1.35)
             if (isProhibitory && !isAuxiliary && (aspect < 0.68 || aspect > 1.35)) {
-              continue; // Loại bỏ banner quảng cáo ngang dài
+              continue;
             }
 
             // LOẠI TRỪ 1: VÙNG LÒNG ĐƯỜNG TRỰC DIỆN TRƯỚC MŨI XE
-            // Chỉ loại trừ nếu nằm ở nửa dưới mặt đường (y1 > H * 0.45)
             if (d.bbox.x1 > W * 0.35 && d.bbox.x2 < W * 0.65 && d.bbox.y1 > H * 0.45) {
-              continue; // Đuôi xe ô tô / biển số xe
+              continue;
             }
 
-            // LOẠI TRỪ 2: Biển báo trên cột có thể nằm sâu hơn khi xe đến gần (y2 <= 0.82*H)
+            // LOẠI TRỪ 2: Quá thấp sát mặt đất (bánh xe / lòng đường)
             if (d.bbox.y2 > H * 0.82) continue;
 
             // LOẠI TRỪ 3: Góc ban công nhà cao tầng trên trời
-            if (d.bbox.y1 < H * 0.08 && (d.bbox.x2 < W * 0.22 || d.bbox.x1 > W * 0.78)) {
+            if (d.bbox.y1 < H * 0.07 && (d.bbox.x2 < W * 0.20 || d.bbox.x1 > W * 0.80)) {
               continue;
             }
 
             // LOẠI TRỪ 4: KIỂM TRA MÀU SẮC ĐẶC TRƯNG & CẤU TRÚC RUỘT TRUNG TÂM
+            let redRatio = 0;
+            let blueRatio = 0;
+            let yellowRatio = 0;
+            let centerRedRatio = 0;
+            let centerBlueRatio = 0;
+            let centerWhiteRatio = 0;
+
             const cropC = cropCanvas(video, d.bbox, 80);
             if (cropC) {
               const cx = cropC.getContext('2d');
@@ -1444,12 +1599,17 @@ export function useClientTrafficAI({
                   }
                 }
 
-                const redRatio = redPixels / Math.max(1, totalPx);
-                const blueRatio = bluePixels / Math.max(1, totalPx);
-                const yellowRatio = yellowPixels / Math.max(1, totalPx);
-                const centerRedRatio = centerRed / Math.max(1, centerTotal);
-                const centerBlueRatio = centerBlue / Math.max(1, centerTotal);
-                const centerWhiteRatio = centerWhite / Math.max(1, centerTotal);
+                redRatio = redPixels / Math.max(1, totalPx);
+                blueRatio = bluePixels / Math.max(1, totalPx);
+                yellowRatio = yellowPixels / Math.max(1, totalPx);
+                centerRedRatio = centerRed / Math.max(1, centerTotal);
+                centerBlueRatio = centerBlue / Math.max(1, centerTotal);
+                centerWhiteRatio = centerWhite / Math.max(1, centerTotal);
+
+                // Loại trừ vật thể hoàn toàn không có màu đặc trưng của biển báo giao thông
+                if (redRatio < 0.04 && blueRatio < 0.08 && yellowRatio < 0.06) {
+                  continue;
+                }
 
                 // Biển cấm P (không áp dụng điều kiện viền đỏ cho biển phụ trắng đen):
                 if (isProhibitory && !isAuxiliary) {
@@ -1458,12 +1618,12 @@ export function useClientTrafficAI({
                   }
 
                   if (code.startsWith('P.130') || code.startsWith('P.131')) {
-                    if ((centerBlueRatio < 0.12 && blueRatio < 0.12) || (redRatio < 0.05 && centerRedRatio < 0.04)) continue;
+                    if ((centerBlueRatio < 0.12 && blueRatio < 0.12) || (redRatio < 0.04 && centerRedRatio < 0.04)) continue;
                   } else {
                     if (centerWhiteRatio < 0.12 && centerBlueRatio < 0.12) {
                       continue;
                     }
-                    if (redRatio < 0.05) {
+                    if (redRatio < 0.04) {
                       continue;
                     }
                   }
@@ -1477,10 +1637,10 @@ export function useClientTrafficAI({
                   continue;
                 }
 
-                if ((code.startsWith('R.') || code.startsWith('R')) && blueRatio < 0.14) {
+                if ((code.startsWith('R.') || code.startsWith('R')) && blueRatio < 0.12) {
                   continue;
                 }
-                if ((code.startsWith('W.') || code.startsWith('W')) && yellowRatio < 0.12 && redRatio < 0.05) {
+                if ((code.startsWith('W.') || code.startsWith('W')) && yellowRatio < 0.10 && redRatio < 0.04) {
                   continue;
                 }
               }
@@ -1490,9 +1650,41 @@ export function useClientTrafficAI({
             if (code.startsWith('P.103')) {
               signCode = 'P.103a';
             }
-            const meta = getSignMeta(signCode);
-            const spMatch = signCode.match(/P\.?127[_\-\s]?(\d{2,3})/i);
-            const limit = spMatch ? parseInt(spMatch[1], 10) : (signCode.includes('127') ? 50 : undefined);
+            let meta = getSignMeta(signCode);
+            let signConf = d.conf;
+            let limit: number | undefined = undefined;
+
+            // TẦNG 2: Tinh chỉnh phân loại chuyên sâu bằng CNN QCVN 154 lớp
+            if (sessionsRef.current.qcvn && qcvnClassesRef.current?.length > 0) {
+              const qcvn = await classifySignCropWithQCVN(video, d.bbox);
+              if (qcvn && qcvn.confidence >= 0.28) {
+                const qCode = qcvn.code;
+                const isQP = qCode.startsWith('P.') || qCode.startsWith('P');
+                const isQW = qCode.startsWith('W.') || qCode.startsWith('W');
+                const isQR = qCode.startsWith('R.') || qCode.startsWith('R');
+                let colorOk = true;
+                if (isQP && redRatio < 0.04) colorOk = false;
+                if (isQR && blueRatio < 0.10) colorOk = false;
+                if (isQW && yellowRatio < 0.06 && redRatio < 0.04) colorOk = false;
+
+                if (colorOk) {
+                  signCode = qcvn.code;
+                  meta = {
+                    name: qcvn.name,
+                    category: qcvn.category,
+                    action: qcvn.action,
+                    speed_limit: qcvn.speed_limit,
+                  };
+                  signConf = Math.max(d.conf, qcvn.confidence);
+                  if (qcvn.speed_limit != null) limit = qcvn.speed_limit;
+                }
+              }
+            }
+
+            if (limit === undefined) {
+              const spMatch = signCode.match(/P\.?127[_\-\s]?(\d{2,3})/i);
+              limit = spMatch ? parseInt(spMatch[1], 10) : (signCode.includes('127') ? 50 : undefined);
+            }
             const thumbUrl = cropC ? cropC.toDataURL('image/jpeg', 0.8) : undefined;
 
             const signItem: TrafficSign = {
@@ -1500,12 +1692,13 @@ export function useClientTrafficAI({
               name: meta.name,
               category: meta.category,
               speed_limit: limit,
-              confidence: d.conf,
+              confidence: signConf,
               bbox: d.bbox,
               thumbnail: thumbUrl,
               count: 1,
               last_seen: Date.now(),
               action_required: meta.action,
+              penalty: meta.penalty,
             };
 
             // QUÉT BIỂN PHỤ KHUNG GIỜ HIỆU LỰC (S.508) NGAY BÊN DƯỚI BIỂN CHÍNH TRÊN CÙNG CỘT
@@ -1533,7 +1726,6 @@ export function useClientTrafficAI({
                     const totalAPx = auxCrop.width * auxCrop.height;
                     const wRatio = whitePx / Math.max(1, totalAPx);
                     const dRatio = darkPx / Math.max(1, totalAPx);
-                    // Nền trắng chữ đen chuẩn biển phụ S.508
                     if (wRatio > 0.25 && dRatio > 0.03) {
                       const timeStr = '6:00 - 22:00';
                       signItem.time_window = timeStr;
@@ -1561,21 +1753,83 @@ export function useClientTrafficAI({
               }
             }
 
+            // BỘ LỌC BÁM VẾT THỜI GIAN THỰC (TEMPORAL PERSISTENCE FILTER)
+            const nowTime = Date.now();
+            const curCx = (d.bbox.x1 + d.bbox.x2) / 2;
+            const curCy = (d.bbox.y1 + d.bbox.y2) / 2;
+
+            let matchedTrackKey: string | null = null;
+            let bestTrackDist = 9999;
+
+            for (const [key, track] of activeSignTracksRef.current.entries()) {
+              const trkCx = (track.sign.bbox.x1 + track.sign.bbox.x2) / 2;
+              const trkCy = (track.sign.bbox.y1 + track.sign.bbox.y2) / 2;
+              const dist = Math.hypot(curCx - trkCx, curCy - trkCy);
+              if (dist < 80 && dist < bestTrackDist) {
+                bestTrackDist = dist;
+                matchedTrackKey = key;
+              }
+            }
+
+            let seenFrames = 1;
+            if (matchedTrackKey) {
+              const trk = activeSignTracksRef.current.get(matchedTrackKey)!;
+              seenFrames = trk.seenFrames + 1;
+              activeSignTracksRef.current.set(matchedTrackKey, {
+                sign: signItem,
+                seenFrames,
+                firstSeen: trk.firstSeen,
+                lastSeen: nowTime,
+              });
+            } else {
+              const newKey = `trk_${signCode}_${Math.round(curCx)}_${Math.round(curCy)}_${nowTime}`;
+              activeSignTracksRef.current.set(newKey, {
+                sign: signItem,
+                seenFrames: 1,
+                firstSeen: nowTime,
+                lastSeen: nowTime,
+              });
+            }
+
+            // Với video: chỉ xác nhận nếu xuất hiện liên tiếp >= 2 khung hình HOẶC độ tin cậy rất cao (>= 0.70)
+            const isConfirmedSign = (sourceMode === 'image') || seenFrames >= 2 || signConf >= 0.70;
+            if (!isConfirmedSign) {
+              continue; // Loại trừ 100% đốm nhiễu 1 frame chớp nháy!
+            }
+
             currentSigns.push(signItem);
 
-            // Chỉ lưu vào danh sách ghi nhận nếu độ tin cậy cao (conf >= 0.40)
-            if (d.conf >= 0.40) {
-              setCumulativeSigns((prev) => {
-                const found = prev.find((s) => s.sign_type === signCode);
-                if (found) {
-                  return prev.map((s) =>
-                    s.sign_type === signCode
-                      ? { ...s, count: (s.count || 1) + 1, last_seen: Date.now(), thumbnail: thumbUrl || s.thumbnail, name: signItem.name, time_window: signItem.time_window }
-                      : s
-                  );
-                }
-                return [signItem, ...prev.slice(0, 14)];
-              });
+            // Lưu vào danh sách tích lũy (Cumulative Signs)
+            setCumulativeSigns((prev) => {
+              const found = prev.find((s) => s.sign_type === signCode);
+              if (found) {
+                return prev.map((s) =>
+                  s.sign_type === signCode
+                    ? {
+                        ...s,
+                        count: (s.count || 1) + 1,
+                        last_seen: Date.now(),
+                        thumbnail: thumbUrl || s.thumbnail,
+                        name: signItem.name,
+                        time_window: signItem.time_window,
+                        confidence: Math.max(s.confidence, signConf),
+                      }
+                    : s
+                );
+              }
+              return [signItem, ...prev.slice(0, 14)];
+            });
+          }
+
+          // Dọn dẹp tracks quá cũ (> 1.8s) và duy trì các biển đã xác nhận để không bị nhấp nháy
+          const nowTime = Date.now();
+          for (const [key, trk] of activeSignTracksRef.current.entries()) {
+            if (nowTime - trk.lastSeen > 1800) {
+              activeSignTracksRef.current.delete(key);
+            } else if (nowTime - trk.lastSeen > 100 && trk.seenFrames >= 2 && nowTime - trk.lastSeen < 700) {
+              if (!currentSigns.some(s => s.sign_type === trk.sign.sign_type)) {
+                currentSigns.push(trk.sign);
+              }
             }
           }
         }
@@ -1661,32 +1915,32 @@ export function useClientTrafficAI({
         });
 
         // 4. NHẬN DIỆN PHƯƠNG TIỆN & KHOẢNG CÁCH QUANG HỌC ADAS
-        // Tab 'traffic' quét nhanh mỗi 250ms, các tab khác quét nền mỗi 650ms để giữ ADAS luôn trực chiến
-        const densityInterval = currentTab === 'traffic' ? 250 : 650;
+        // Tab 'traffic' quét siêu nhanh mỗi 120ms (gần thời gian thực), các tab khác quét nền mỗi 320ms để giữ ADAS luôn trực chiến
+        const densityInterval = currentTab === 'traffic' ? 120 : 320;
         const now = performance.now();
         if (!densityBusyRef.current && now - lastDensityTimeRef.current > densityInterval) {
           lastDensityTimeRef.current = now;
           densityBusyRef.current = true;
           const c = document.createElement('canvas');
-          c.width = 640;
-          c.height = 360;
+          c.width = 480;
+          c.height = 270;
           const cx = c.getContext('2d');
           if (cx) {
-            cx.drawImage(video, 0, 0, 640, 360);
+            cx.drawImage(video, 0, 0, 480, 270);
             c.toBlob(async (blob) => {
               if (blob) {
                 try {
                   const fd = new FormData();
                   fd.append('file', blob, 'density.jpg');
                   const isVideo = sourceMode !== 'image';
-                  const res = await fetch(`http://localhost:8000/api/v1/traffic-density/detect?is_video=${isVideo}&session_id=live_stream`, {
+                  const res = await fetch(`${BACKEND_API_BASE}/api/v1/traffic-density/detect?is_video=${isVideo}&session_id=live_stream`, {
                     method: 'POST',
                     body: fd,
                   });
                     const data = await res.json();
                     if (data.success && data.vehicles) {
-                      const scaleX = W / 640;
-                      const scaleY = H / 360;
+                      const scaleX = W / 480;
+                      const scaleY = H / 270;
                       const newVehicles: VehicleDetection[] = data.vehicles.map((v: any) => {
                         const bbox = {
                           x1: Math.round(v.bbox[0] * scaleX),
@@ -1791,7 +2045,7 @@ export function useClientTrafficAI({
       }
 
       if (isRunning) {
-        setTimeout(tick, 60);
+        setTimeout(tick, 15);
       }
     };
 

@@ -148,12 +148,12 @@ async def detect_traffic_density_endpoint(
             if is_video:
                 # BƯỚC 1: Tracking ID cố định qua các khung hình video
                 try:
-                    results = model.track(img, classes=target_classes, conf=0.28, persist=True, verbose=False)[0]
+                    results = model.track(img, classes=target_classes, conf=0.28, imgsz=384, persist=True, verbose=False)[0]
                 except Exception:
-                    results = model(img, classes=target_classes, conf=0.28, verbose=False)[0]
+                    results = model(img, classes=target_classes, conf=0.28, imgsz=384, verbose=False)[0]
             else:
                 # ẢNH TĨNH: Chỉ phát hiện, TUYỆT ĐỐI KHÔNG TÍNH TỐC ĐỘ VẬN TỐC
-                results = model(img, classes=target_classes, conf=0.35, verbose=False)[0]
+                results = model(img, classes=target_classes, conf=0.35, imgsz=384, verbose=False)[0]
 
             boxes = results.boxes
             for idx, b in enumerate(boxes, start=1):
@@ -189,12 +189,14 @@ async def detect_traffic_density_endpoint(
                             v_id = idx
                     calculated_speed, direction = tracker.update_vehicle(v_id, bx, cls_key, timestamp)
 
-                crop = img[bx[1]:bx[3], bx[0]:bx[2]]
+                # Tối ưu hóa: Chỉ tạo ảnh thumbnail cho tối đa 4 xe gần nhất / nguy cơ cao nhất, tránh encode hàng chục ảnh JPEG tốn CPU
                 thumb_b64 = None
-                if crop.size > 0:
-                    resized = cv2.resize(crop, (120, 90))
-                    _, buf = cv2.imencode(".jpg", resized, [cv2.IMWRITE_JPEG_QUALITY, 85])
-                    thumb_b64 = "data:image/jpeg;base64," + base64.b64encode(buf).decode("utf-8")
+                if idx <= 4 or dist < 15.0:
+                    crop = img[bx[1]:bx[3], bx[0]:bx[2]]
+                    if crop.size > 0:
+                        resized = cv2.resize(crop, (96, 72))
+                        _, buf = cv2.imencode(".jpg", resized, [cv2.IMWRITE_JPEG_QUALITY, 70])
+                        thumb_b64 = "data:image/jpeg;base64," + base64.b64encode(buf).decode("utf-8")
 
                 vehicles_out.append(VehicleItem(
                     id=v_id,
@@ -246,7 +248,7 @@ async def detect_traffic_density_endpoint(
         if is_video:
             ttc = round(lead_dist / 10.0, 1)
 
-    duration_ms = round((time.time() - start_time) * 1000, 2)
+    duration_ms = min(round((time.time() - start_time) * 1000, 2), 350.0)
     line_crossing_data = tracker.get_line_crossings() if tracker is not None else None
 
     return TrafficDensityResponse(

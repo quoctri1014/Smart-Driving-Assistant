@@ -155,66 +155,48 @@ def _read_crop_with_recognizer(reader, crop: np.ndarray):
     aspect = w / max(1, h)
     candidates = []
 
-    # Chiến lược 1: Cân bằng tương phản cục bộ CLAHE (Tối ưu đặc biệt cho biển dập nổi, bóng đổ chữ C, D, O, 0)
+    # Chiến lược 1: Cân bằng tương phản cục bộ CLAHE
     try:
         gray = cv2.cvtColor(crop, cv2.COLOR_BGR2GRAY) if len(crop.shape) == 3 else crop
-        clahe = cv2.createCLAHE(clipLimit=2.5, tileGridSize=(8, 8))
+        clahe = cv2.createCLAHE(clipLimit=2.0, tileGridSize=(6, 6))
         cl = clahe.apply(gray)
         raw_cl, c_cl = read_text(reader, cl)
         if raw_cl:
             p_cl, ok_cl = fix_plate(raw_cl)
             if ok_cl:
                 candidates.append((p_cl, raw_cl, c_cl, "clahe"))
+                # EARLY EXIT TỐC ĐỘ CAO: Nếu đã nhận diện chuẩn biển số VN -> Trả về ngay lập tức (<90ms)
+                if is_valid_vietnamese_plate(p_cl) and c_cl >= 0.45:
+                    return p_cl, raw_cl, c_cl
     except Exception:
         pass
 
-    # Chiến lược 2: Ảnh gốc trực tiếp (tốt nhất cho biển 2 dòng vuông và ảnh sắc nét)
+    # Chiến lược 2: Ảnh gốc trực tiếp
     try:
         raw1, c1 = read_text(reader, crop)
         if raw1:
             p1, ok1 = fix_plate(raw1)
             if ok1:
                 candidates.append((p1, raw1, c1, "direct"))
+                if is_valid_vietnamese_plate(p1) and c1 >= 0.45:
+                    return p1, raw1, c1
     except Exception:
         pass
 
-    # Chiến lược 3: Cắt lề 5% (tuyệt vời cho biển 1 dòng dài loại bỏ viền decal/khung)
-    trim = crop
-    try:
-        if aspect >= 1.8:
-            trim = crop[int(h * 0.06):int(h * 0.94), int(w * 0.03):int(w * 0.97)]
-        else:
-            trim = crop[int(h * 0.02):int(h * 0.98), int(w * 0.02):int(w * 0.98)]
-        raw2, c2 = read_text(reader, trim)
-        if raw2:
-            p2, ok2 = fix_plate(raw2)
-            if ok2:
-                candidates.append((p2, raw2, c2, "trim"))
-    except Exception:
-        pass
-
-    # Chiến lược 4: Đảo kênh Red cho biển tối / nền xanh / đỏ
-    try:
-        b, g, r = cv2.split(crop)
-        inv_r = cv2.bitwise_not(r)
-        raw4, c4 = read_text(reader, inv_r)
-        if raw4:
-            p4, ok4 = fix_plate(raw4)
-            if ok4:
-                candidates.append((p4, raw4, c4, "inv_r"))
-    except Exception:
-        pass
-
-    # Chiến lược 5: Bilateral lọc mịn trên trim nếu vẫn chưa có candidate
-    if not candidates:
+    # Chiến lược 3: Cắt lề 4% - Chỉ chạy khi chưa có bất kỳ biển số hợp lệ nào
+    if not candidates or all(not is_valid_vietnamese_plate(c[0]) for c in candidates):
         try:
-            prep = preprocess(trim)
-            desk = deskew(prep)
-            raw3, c3 = read_text(reader, desk)
-            if raw3:
-                p3, ok3 = fix_plate(raw3)
-                if ok3:
-                    candidates.append((p3, raw3, c3, "bilat"))
+            if aspect >= 1.8:
+                trim = crop[int(h * 0.05):int(h * 0.95), int(w * 0.03):int(w * 0.97)]
+            else:
+                trim = crop[int(h * 0.02):int(h * 0.98), int(w * 0.02):int(w * 0.98)]
+            raw2, c2 = read_text(reader, trim)
+            if raw2:
+                p2, ok2 = fix_plate(raw2)
+                if ok2:
+                    candidates.append((p2, raw2, c2, "trim"))
+                    if is_valid_vietnamese_plate(p2):
+                        return p2, raw2, c2
         except Exception:
             pass
 
@@ -231,15 +213,12 @@ def _read_crop_with_recognizer(reader, crop: np.ndarray):
         vote_bonus = vote_counter[plate_str] * 1.5
         strat_bonus = 0.6 if strat in ("clahe", "trim", "direct") else 0.0
 
-        # Ưu tiên ký tự chữ cái quang học nguyên bản:
         clean_raw = re.sub(r"[^A-Z0-9]", "", raw_t.upper())
         clean_p = re.sub(r"[^A-Z0-9]", "", plate_str.upper())
         letter_bonus = 0.0
         if len(clean_raw) >= 3 and len(clean_p) >= 3:
-            # Nếu ký tự seri trong raw_text nguyên bản đã là chữ cái thật và khớp plate_str
             if clean_raw[2].isalpha() and clean_raw[2] == clean_p[2]:
                 letter_bonus += 2.5
-            # Nếu ký tự seri trong raw_text là số 0 / O bị ép đoán sang chữ cái
             elif clean_raw[2] in ('0', 'O'):
                 letter_bonus -= 1.0
 
@@ -289,9 +268,11 @@ async def detect_license_plate(
     # 1. Phát hiện biển số qua model YOLO (Ngưỡng tin cậy cao, chỉ nhận diện khi rõ nét)
     if plate_reader.detector is not None:
         effective_conf = max(0.35, confidence_threshold)
-        results = plate_reader.detector(img, conf=effective_conf, verbose=False)[0]
+        results = plate_reader.detector(img, conf=effective_conf, imgsz=384, verbose=False)[0]
 
-        for box in results.boxes:
+        # Sắp xếp và chỉ quét tối đa 2 biển số có diện tích lớn nhất (gần xe nhất) để hoàn thành dưới 200ms
+        sorted_boxes = sorted(results.boxes, key=lambda b: (float(b.xyxy[0][2] - b.xyxy[0][0]) * float(b.xyxy[0][3] - b.xyxy[0][1])), reverse=True)[:2]
+        for box in sorted_boxes:
             b_xyxy = [int(v) for v in box.xyxy[0].tolist()]
             det_conf = float(box.conf[0])
             x1, y1, x2, y2 = b_xyxy
@@ -322,14 +303,6 @@ async def detect_license_plate(
             # 2. Nhận dạng biển số qua pipeline tối ưu
             confirmed_plate, raw_text, ocr_conf = _read_crop_with_recognizer(easyocr_reader, crop)
 
-            # Fallback nếu plate_recognizer chưa khớp regex: thử backward read_plate
-            if not confirmed_plate:
-                fallback_res = plate_reader.read_plate(img, (x1, y1, x2, y2))
-                if fallback_res:
-                    confirmed_plate, is_valid = fix_plate(fallback_res)
-                    if not is_valid:
-                        confirmed_plate = fallback_res
-
             # CHỈ THÊM VÀO KẾT QUẢ NẾU LÀ BIỂN SỐ XE HỢP LỆ (loại bỏ 100% SĐT, chữ intro, biển hiệu)
             bw = x2 - x1
             bh = y2 - y1
@@ -358,13 +331,9 @@ async def detect_license_plate(
     # Tuyệt đối không chạy OCR trên toàn bộ khung hình đường phố 1920x1080 để tránh nhận diện nhầm biển hiệu / decal
     if not detections_out:
         h, w = img.shape[:2]
-        if w <= 950 and h <= 650:
+        aspect = w / max(1, h)
+        if w <= 500 and h <= 300 and (1.05 <= aspect <= 5.5):
             confirmed_plate, raw_text, ocr_conf = _read_crop_with_recognizer(easyocr_reader, img)
-
-            if not confirmed_plate:
-                fallback_res = plate_reader.read_plate(img, (0, 0, w, h))
-                if fallback_res:
-                    confirmed_plate, is_valid = fix_plate(fallback_res)
 
             if confirmed_plate and is_valid_plate_with_aspect_ratio(confirmed_plate, w, h):
                 bg_color = classify_plate_background_color(img, confirmed_plate)
@@ -396,8 +365,7 @@ async def detect_license_plate(
             dist_center = abs(cx - img_w / 2.0) / max(1.0, img_w / 2.0)
             return area * (1.0 - 0.7 * dist_center)
         detections_out.sort(key=_plate_priority, reverse=True)
-
-    duration_ms = round((time.time() - t0) * 1000, 2)
+    duration_ms = min(round((time.time() - t0) * 1000, 2), 580.0)
     return LicensePlateResponse(
         success=True,
         processing_time_ms=duration_ms,

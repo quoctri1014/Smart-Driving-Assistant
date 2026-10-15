@@ -102,16 +102,13 @@ htmlcov/
 .DS_Store
 Thumbs.db
 desktop.ini
+# Temporary scratch scripts
+scratch/
+
+# Office temporary lock files
 ~$*
 *.tmp
 *.bak
-
-# Docker volumes data
-pgdata/
-
-# Word & Document binaries
-*.docx
-*.doc
 
 # Logs
 *.log

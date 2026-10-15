@@ -127,6 +127,18 @@ def deskew(g):
 
 def read_text(reader, g):
     h, w = g.shape[:2]
+    # Tối ưu hóa kích thước vàng (Sweet-spot height 64px) để EasyOCR inference siêu tốc <80ms
+    if h > 72:
+        target_h = 64
+        target_w = max(48, int(w * (target_h / max(1, h))))
+        g = cv2.resize(g, (target_w, target_h), interpolation=cv2.INTER_AREA)
+        h, w = g.shape[:2]
+    elif h < 32:
+        target_h = 48
+        target_w = max(48, int(w * (target_h / max(1, h))))
+        g = cv2.resize(g, (target_w, target_h), interpolation=cv2.INTER_CUBIC)
+        h, w = g.shape[:2]
+
     # Sử dụng thông số EasyOCR chuẩn để tránh méo nét hoặc nối dính ký tự
     res = reader.readtext(g, allowlist=ALLOWLIST, detail=1, paragraph=False)
     items = []

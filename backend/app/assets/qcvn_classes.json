@@ -5,7 +5,8 @@
     "name": "Đường cấm",
     "category": "CẤM",
     "action": "Cấm tất cả các loại phương tiện đi lại cả hai hướng",
-    "speed_limit": null
+    "speed_limit": null,
+    "penalty": "Đi vào đường cấm: Ô tô 2 - 3 triệu (tước GPLX 1-3T) • Xe máy 400k - 600k"
   },
   {
     "idx": 1,
@@ -13,7 +14,8 @@
     "name": "Cấm đi ngược chiều",
     "category": "CẤM",
     "action": "Cấm tất cả các loại xe đi vào theo chiều đặt biển",
-    "speed_limit": null
+    "speed_limit": null,
+    "penalty": "Đi ngược chiều: Ô tô 4 - 6 triệu (tước GPLX 2-4T) • Xe máy 1 - 2 triệu"
   },
   {
     "idx": 2,
@@ -21,7 +23,8 @@
     "name": "Cấm người đi bộ",
     "category": "CẤM",
     "action": "Cấm người đi bộ qua lại trên đoạn đường này",
-    "speed_limit": null
+    "speed_limit": null,
+    "penalty": "Người đi bộ đi vào đường cấm: Phạt 60k - 100k"
   },
   {
     "idx": 3,
@@ -29,7 +32,8 @@
     "name": "Cấm xe đạp",
     "category": "CẤM",
     "action": "Cấm xe đạp đi vào đoạn đường này",
-    "speed_limit": null
+    "speed_limit": null,
+    "penalty": "Vi phạm hiệu lực biển cấm: Ô tô 800.000đ - 3.000.000đ (có thể tước GPLX) • Xe máy 300.000đ - 1.000.000đ"
   },
   {
     "idx": 4,
@@ -37,7 +41,8 @@
     "name": "Cấm xe gắn máy",
     "category": "CẤM",
     "action": "Cấm các loại xe gắn máy đi vào",
-    "speed_limit": null
+    "speed_limit": null,
+    "penalty": "Vi phạm hiệu lực biển cấm: Ô tô 800.000đ - 3.000.000đ (có thể tước GPLX) • Xe máy 300.000đ - 1.000.000đ"
   },
   {
     "idx": 5,
@@ -45,7 +50,8 @@
     "name": "Cấm xe mô tô 2-3 bánh",
     "category": "CẤM",
     "action": "Cấm các loại xe mô tô hai bánh và ba bánh",
-    "speed_limit": null
+    "speed_limit": null,
+    "penalty": "Xe máy đi vào đường cấm xe máy: Phạt 400k - 600k"
   },
   {
     "idx": 6,
@@ -53,7 +59,8 @@
     "name": "Cấm xe ô tô",
     "category": "CẤM",
     "action": "Cấm tất cả các loại xe cơ giới từ 3 bánh trở lên đi vào",
-    "speed_limit": null
+    "speed_limit": null,
+    "penalty": "Ô tô đi vào đường cấm ô tô: Phạt 2 - 3 triệu (tước GPLX 1-3T)"
   },
   {
     "idx": 7,
@@ -61,7 +68,8 @@
     "name": "Cấm ô tô và xe máy",
     "category": "CẤM",
     "action": "Cấm các loại xe cơ giới và xe mô tô",
-    "speed_limit": null
+    "speed_limit": null,
+    "penalty": "Đi vào đường cấm: Ô tô 2 - 3 triệu (tước GPLX 1-3T) • Xe máy 400k - 600k"
   },
   {
     "idx": 8,
@@ -69,7 +77,8 @@
     "name": "Cấm xe ô tô khách",
     "category": "CẤM",
     "action": "Cấm ô tô chở khách từ 9 chỗ trở lên",
-    "speed_limit": null
+    "speed_limit": null,
+    "penalty": "Xe khách đi vào đường cấm: Phạt 2 - 3 triệu (tước GPLX 1-3T)"
   },
   {
     "idx": 9,
@@ -77,7 +86,8 @@
     "name": "Cấm xe ô tô tải",
     "category": "CẤM",
     "action": "Cấm các loại xe ô tô tải trừ xe ưu tiên",
-    "speed_limit": null
+    "speed_limit": null,
+    "penalty": "Xe tải đi vào đường cấm tải: Phạt 2 - 3 triệu (tước GPLX 1-3T)"
   },
   {
     "idx": 10,
@@ -85,7 +95,8 @@
     "name": "Cấm xe ô tô khách và ô tô tải",
     "category": "CẤM",
     "action": "Cấm cả ô tô tải và ô tô khách",
-    "speed_limit": null
+    "speed_limit": null,
+    "penalty": "Xe tải/khách đi vào đường cấm: Phạt 2 - 3 triệu (tước GPLX 1-3T)"
   },
   {
     "idx": 11,
@@ -93,7 +104,8 @@
     "name": "Cấm xe ô tô taxi",
     "category": "CẤM",
     "action": "Cấm các loại xe taxi lưu thông",
-    "speed_limit": null
+    "speed_limit": null,
+    "penalty": "Vi phạm hiệu lực biển cấm: Ô tô 800.000đ - 3.000.000đ (có thể tước GPLX) • Xe máy 300.000đ - 1.000.000đ"
   },
   {
     "idx": 12,
@@ -101,7 +113,8 @@
     "name": "Cấm xe sơ-mi rơ-moóc",
     "category": "CẤM",
     "action": "Cấm các loại xe đầu kéo kéo sơ-mi rơ-moóc",
-    "speed_limit": null
+    "speed_limit": null,
+    "penalty": "Vi phạm hiệu lực biển cấm: Ô tô 800.000đ - 3.000.000đ (có thể tước GPLX) • Xe máy 300.000đ - 1.000.000đ"
   },
   {
     "idx": 13,
@@ -109,7 +122,8 @@
     "name": "Cấm xe kéo rơ-moóc",
     "category": "CẤM",
     "action": "Cấm các loại xe cơ giới kéo theo rơ-moóc",
-    "speed_limit": null
+    "speed_limit": null,
+    "penalty": "Xe kéo rơ-moóc vào đường cấm: Phạt 2 - 3 triệu (tước GPLX 1-3T)"
   },
   {
     "idx": 14,
@@ -117,7 +131,8 @@
     "name": "Cấm máy kéo",
     "category": "CẤM",
     "action": "Cấm các loại máy kéo bánh hơi và bánh xích",
-    "speed_limit": null
+    "speed_limit": null,
+    "penalty": "Vi phạm hiệu lực biển cấm: Ô tô 800.000đ - 3.000.000đ (có thể tước GPLX) • Xe máy 300.000đ - 1.000.000đ"
   },
   {
     "idx": 15,
@@ -125,7 +140,8 @@
     "name": "Cấm xe công nông",
     "category": "CẤM",
     "action": "Cấm xe công nông và xe tự chế",
-    "speed_limit": null
+    "speed_limit": null,
+    "penalty": "Vi phạm hiệu lực biển cấm: Ô tô 800.000đ - 3.000.000đ (có thể tước GPLX) • Xe máy 300.000đ - 1.000.000đ"
   },
   {
     "idx": 16,
@@ -133,7 +149,8 @@
     "name": "Cấm xe súc vật kéo",
     "category": "CẤM",
     "action": "Cấm súc vật vận tải hoặc kéo xe",
-    "speed_limit": null
+    "speed_limit": null,
+    "penalty": "Vi phạm hiệu lực biển cấm: Ô tô 800.000đ - 3.000.000đ (có thể tước GPLX) • Xe máy 300.000đ - 1.000.000đ"
   },
   {
     "idx": 17,
@@ -141,7 +158,8 @@
     "name": "Cấm xe ba bánh có động cơ",
     "category": "CẤM",
     "action": "Cấm các loại xe lam, xe lôi, xích lô máy",
-    "speed_limit": null
+    "speed_limit": null,
+    "penalty": "Vi phạm hiệu lực biển cấm: Ô tô 800.000đ - 3.000.000đ (có thể tước GPLX) • Xe máy 300.000đ - 1.000.000đ"
   },
   {
     "idx": 18,
@@ -149,7 +167,8 @@
     "name": "Cấm xe ba bánh không có động cơ",
     "category": "CẤM",
     "action": "Cấm xe xích lô và xe ba gác đạp",
-    "speed_limit": null
+    "speed_limit": null,
+    "penalty": "Vi phạm hiệu lực biển cấm: Ô tô 800.000đ - 3.000.000đ (có thể tước GPLX) • Xe máy 300.000đ - 1.000.000đ"
   },
   {
     "idx": 19,
@@ -157,7 +176,8 @@
     "name": "Cấm xe lôi",
     "category": "CẤM",
     "action": "Cấm các loại xe lôi đạp và kéo",
-    "speed_limit": null
+    "speed_limit": null,
+    "penalty": "Vi phạm hiệu lực biển cấm: Ô tô 800.000đ - 3.000.000đ (có thể tước GPLX) • Xe máy 300.000đ - 1.000.000đ"
   },
   {
     "idx": 20,
@@ -165,7 +185,8 @@
     "name": "Cấm xe chở hàng nguy hiểm",
     "category": "CẤM",
     "action": "Cấm các xe vận chuyển chất cháy, nổ, độc hại",
-    "speed_limit": null
+    "speed_limit": null,
+    "penalty": "Vi phạm hiệu lực biển cấm: Ô tô 800.000đ - 3.000.000đ (có thể tước GPLX) • Xe máy 300.000đ - 1.000.000đ"
   },
   {
     "idx": 21,
@@ -173,7 +194,8 @@
     "name": "Cấm rẽ trái",
     "category": "CẤM",
     "action": "Cấm các loại phương tiện cơ giới và thô sơ rẽ trái (được phép quay đầu)",
-    "speed_limit": null
+    "speed_limit": null,
+    "penalty": "Rẽ trái nơi cấm rẽ: Ô tô 800k - 1 triệu • Xe máy 400k - 600k"
   },
   {
     "idx": 22,
@@ -181,7 +203,8 @@
     "name": "Cấm xe ô tô rẽ trái",
     "category": "CẤM",
     "action": "Cấm các loại xe cơ giới rẽ trái",
-    "speed_limit": null
+    "speed_limit": null,
+    "penalty": "Rẽ trái nơi có biển cấm: Ô tô 800k - 1 triệu • Xe máy 400k - 600k"
   },
   {
     "idx": 23,
@@ -189,7 +212,8 @@
     "name": "Cấm rẽ phải",
     "category": "CẤM",
     "action": "Cấm các loại phương tiện cơ giới và thô sơ rẽ phải",
-    "speed_limit": null
+    "speed_limit": null,
+    "penalty": "Rẽ phải nơi cấm rẽ: Ô tô 800k - 1 triệu • Xe máy 400k - 600k"
   },
   {
     "idx": 24,
@@ -197,7 +221,8 @@
     "name": "Cấm xe ô tô rẽ phải",
     "category": "CẤM",
     "action": "Cấm các loại xe cơ giới rẽ phải",
-    "speed_limit": null
+    "speed_limit": null,
+    "penalty": "Rẽ phải nơi có biển cấm: Ô tô 800k - 1 triệu • Xe máy 400k - 600k"
   },
   {
     "idx": 25,
@@ -205,7 +230,8 @@
     "name": "Cấm quay đầu xe",
     "category": "CẤM",
     "action": "Cấm tất cả phương tiện quay đầu xe theo kiểu chữ U",
-    "speed_limit": null
+    "speed_limit": null,
+    "penalty": "Quay đầu nơi cấm quay đầu: Ô tô 800k - 1 triệu • Xe máy 400k - 600k"
   },
   {
     "idx": 26,
@@ -213,7 +239,8 @@
     "name": "Cấm ô tô quay đầu xe",
     "category": "CẤM",
     "action": "Cấm xe ô tô quay đầu xe theo kiểu chữ U",
-    "speed_limit": null
+    "speed_limit": null,
+    "penalty": "Ô tô quay đầu nơi cấm quay: Phạt 800k - 1 triệu"
   },
   {
     "idx": 27,
@@ -221,7 +248,8 @@
     "name": "Cấm ô tô quay đầu xe (mẫu 2)",
     "category": "CẤM",
     "action": "Cấm xe ô tô quay đầu xe",
-    "speed_limit": null
+    "speed_limit": null,
+    "penalty": "Vi phạm hiệu lực biển cấm: Ô tô 800.000đ - 3.000.000đ (có thể tước GPLX) • Xe máy 300.000đ - 1.000.000đ"
   },
   {
     "idx": 28,
@@ -229,7 +257,8 @@
     "name": "Cấm ô tô quay đầu xe (mẫu 3)",
     "category": "CẤM",
     "action": "Cấm xe ô tô quay đầu xe",
-    "speed_limit": null
+    "speed_limit": null,
+    "penalty": "Vi phạm hiệu lực biển cấm: Ô tô 800.000đ - 3.000.000đ (có thể tước GPLX) • Xe máy 300.000đ - 1.000.000đ"
   },
   {
     "idx": 29,
@@ -237,7 +266,8 @@
     "name": "Cấm rẽ trái và quay đầu xe",
     "category": "CẤM",
     "action": "Cấm các phương tiện rẽ trái đồng thời cấm quay đầu xe",
-    "speed_limit": null
+    "speed_limit": null,
+    "penalty": "Rẽ trái hoặc quay đầu trái phép: Ô tô 800k - 1 triệu • Xe máy 400k - 600k"
   },
   {
     "idx": 30,
@@ -245,7 +275,8 @@
     "name": "Cấm ô tô rẽ trái và quay đầu xe",
     "category": "CẤM",
     "action": "Cấm ô tô rẽ trái đồng thời cấm quay đầu xe",
-    "speed_limit": null
+    "speed_limit": null,
+    "penalty": "Vi phạm hiệu lực biển cấm: Ô tô 800.000đ - 3.000.000đ (có thể tước GPLX) • Xe máy 300.000đ - 1.000.000đ"
   },
   {
     "idx": 31,
@@ -253,7 +284,8 @@
     "name": "Cấm rẽ phải và quay đầu xe",
     "category": "CẤM",
     "action": "Cấm các phương tiện rẽ phải đồng thời cấm quay đầu xe",
-    "speed_limit": null
+    "speed_limit": null,
+    "penalty": "Rẽ phải hoặc quay đầu trái phép: Ô tô 800k - 1 triệu • Xe máy 400k - 600k"
   },
   {
     "idx": 32,
@@ -261,7 +293,8 @@
     "name": "Cấm ô tô rẽ phải và quay đầu xe",
     "category": "CẤM",
     "action": "Cấm ô tô rẽ phải đồng thời cấm quay đầu xe",
-    "speed_limit": null
+    "speed_limit": null,
+    "penalty": "Vi phạm hiệu lực biển cấm: Ô tô 800.000đ - 3.000.000đ (có thể tước GPLX) • Xe máy 300.000đ - 1.000.000đ"
   },
   {
     "idx": 33,
@@ -269,7 +302,8 @@
     "name": "Hạn chế chiều cao xe",
     "category": "CẤM",
     "action": "Cấm các xe có chiều cao vượt quá chỉ số ghi trên biển",
-    "speed_limit": null
+    "speed_limit": null,
+    "penalty": "Vượt quá chiều cao cho phép: Phạt 2 - 3 triệu (tước GPLX 1-3T)"
   },
   {
     "idx": 34,
@@ -277,7 +311,8 @@
     "name": "Hạn chế chiều ngang xe",
     "category": "CẤM",
     "action": "Cấm các xe có chiều ngang vượt quá mức ghi trên biển",
-    "speed_limit": null
+    "speed_limit": null,
+    "penalty": "Xe quá khổ chiều ngang: Phạt 2 - 3 triệu"
   },
   {
     "idx": 35,
@@ -285,7 +320,8 @@
     "name": "Hạn chế tải trọng toàn bộ xe",
     "category": "CẤM",
     "action": "Cấm xe có trọng lượng toàn bộ vượt quá số tấn ghi trên biển",
-    "speed_limit": null
+    "speed_limit": null,
+    "penalty": "Chở quá tải cầu đường: Phạt 4 - 16 triệu (tước phù hiệu & GPLX 1-3T)"
   },
   {
     "idx": 36,
@@ -293,7 +329,8 @@
     "name": "Hạn chế tải trọng trên trục xe",
     "category": "CẤM",
     "action": "Cấm xe có tải trọng phân bổ trên trục vượt quá chỉ số ghi trên biển",
-    "speed_limit": null
+    "speed_limit": null,
+    "penalty": "Quá tải trọng trục: Phạt 4 - 16 triệu"
   },
   {
     "idx": 37,
@@ -301,7 +338,8 @@
     "name": "Hạn chế chiều dài xe",
     "category": "CẤM",
     "action": "Cấm các xe có chiều dài tổng thể vượt quá mức ghi trên biển",
-    "speed_limit": null
+    "speed_limit": null,
+    "penalty": "Xe quá khổ chiều dài: Phạt 2 - 3 triệu"
   },
   {
     "idx": 38,
@@ -309,7 +347,8 @@
     "name": "Hạn chế chiều dài xe kéo moóc",
     "category": "CẤM",
     "action": "Cấm đoàn xe kéo moóc có tổng chiều dài vượt quá mức ghi trên biển",
-    "speed_limit": null
+    "speed_limit": null,
+    "penalty": "Xe rơ-moóc quá chiều dài: Phạt 2 - 3 triệu"
   },
   {
     "idx": 39,
@@ -317,7 +356,8 @@
     "name": "Cự ly tối thiểu giữa hai xe",
     "category": "CẤM",
     "action": "Giữ khoảng cách tối thiểu với xe đi trước theo chỉ số mét",
-    "speed_limit": null
+    "speed_limit": null,
+    "penalty": "Không giữ cự ly tối thiểu: Ô tô 800k - 1 triệu (gây tai nạn 10 - 12 triệu)"
   },
   {
     "idx": 40,
@@ -325,7 +365,8 @@
     "name": "Cấm vượt",
     "category": "CẤM",
     "action": "Cấm tất cả các loại xe cơ giới vượt nhau",
-    "speed_limit": null
+    "speed_limit": null,
+    "penalty": "Vượt xe nơi có biển cấm vượt: Ô tô 4 - 6 triệu (tước GPLX 1-3T) • Xe máy 800k - 1 triệu"
   },
   {
     "idx": 41,
@@ -333,7 +374,8 @@
     "name": "Cấm ô tô tải vượt",
     "category": "CẤM",
     "action": "Cấm các loại ô tô tải có khối lượng chuyên chở vượt xe cơ giới khác",
-    "speed_limit": null
+    "speed_limit": null,
+    "penalty": "Xe tải vượt nơi cấm vượt: Phạt 4 - 6 triệu (tước GPLX 1-3T)"
   },
   {
     "idx": 42,
@@ -341,7 +383,8 @@
     "name": "Tốc độ tối đa cho phép",
     "category": "CẤM",
     "action": "Chạy dưới hoặc bằng tốc độ tối đa ghi trên mặt biển",
-    "speed_limit": 50
+    "speed_limit": 50,
+    "penalty": "Quá 5-10km/h: 800k - 1tr (ô tô), 300k - 400k (xe máy) • Quá >20km/h: 4 - 12 triệu (giam bằng)"
   },
   {
     "idx": 43,
@@ -349,7 +392,8 @@
     "name": "Tốc độ tối đa ban đêm",
     "category": "CẤM",
     "action": "Chạy dưới hoặc bằng tốc độ quy định vào khung giờ ban đêm",
-    "speed_limit": 70
+    "speed_limit": 70,
+    "penalty": "Vi phạm hiệu lực biển cấm: Ô tô 800.000đ - 3.000.000đ (có thể tước GPLX) • Xe máy 300.000đ - 1.000.000đ"
   },
   {
     "idx": 44,
@@ -357,7 +401,8 @@
     "name": "Cấm sử dụng còi",
     "category": "CẤM",
     "action": "Không được bấm còi trong phạm vi có hiệu lực",
-    "speed_limit": null
+    "speed_limit": null,
+    "penalty": "Bấm còi nơi cấm còi: Ô tô 300k - 400k • Xe máy 100k - 200k"
   },
   {
     "idx": 45,
@@ -365,7 +410,8 @@
     "name": "Cấm dừng xe và đỗ xe",
     "category": "CẤM",
     "action": "Cấm các phương tiện dừng xe và đỗ xe ở đoạn đường này",
-    "speed_limit": null
+    "speed_limit": null,
+    "penalty": "Dừng đỗ xe trái phép: Ô tô 800k - 1 triệu • Xe máy 300k - 400k"
   },
   {
     "idx": 46,
@@ -373,7 +419,8 @@
     "name": "Cấm đỗ xe",
     "category": "CẤM",
     "action": "Cấm tất cả các phương tiện đỗ xe ở đoạn đường đặt biển",
-    "speed_limit": null
+    "speed_limit": null,
+    "penalty": "Đỗ xe nơi cấm đỗ: Ô tô 400k - 600k • Xe máy 300k - 400k"
   },
   {
     "idx": 47,
@@ -381,7 +428,8 @@
     "name": "Cấm đỗ xe ngày lẻ",
     "category": "CẤM",
     "action": "Cấm đỗ xe vào các ngày lẻ trong tháng",
-    "speed_limit": null
+    "speed_limit": null,
+    "penalty": "Đỗ xe ngày lẻ trái phép: Ô tô 400k - 600k • Xe máy 300k - 400k"
   },
   {
     "idx": 48,
@@ -389,7 +437,8 @@
     "name": "Cấm đỗ xe ngày chẵn",
     "category": "CẤM",
     "action": "Cấm đỗ xe vào các ngày chẵn trong tháng",
-    "speed_limit": null
+    "speed_limit": null,
+    "penalty": "Đỗ xe ngày chẵn trái phép: Ô tô 400k - 600k • Xe máy 300k - 400k"
   },
   {
     "idx": 49,
@@ -397,7 +446,8 @@
     "name": "Nhường đường cho xe ngược chiều",
     "category": "CẤM",
     "action": "Nhường đường cho xe cơ giới đi ngược chiều qua đoạn đường hẹp",
-    "speed_limit": null
+    "speed_limit": null,
+    "penalty": "Không nhường xe ngược chiều: Ô tô 400k - 600k"
   },
   {
     "idx": 50,
@@ -405,7 +455,8 @@
     "name": "Tốc độ tối đa theo phương tiện trên từng làn đường",
     "category": "CẤM",
     "action": "Tuân thủ tốc độ tối đa theo từng làn xe quy định",
-    "speed_limit": null
+    "speed_limit": null,
+    "penalty": "Vi phạm hiệu lực biển cấm: Ô tô 800.000đ - 3.000.000đ (có thể tước GPLX) • Xe máy 300.000đ - 1.000.000đ"
   },
   {
     "idx": 51,
@@ -413,7 +464,8 @@
     "name": "Tốc độ tối đa theo từng làn đường",
     "category": "CẤM",
     "action": "Tuân thủ tốc độ tối đa theo từng làn đường chỉ định",
-    "speed_limit": null
+    "speed_limit": null,
+    "penalty": "Vi phạm hiệu lực biển cấm: Ô tô 800.000đ - 3.000.000đ (có thể tước GPLX) • Xe máy 300.000đ - 1.000.000đ"
   },
   {
     "idx": 52,
@@ -421,7 +473,8 @@
     "name": "Hết tất cả các lệnh cấm",
     "category": "HIỆU LỆNH",
     "action": "Đã hết hiệu lực của các biển cấm trước đó",
-    "speed_limit": null
+    "speed_limit": null,
+    "penalty": "Không áp dụng xử phạt (Hết hiệu lực các lệnh cấm trước đó)"
   },
   {
     "idx": 53,
@@ -429,7 +482,8 @@
     "name": "Hết cấm vượt",
     "category": "HIỆU LỆNH",
     "action": "Được phép vượt xe trở lại bình thường",
-    "speed_limit": null
+    "speed_limit": null,
+    "penalty": "Không chấp hành hiệu lệnh biển báo: Ô tô 300.000đ - 400.000đ • Xe máy 100.000đ - 200.000đ"
   },
   {
     "idx": 54,
@@ -437,7 +491,8 @@
     "name": "Hết hạn chế tốc độ tối đa",
     "category": "HIỆU LỆNH",
     "action": "Hết hiệu lực của biển hạn chế tốc độ trước đó",
-    "speed_limit": null
+    "speed_limit": null,
+    "penalty": "Không chấp hành hiệu lệnh biển báo: Ô tô 300.000đ - 400.000đ • Xe máy 100.000đ - 200.000đ"
   },
   {
     "idx": 55,
@@ -445,7 +500,8 @@
     "name": "Hết hạn chế tốc độ theo biển ghép",
     "category": "HIỆU LỆNH",
     "action": "Hết hiệu lực hạn chế tốc độ ghép",
-    "speed_limit": null
+    "speed_limit": null,
+    "penalty": "Không chấp hành hiệu lệnh biển báo: Ô tô 300.000đ - 400.000đ • Xe máy 100.000đ - 200.000đ"
   },
   {
     "idx": 56,
@@ -453,7 +509,8 @@
     "name": "Đường giao nhau cùng mức (ngã tư)",
     "category": "CẢNH BÁO",
     "action": "Giao nhau cùng mức các tuyến đường cùng cấp",
-    "speed_limit": null
+    "speed_limit": null,
+    "penalty": "Nút giao: Không giảm tốc độ, không nhường đường phạt 400k - 600k (ô tô)"
   },
   {
     "idx": 57,
@@ -461,7 +518,8 @@
     "name": "Đường giao nhau nhánh bên phải",
     "category": "CẢNH BÁO",
     "action": "Giao nhau nhánh đường cùng cấp bên phải",
-    "speed_limit": null
+    "speed_limit": null,
+    "penalty": "Nút giao: Không giảm tốc độ, không nhường đường theo quy định phạt 400k - 600k"
   },
   {
     "idx": 58,
@@ -469,7 +527,8 @@
     "name": "Đường giao nhau nhánh bên trái",
     "category": "CẢNH BÁO",
     "action": "Giao nhau nhánh đường cùng cấp bên trái",
-    "speed_limit": null
+    "speed_limit": null,
+    "penalty": "Nút giao: Không giảm tốc độ, không nhường đường theo quy định phạt 400k - 600k"
   },
   {
     "idx": 59,
@@ -477,7 +536,8 @@
     "name": "Giao nhau với đường không ưu tiên",
     "category": "CẢNH BÁO",
     "action": "Đang đi trên đường ưu tiên qua nơi giao nhau",
-    "speed_limit": null
+    "speed_limit": null,
+    "penalty": "Được ưu tiên: Giữ tốc độ an toàn, chú ý phương tiện bất ngờ từ đường phụ"
   },
   {
     "idx": 60,
@@ -485,7 +545,8 @@
     "name": "Giao nhau đường không ưu tiên bên phải",
     "category": "CẢNH BÁO",
     "action": "Có nhánh đường phụ nhập vào từ bên phải",
-    "speed_limit": null
+    "speed_limit": null,
+    "penalty": "Chú ý nhánh phụ bên phải: Giảm ga, quan sát xe nhập làn"
   },
   {
     "idx": 61,
@@ -493,7 +554,8 @@
     "name": "Giao nhau đường không ưu tiên bên trái",
     "category": "CẢNH BÁO",
     "action": "Có nhánh đường phụ nhập vào từ bên trái",
-    "speed_limit": null
+    "speed_limit": null,
+    "penalty": "Chú ý nhánh phụ bên trái: Giảm ga, quan sát xe nhập làn"
   },
   {
     "idx": 62,
@@ -501,7 +563,8 @@
     "name": "Giao nhau với đường ưu tiên",
     "category": "CẢNH BÁO",
     "action": "Nhường đường cho xe trên tuyến đường ưu tiên",
-    "speed_limit": null
+    "speed_limit": null,
+    "penalty": "Không nhường xe trên đường ưu tiên: Ô tô 800k - 1 triệu • Xe máy 400k - 600k"
   },
   {
     "idx": 63,
@@ -509,7 +572,8 @@
     "name": "Nơi giao nhau có tín hiệu đèn",
     "category": "CẢNH BÁO",
     "action": "Chuẩn bị tới nơi giao nhau có đèn giao thông",
-    "speed_limit": null
+    "speed_limit": null,
+    "penalty": "Vượt đèn đỏ: Ô tô 4 - 6 triệu (giam bằng 1-3T) • Xe máy 800k - 1 triệu"
   },
   {
     "idx": 64,
@@ -517,7 +581,8 @@
     "name": "Đường người đi xe đạp cắt ngang",
     "category": "CẢNH BÁO",
     "action": "Chú ý người đi xe đạp qua đường",
-    "speed_limit": null
+    "speed_limit": null,
+    "penalty": "Không giảm tốc độ khi gặp biển cảnh báo gây tai nạn: Phạt 4.000.000đ - 5.000.000đ (tước GPLX)"
   },
   {
     "idx": 65,
@@ -525,7 +590,8 @@
     "name": "Đường người đi bộ cắt ngang",
     "category": "CẢNH BÁO",
     "action": "Giảm tốc độ, chú ý nhường đường người đi bộ",
-    "speed_limit": null
+    "speed_limit": null,
+    "penalty": "Không nhường đường người đi bộ: Ô tô 200k - 400k • Xe máy 100k - 200k"
   },
   {
     "idx": 66,
@@ -533,7 +599,8 @@
     "name": "Trẻ em qua đường",
     "category": "CẢNH BÁO",
     "action": "Khu vực trường học hoặc sân chơi trẻ em, đi chậm",
-    "speed_limit": null
+    "speed_limit": null,
+    "penalty": "Khu vực trường học/trẻ em: Chú ý quan sát, giảm ga tránh tai nạn bất ngờ"
   },
   {
     "idx": 67,
@@ -541,7 +608,8 @@
     "name": "Đường hai chiều",
     "category": "CẢNH BÁO",
     "action": "Đoạn đường lưu thông theo cả 2 chiều ngược nhau",
-    "speed_limit": null
+    "speed_limit": null,
+    "penalty": "Không giảm tốc độ khi gặp biển cảnh báo gây tai nạn: Phạt 4.000.000đ - 5.000.000đ (tước GPLX)"
   },
   {
     "idx": 68,
@@ -549,7 +617,8 @@
     "name": "Giao nhau với đường hai chiều",
     "category": "CẢNH BÁO",
     "action": "Sắp giao nhau với tuyến đường hai chiều",
-    "speed_limit": null
+    "speed_limit": null,
+    "penalty": "Không giảm tốc độ khi gặp biển cảnh báo gây tai nạn: Phạt 4.000.000đ - 5.000.000đ (tước GPLX)"
   },
   {
     "idx": 69,
@@ -557,7 +626,8 @@
     "name": "Đường đôi",
     "category": "CẢNH BÁO",
     "action": "Bắt đầu đoạn đường đôi có dải phân cách giữa",
-    "speed_limit": null
+    "speed_limit": null,
+    "penalty": "Đường đôi: Đi đúng làn đường phân cách; đi sai làn phạt 3 - 5 triệu (tước GPLX)"
   },
   {
     "idx": 70,
@@ -565,7 +635,8 @@
     "name": "Kết thúc đường đôi",
     "category": "CẢNH BÁO",
     "action": "Hết đoạn đường đôi, chú ý làn xe ngược chiều",
-    "speed_limit": null
+    "speed_limit": null,
+    "penalty": "Không giảm tốc độ khi gặp biển cảnh báo gây tai nạn: Phạt 4.000.000đ - 5.000.000đ (tước GPLX)"
   },
   {
     "idx": 71,
@@ -573,7 +644,8 @@
     "name": "Cầu vồng",
     "category": "CẢNH BÁO",
     "action": "Đoạn cầu vồng dốc gồ ghề hạn chế tầm nhìn",
-    "speed_limit": null
+    "speed_limit": null,
+    "penalty": "Không giảm tốc độ khi gặp biển cảnh báo gây tai nạn: Phạt 4.000.000đ - 5.000.000đ (tước GPLX)"
   },
   {
     "idx": 72,
@@ -581,7 +653,8 @@
     "name": "Cửa chui",
     "category": "CẢNH BÁO",
     "action": "Sắp qua cửa chui hẹp, chú ý chiều cao xe",
-    "speed_limit": null
+    "speed_limit": null,
+    "penalty": "Không giảm tốc độ khi gặp biển cảnh báo gây tai nạn: Phạt 4.000.000đ - 5.000.000đ (tước GPLX)"
   },
   {
     "idx": 73,
@@ -589,7 +662,8 @@
     "name": "Đường hầm",
     "category": "CẢNH BÁO",
     "action": "Sắp vào hầm đường bộ, bật đèn xe",
-    "speed_limit": null
+    "speed_limit": null,
+    "penalty": "Không giảm tốc độ khi gặp biển cảnh báo gây tai nạn: Phạt 4.000.000đ - 5.000.000đ (tước GPLX)"
   },
   {
     "idx": 74,
@@ -597,7 +671,8 @@
     "name": "Đường cao tốc phía trước",
     "category": "CẢNH BÁO",
     "action": "Sắp vào đường cao tốc",
-    "speed_limit": null
+    "speed_limit": null,
+    "penalty": "Không giảm tốc độ khi gặp biển cảnh báo gây tai nạn: Phạt 4.000.000đ - 5.000.000đ (tước GPLX)"
   },
   {
     "idx": 75,
@@ -605,7 +680,8 @@
     "name": "Ùn tắc giao thông",
     "category": "CẢNH BÁO",
     "action": "Đoạn đường thường xuyên ùn tắc",
-    "speed_limit": null
+    "speed_limit": null,
+    "penalty": "Không giảm tốc độ khi gặp biển cảnh báo gây tai nạn: Phạt 4.000.000đ - 5.000.000đ (tước GPLX)"
   },
   {
     "idx": 76,
@@ -613,7 +689,8 @@
     "name": "Đường trơn",
     "category": "CẢNH BÁO",
     "action": "Mặt đường trơn trượt, giảm tốc độ tránh phanh gấp",
-    "speed_limit": null
+    "speed_limit": null,
+    "penalty": "Không giảm tốc độ khi gặp biển cảnh báo gây tai nạn: Phạt 4.000.000đ - 5.000.000đ (tước GPLX)"
   },
   {
     "idx": 77,
@@ -621,7 +698,8 @@
     "name": "Đoạn đường hay xảy ra tai nạn",
     "category": "CẢNH BÁO",
     "action": "Đi chậm và chú ý quan sát đặc biệt",
-    "speed_limit": null
+    "speed_limit": null,
+    "penalty": "Không giảm tốc độ khi gặp biển cảnh báo gây tai nạn: Phạt 4.000.000đ - 5.000.000đ (tước GPLX)"
   },
   {
     "idx": 78,
@@ -629,7 +707,8 @@
     "name": "Gia súc",
     "category": "CẢNH BÁO",
     "action": "Gia súc thường qua đường bất ngờ",
-    "speed_limit": null
+    "speed_limit": null,
+    "penalty": "Không giảm tốc độ khi gặp biển cảnh báo gây tai nạn: Phạt 4.000.000đ - 5.000.000đ (tước GPLX)"
   },
   {
     "idx": 79,
@@ -637,7 +716,8 @@
     "name": "Gió ngang",
     "category": "CẢNH BÁO",
     "action": "Gió thổi ngang mạnh nguy hiểm, giữ vững tay lái",
-    "speed_limit": null
+    "speed_limit": null,
+    "penalty": "Không giảm tốc độ khi gặp biển cảnh báo gây tai nạn: Phạt 4.000.000đ - 5.000.000đ (tước GPLX)"
   },
   {
     "idx": 80,
@@ -645,7 +725,8 @@
     "name": "Nền đường yếu",
     "category": "CẢNH BÁO",
     "action": "Đoạn đường có nền đất yếu dễ sụt lún",
-    "speed_limit": null
+    "speed_limit": null,
+    "penalty": "Không giảm tốc độ khi gặp biển cảnh báo gây tai nạn: Phạt 4.000.000đ - 5.000.000đ (tước GPLX)"
   },
   {
     "idx": 81,
@@ -653,7 +734,8 @@
     "name": "Sỏi đá bắn lên",
     "category": "CẢNH BÁO",
     "action": "Mặt đường rải sỏi đá dăm, giữ cự ly xa xe trước",
-    "speed_limit": null
+    "speed_limit": null,
+    "penalty": "Không giảm tốc độ khi gặp biển cảnh báo gây tai nạn: Phạt 4.000.000đ - 5.000.000đ (tước GPLX)"
   },
   {
     "idx": 82,
@@ -661,7 +743,8 @@
     "name": "Đường cáp điện ở phía trên",
     "category": "CẢNH BÁO",
     "action": "Chú ý tĩnh không đường dây điện cao thế",
-    "speed_limit": null
+    "speed_limit": null,
+    "penalty": "Không giảm tốc độ khi gặp biển cảnh báo gây tai nạn: Phạt 4.000.000đ - 5.000.000đ (tước GPLX)"
   },
   {
     "idx": 83,
@@ -669,7 +752,8 @@
     "name": "Bến phà",
     "category": "CẢNH BÁO",
     "action": "Sắp đến bến phà, đi chậm theo hướng dẫn",
-    "speed_limit": null
+    "speed_limit": null,
+    "penalty": "Không giảm tốc độ khi gặp biển cảnh báo gây tai nạn: Phạt 4.000.000đ - 5.000.000đ (tước GPLX)"
   },
   {
     "idx": 84,
@@ -677,7 +761,8 @@
     "name": "Đá lở",
     "category": "CẢNH BÁO",
     "action": "Nguy cơ đất đá sạt lở từ taluy dương",
-    "speed_limit": null
+    "speed_limit": null,
+    "penalty": "Không giảm tốc độ khi gặp biển cảnh báo gây tai nạn: Phạt 4.000.000đ - 5.000.000đ (tước GPLX)"
   },
   {
     "idx": 85,
@@ -685,7 +770,8 @@
     "name": "Công trường thi công",
     "category": "CẢNH BÁO",
     "action": "Đoạn đường đang sửa chữa hoặc thi công, giảm tốc",
-    "speed_limit": null
+    "speed_limit": null,
+    "penalty": "Không giảm tốc qua khu vực thi công: Phạt 400k - 600k (ô tô)"
   },
   {
     "idx": 86,
@@ -693,7 +779,8 @@
     "name": "Lề đường nguy hiểm",
     "category": "CẢNH BÁO",
     "action": "Lề đường không ổn định dễ trượt bánh",
-    "speed_limit": null
+    "speed_limit": null,
+    "penalty": "Không giảm tốc độ khi gặp biển cảnh báo gây tai nạn: Phạt 4.000.000đ - 5.000.000đ (tước GPLX)"
   },
   {
     "idx": 87,
@@ -701,7 +788,8 @@
     "name": "Kè, vực sâu phía trước",
     "category": "CẢNH BÁO",
     "action": "Bờ kè hoặc bờ vực phía trước",
-    "speed_limit": null
+    "speed_limit": null,
+    "penalty": "Không giảm tốc độ khi gặp biển cảnh báo gây tai nạn: Phạt 4.000.000đ - 5.000.000đ (tước GPLX)"
   },
   {
     "idx": 88,
@@ -709,7 +797,8 @@
     "name": "Kè, vực sâu bên trái",
     "category": "CẢNH BÁO",
     "action": "Bờ vực hoặc mặt nước bên trái",
-    "speed_limit": null
+    "speed_limit": null,
+    "penalty": "Không giảm tốc độ khi gặp biển cảnh báo gây tai nạn: Phạt 4.000.000đ - 5.000.000đ (tước GPLX)"
   },
   {
     "idx": 89,
@@ -717,7 +806,8 @@
     "name": "Kè, vực sâu bên phải",
     "category": "CẢNH BÁO",
     "action": "Bờ vực hoặc mặt nước bên phải",
-    "speed_limit": null
+    "speed_limit": null,
+    "penalty": "Không giảm tốc độ khi gặp biển cảnh báo gây tai nạn: Phạt 4.000.000đ - 5.000.000đ (tước GPLX)"
   },
   {
     "idx": 90,
@@ -725,7 +815,8 @@
     "name": "Dốc xuống nguy hiểm",
     "category": "CẢNH BÁO",
     "action": "Đoạn dốc xuống sâu nguy hiểm, đi số thấp",
-    "speed_limit": null
+    "speed_limit": null,
+    "penalty": "Dốc dài: Về số thấp, không rà phanh liên tục phòng tránh mất phanh và tai nạn"
   },
   {
     "idx": 91,
@@ -733,7 +824,8 @@
     "name": "Dốc lên nguy hiểm",
     "category": "CẢNH BÁO",
     "action": "Đoạn dốc lên cao, chú ý không vượt ẩu",
-    "speed_limit": null
+    "speed_limit": null,
+    "penalty": "Không giảm tốc độ khi gặp biển cảnh báo gây tai nạn: Phạt 4.000.000đ - 5.000.000đ (tước GPLX)"
   },
   {
     "idx": 92,
@@ -741,7 +833,8 @@
     "name": "Đường có gờ giảm tốc",
     "category": "CẢNH BÁO",
     "action": "Mặt đường có gờ giảm tốc, đi chậm lại",
-    "speed_limit": null
+    "speed_limit": null,
+    "penalty": "Gờ giảm tốc: Giảm tốc độ qua gờ; không giảm tốc gây va chạm phạt 400k - 600k"
   },
   {
     "idx": 93,
@@ -749,7 +842,8 @@
     "name": "Đường có ổ gà lồi lõm",
     "category": "CẢNH BÁO",
     "action": "Mặt đường xấu, lồi lõm nhiều ổ gà",
-    "speed_limit": null
+    "speed_limit": null,
+    "penalty": "Không giảm tốc độ khi gặp biển cảnh báo gây tai nạn: Phạt 4.000.000đ - 5.000.000đ (tước GPLX)"
   },
   {
     "idx": 94,
@@ -757,7 +851,8 @@
     "name": "Cầu hẹp",
     "category": "CẢNH BÁO",
     "action": "Đoạn cầu hẹp một làn xe",
-    "speed_limit": null
+    "speed_limit": null,
+    "penalty": "Không giảm tốc độ khi gặp biển cảnh báo gây tai nạn: Phạt 4.000.000đ - 5.000.000đ (tước GPLX)"
   },
   {
     "idx": 95,
@@ -765,7 +860,8 @@
     "name": "Cầu tạm",
     "category": "CẢNH BÁO",
     "action": "Đoạn cầu tạm có tải trọng giới hạn",
-    "speed_limit": null
+    "speed_limit": null,
+    "penalty": "Không giảm tốc độ khi gặp biển cảnh báo gây tai nạn: Phạt 4.000.000đ - 5.000.000đ (tước GPLX)"
   },
   {
     "idx": 96,
@@ -773,7 +869,8 @@
     "name": "Cầu quay - cầu cất",
     "category": "CẢNH BÁO",
     "action": "Cầu quay hoặc cầu cất nhịp thông thuyền",
-    "speed_limit": null
+    "speed_limit": null,
+    "penalty": "Không giảm tốc độ khi gặp biển cảnh báo gây tai nạn: Phạt 4.000.000đ - 5.000.000đ (tước GPLX)"
   },
   {
     "idx": 97,
@@ -781,7 +878,8 @@
     "name": "Chỗ ngoặt nguy hiểm vòng bên trái",
     "category": "CẢNH BÁO",
     "action": "Đoạn đường cong gấp nguy hiểm về phía bên trái",
-    "speed_limit": null
+    "speed_limit": null,
+    "penalty": "Khúc cua nguy hiểm: Không giảm tốc độ/vượt xe gây TNGT phạt 4 - 5 triệu (tước GPLX 2-4T)"
   },
   {
     "idx": 98,
@@ -789,7 +887,8 @@
     "name": "Chỗ ngoặt nguy hiểm vòng bên phải",
     "category": "CẢNH BÁO",
     "action": "Đoạn đường cong gấp nguy hiểm về phía bên phải",
-    "speed_limit": null
+    "speed_limit": null,
+    "penalty": "Khúc cua nguy hiểm: Không giảm tốc độ/vượt xe gây TNGT phạt 4 - 5 triệu (tước GPLX 2-4T)"
   },
   {
     "idx": 99,
@@ -797,7 +896,8 @@
     "name": "Đường bị hẹp cả hai bên",
     "category": "CẢNH BÁO",
     "action": "Mặt đường bị hẹp đột ngột từ cả hai phía",
-    "speed_limit": null
+    "speed_limit": null,
+    "penalty": "Đoạn hẹp: Không giảm tốc độ, không nhường xe đối diện phạt 400k - 600k (ô tô)"
   },
   {
     "idx": 100,
@@ -805,7 +905,8 @@
     "name": "Đường bị hẹp về phía trái",
     "category": "CẢNH BÁO",
     "action": "Mặt đường bị hẹp đột ngột về phía bên trái",
-    "speed_limit": null
+    "speed_limit": null,
+    "penalty": "Đoạn hẹp bên trái: Không giảm tốc độ, không nhường đường phạt 400k - 600k"
   },
   {
     "idx": 101,
@@ -813,7 +914,8 @@
     "name": "Đường bị hẹp về phía phải",
     "category": "CẢNH BÁO",
     "action": "Mặt đường bị hẹp đột ngột về phía bên phải",
-    "speed_limit": null
+    "speed_limit": null,
+    "penalty": "Đoạn hẹp bên phải: Không giảm tốc độ, không nhường đường phạt 400k - 600k"
   },
   {
     "idx": 102,
@@ -821,7 +923,8 @@
     "name": "Nhiều chỗ ngoặt nguy hiểm liên tiếp sang trái",
     "category": "CẢNH BÁO",
     "action": "Nhiều khúc cua gấp liên tiếp, cua đầu sang trái",
-    "speed_limit": null
+    "speed_limit": null,
+    "penalty": "Cua liên tiếp: Không giảm tốc độ/vượt xe gây TNGT phạt 4 - 5 triệu (tước GPLX 2-4T)"
   },
   {
     "idx": 103,
@@ -829,7 +932,8 @@
     "name": "Nhiều chỗ ngoặt nguy hiểm liên tiếp sang phải",
     "category": "CẢNH BÁO",
     "action": "Nhiều khúc cua gấp liên tiếp, cua đầu sang phải",
-    "speed_limit": null
+    "speed_limit": null,
+    "penalty": "Cua liên tiếp: Không giảm tốc độ/vượt xe gây TNGT phạt 4 - 5 triệu (tước GPLX 2-4T)"
   },
   {
     "idx": 104,
@@ -837,7 +941,8 @@
     "name": "Giao nhau chạy theo vòng xuyến",
     "category": "CẢNH BÁO",
     "action": "Nơi giao nhau có đảo giao thông vòng xuyến",
-    "speed_limit": null
+    "speed_limit": null,
+    "penalty": "Không giảm tốc độ khi gặp biển cảnh báo gây tai nạn: Phạt 4.000.000đ - 5.000.000đ (tước GPLX)"
   },
   {
     "idx": 105,
@@ -845,7 +950,8 @@
     "name": "Giao nhau với đường tàu điện",
     "category": "CẢNH BÁO",
     "action": "Giao cắt với tuyến tàu điện",
-    "speed_limit": null
+    "speed_limit": null,
+    "penalty": "Không giảm tốc độ khi gặp biển cảnh báo gây tai nạn: Phạt 4.000.000đ - 5.000.000đ (tước GPLX)"
   },
   {
     "idx": 106,
@@ -853,7 +959,8 @@
     "name": "Giao nhau với đường sắt có rào chắn",
     "category": "CẢNH BÁO",
     "action": "Đường sắt giao nhau có rào chắn tự động",
-    "speed_limit": null
+    "speed_limit": null,
+    "penalty": "Vượt rào chắn đường sắt: Ô tô 4 - 6 triệu • Xe máy 800k - 1 triệu (giam bằng 1-3T)"
   },
   {
     "idx": 107,
@@ -861,7 +968,8 @@
     "name": "Giao nhau với đường sắt không rào chắn",
     "category": "CẢNH BÁO",
     "action": "Đường sắt giao nhau không rào chắn, dừng lại quan sát",
-    "speed_limit": null
+    "speed_limit": null,
+    "penalty": "Không dừng quan sát tại đường sắt: Ô tô 800k - 1 triệu • Xe máy 300k - 400k"
   },
   {
     "idx": 108,
@@ -869,7 +977,8 @@
     "name": "Nơi đường sắt giao vuông góc",
     "category": "CẢNH BÁO",
     "action": "Nơi đường sắt giao cắt vuông góc với đường bộ",
-    "speed_limit": null
+    "speed_limit": null,
+    "penalty": "Không giảm tốc độ khi gặp biển cảnh báo gây tai nạn: Phạt 4.000.000đ - 5.000.000đ (tước GPLX)"
   },
   {
     "idx": 109,
@@ -877,7 +986,8 @@
     "name": "Nơi đường sắt giao không vuông góc",
     "category": "CẢNH BÁO",
     "action": "Nơi đường sắt giao cắt chéo với đường bộ",
-    "speed_limit": null
+    "speed_limit": null,
+    "penalty": "Không giảm tốc độ khi gặp biển cảnh báo gây tai nạn: Phạt 4.000.000đ - 5.000.000đ (tước GPLX)"
   },
   {
     "idx": 110,
@@ -885,7 +995,8 @@
     "name": "Các xe chỉ được đi thẳng",
     "category": "HIỆU LỆNH",
     "action": "Các phương tiện chỉ được phép đi thẳng",
-    "speed_limit": null
+    "speed_limit": null,
+    "penalty": "Không chấp hành hiệu lệnh đi thẳng: Ô tô 300k - 400k • Xe máy 100k - 200k"
   },
   {
     "idx": 111,
@@ -893,7 +1004,8 @@
     "name": "Các xe chỉ được rẽ phải",
     "category": "HIỆU LỆNH",
     "action": "Các phương tiện chỉ được phép rẽ sang phải",
-    "speed_limit": null
+    "speed_limit": null,
+    "penalty": "Không chấp hành hiệu lệnh rẽ phải: Ô tô 300k - 400k • Xe máy 100k - 200k"
   },
   {
     "idx": 112,
@@ -901,7 +1013,8 @@
     "name": "Các xe chỉ được rẽ trái",
     "category": "HIỆU LỆNH",
     "action": "Các phương tiện chỉ được phép rẽ sang trái",
-    "speed_limit": null
+    "speed_limit": null,
+    "penalty": "Không chấp hành hiệu lệnh rẽ trái: Ô tô 300k - 400k • Xe máy 100k - 200k"
   },
   {
     "idx": 113,
@@ -909,7 +1022,8 @@
     "name": "Các xe chỉ được rẽ phải (ngã ba/tư)",
     "category": "HIỆU LỆNH",
     "action": "Chỉ được phép rẽ phải ở phạm vi ngã ba, ngã tư",
-    "speed_limit": null
+    "speed_limit": null,
+    "penalty": "Không chấp hành hiệu lệnh rẽ phải: Ô tô 300k - 400k • Xe máy 100k - 200k"
   },
   {
     "idx": 114,
@@ -917,7 +1031,8 @@
     "name": "Các xe chỉ được đi thẳng và rẽ trái",
     "category": "HIỆU LỆNH",
     "action": "Chỉ được phép đi thẳng hoặc rẽ trái",
-    "speed_limit": null
+    "speed_limit": null,
+    "penalty": "Không chấp hành hiệu lệnh hướng đi: Ô tô 300k - 400k • Xe máy 100k - 200k"
   },
   {
     "idx": 115,
@@ -925,7 +1040,8 @@
     "name": "Các xe chỉ được đi thẳng và rẽ phải",
     "category": "HIỆU LỆNH",
     "action": "Chỉ được phép đi thẳng hoặc rẽ phải",
-    "speed_limit": null
+    "speed_limit": null,
+    "penalty": "Không chấp hành hiệu lệnh hướng đi: Ô tô 300k - 400k • Xe máy 100k - 200k"
   },
   {
     "idx": 116,
@@ -933,7 +1049,8 @@
     "name": "Các xe rẽ trái và rẽ phải",
     "category": "HIỆU LỆNH",
     "action": "Chỉ được rẽ trái hoặc rẽ phải",
-    "speed_limit": null
+    "speed_limit": null,
+    "penalty": "Không chấp hành hiệu lệnh biển báo: Ô tô 300.000đ - 400.000đ • Xe máy 100.000đ - 200.000đ"
   },
   {
     "idx": 117,
@@ -941,7 +1058,8 @@
     "name": "Hướng phải đi vòng sang phải",
     "category": "HIỆU LỆNH",
     "action": "Phải đi vòng tránh chướng ngại vật sang bên phải",
-    "speed_limit": null
+    "speed_limit": null,
+    "penalty": "Đi sai hướng tránh chướng ngại vật: Ô tô 300k - 400k • Xe máy 100k - 200k"
   },
   {
     "idx": 118,
@@ -949,7 +1067,8 @@
     "name": "Hướng phải đi vòng sang trái",
     "category": "HIỆU LỆNH",
     "action": "Phải đi vòng tránh chướng ngại vật sang bên trái",
-    "speed_limit": null
+    "speed_limit": null,
+    "penalty": "Đi sai hướng tránh chướng ngại vật: Ô tô 300k - 400k • Xe máy 100k - 200k"
   },
   {
     "idx": 119,
@@ -957,7 +1076,8 @@
     "name": "Nơi giao nhau chạy theo vòng xuyến",
     "category": "HIỆU LỆNH",
     "action": "Chạy vòng quanh đảo an toàn theo chiều mũi tên",
-    "speed_limit": null
+    "speed_limit": null,
+    "penalty": "Không nhường đường/không theo vòng xuyến: Ô tô 300k - 400k • Xe máy 100k - 200k"
   },
   {
     "idx": 120,
@@ -965,7 +1085,8 @@
     "name": "Đường dành cho xe thô sơ",
     "category": "HIỆU LỆNH",
     "action": "Đoạn đường chỉ dành riêng cho xe thô sơ",
-    "speed_limit": null
+    "speed_limit": null,
+    "penalty": "Đi vào làn xe thô sơ: Ô tô 400k - 600k • Xe máy 300k - 400k"
   },
   {
     "idx": 121,
@@ -973,7 +1094,8 @@
     "name": "Đường dành cho người đi bộ",
     "category": "HIỆU LỆNH",
     "action": "Đoạn đường chỉ dành riêng cho người đi bộ",
-    "speed_limit": null
+    "speed_limit": null,
+    "penalty": "Xe cơ giới đi vào đường người đi bộ: Ô tô 2 - 3 triệu • Xe máy 400k - 600k"
   },
   {
     "idx": 122,
@@ -981,7 +1103,8 @@
     "name": "Tốc độ tối thiểu cho phép",
     "category": "HIỆU LỆNH",
     "action": "Chạy với tốc độ lớn hơn hoặc bằng tốc độ ghi trên biển",
-    "speed_limit": 60
+    "speed_limit": 60,
+    "penalty": "Chạy dưới tốc độ tối thiểu: Ô tô 800k - 1 triệu • Xe máy 200k - 400k"
   },
   {
     "idx": 123,
@@ -989,7 +1112,8 @@
     "name": "Hết hạn chế tốc độ tối thiểu",
     "category": "HIỆU LỆNH",
     "action": "Hết hiệu lực tốc độ tối thiểu",
-    "speed_limit": null
+    "speed_limit": null,
+    "penalty": "Không chấp hành hiệu lệnh biển báo: Ô tô 300.000đ - 400.000đ • Xe máy 100.000đ - 200.000đ"
   },
   {
     "idx": 124,
@@ -997,7 +1121,8 @@
     "name": "Đường dành cho ô tô",
     "category": "HIỆU LỆNH",
     "action": "Bắt đầu đoạn đường dành riêng cho xe ô tô",
-    "speed_limit": null
+    "speed_limit": null,
+    "penalty": "Xe máy đi vào đường ô tô: Phạt 2 - 3 triệu (tước GPLX 1-3T)"
   },
   {
     "idx": 125,
@@ -1005,7 +1130,8 @@
     "name": "Đường dành cho ô tô và xe máy",
     "category": "HIỆU LỆNH",
     "action": "Đoạn đường dành riêng cho ô tô và xe máy",
-    "speed_limit": null
+    "speed_limit": null,
+    "penalty": "Không chấp hành hiệu lệnh biển báo: Ô tô 300.000đ - 400.000đ • Xe máy 100.000đ - 200.000đ"
   },
   {
     "idx": 126,
@@ -1013,7 +1139,8 @@
     "name": "Hết đoạn đường dành cho ô tô",
     "category": "HIỆU LỆNH",
     "action": "Hết đoạn đường dành riêng cho ô tô",
-    "speed_limit": null
+    "speed_limit": null,
+    "penalty": "Không chấp hành hiệu lệnh biển báo: Ô tô 300.000đ - 400.000đ • Xe máy 100.000đ - 200.000đ"
   },
   {
     "idx": 127,
@@ -1021,7 +1148,8 @@
     "name": "Hết đoạn đường dành cho ô tô và xe máy",
     "category": "HIỆU LỆNH",
     "action": "Hết đoạn đường dành riêng cho ô tô và xe máy",
-    "speed_limit": null
+    "speed_limit": null,
+    "penalty": "Không chấp hành hiệu lệnh biển báo: Ô tô 300.000đ - 400.000đ • Xe máy 100.000đ - 200.000đ"
   },
   {
     "idx": 128,
@@ -1029,7 +1157,8 @@
     "name": "Hướng đi trên mỗi làn đường theo vạch kẻ",
     "category": "HIỆU LỆNH",
     "action": "Tuân thủ hướng đi quy định trên từng làn đường",
-    "speed_limit": null
+    "speed_limit": null,
+    "penalty": "Không chấp hành hiệu lệnh biển báo: Ô tô 300.000đ - 400.000đ • Xe máy 100.000đ - 200.000đ"
   },
   {
     "idx": 129,
@@ -1037,7 +1166,8 @@
     "name": "Làn đường dành cho ô tô khách",
     "category": "HIỆU LỆNH",
     "action": "Làn đường dành riêng cho ô tô khách",
-    "speed_limit": null
+    "speed_limit": null,
+    "penalty": "Không chấp hành hiệu lệnh biển báo: Ô tô 300.000đ - 400.000đ • Xe máy 100.000đ - 200.000đ"
   },
   {
     "idx": 130,
@@ -1045,7 +1175,8 @@
     "name": "Làn đường dành cho ô tô con",
     "category": "HIỆU LỆNH",
     "action": "Làn đường dành riêng cho ô tô con",
-    "speed_limit": null
+    "speed_limit": null,
+    "penalty": "Không chấp hành hiệu lệnh biển báo: Ô tô 300.000đ - 400.000đ • Xe máy 100.000đ - 200.000đ"
   },
   {
     "idx": 131,
@@ -1053,7 +1184,8 @@
     "name": "Làn đường dành cho ô tô tải",
     "category": "HIỆU LỆNH",
     "action": "Làn đường dành riêng cho ô tô tải",
-    "speed_limit": null
+    "speed_limit": null,
+    "penalty": "Không chấp hành hiệu lệnh biển báo: Ô tô 300.000đ - 400.000đ • Xe máy 100.000đ - 200.000đ"
   },
   {
     "idx": 132,
@@ -1061,7 +1193,8 @@
     "name": "Làn đường dành cho xe máy",
     "category": "HIỆU LỆNH",
     "action": "Làn đường dành riêng cho xe máy",
-    "speed_limit": null
+    "speed_limit": null,
+    "penalty": "Không chấp hành hiệu lệnh biển báo: Ô tô 300.000đ - 400.000đ • Xe máy 100.000đ - 200.000đ"
   },
   {
     "idx": 133,
@@ -1069,7 +1202,8 @@
     "name": "Biển gộp làn đường theo phương tiện",
     "category": "HIỆU LỆNH",
     "action": "Đi đúng làn đường theo loại phương tiện quy định",
-    "speed_limit": null
+    "speed_limit": null,
+    "penalty": "Không chấp hành hiệu lệnh biển báo: Ô tô 300.000đ - 400.000đ • Xe máy 100.000đ - 200.000đ"
   },
   {
     "idx": 134,
@@ -1077,7 +1211,8 @@
     "name": "Bắt đầu khu đông dân cư",
     "category": "HIỆU LỆNH",
     "action": "Bắt đầu khu vực đông dân cư, giảm tốc độ",
-    "speed_limit": null
+    "speed_limit": null,
+    "penalty": "Không chấp hành hiệu lệnh biển báo: Ô tô 300.000đ - 400.000đ • Xe máy 100.000đ - 200.000đ"
   },
   {
     "idx": 135,
@@ -1085,7 +1220,8 @@
     "name": "Hết khu đông dân cư",
     "category": "HIỆU LỆNH",
     "action": "Hết khu vực đông dân cư",
-    "speed_limit": null
+    "speed_limit": null,
+    "penalty": "Không chấp hành hiệu lệnh biển báo: Ô tô 300.000đ - 400.000đ • Xe máy 100.000đ - 200.000đ"
   },
   {
     "idx": 136,
@@ -1093,7 +1229,8 @@
     "name": "Bắt đầu đường ưu tiên",
     "category": "CHỈ DẪN",
     "action": "Đoạn đường được quyền ưu tiên qua nơi giao nhau",
-    "speed_limit": null
+    "speed_limit": null,
+    "penalty": "Được ưu tiên: Đi đúng tốc độ cho phép, chú ý an toàn tại nút giao"
   },
   {
     "idx": 137,
@@ -1101,7 +1238,8 @@
     "name": "Hết đoạn đường ưu tiên",
     "category": "CHỈ DẪN",
     "action": "Hết quyền ưu tiên qua nơi giao nhau",
-    "speed_limit": null
+    "speed_limit": null,
+    "penalty": "Hết ưu tiên: Giảm tốc độ và nhường đường theo quy tắc giao thông"
   },
   {
     "idx": 138,
@@ -1109,7 +1247,8 @@
     "name": "Được ưu tiên qua đường hẹp",
     "category": "CHỈ DẪN",
     "action": "Được quyền ưu tiên qua đoạn đường hẹp",
-    "speed_limit": null
+    "speed_limit": null,
+    "penalty": "Tuân thủ quy định theo Nghị định 100/2019/NĐ-CP & 123/2021/NĐ-CP"
   },
   {
     "idx": 139,
@@ -1117,7 +1256,8 @@
     "name": "Đường một chiều",
     "category": "CHỈ DẪN",
     "action": "Đoạn đường chỉ lưu thông theo một chiều quy định",
-    "speed_limit": null
+    "speed_limit": null,
+    "penalty": "Tuân thủ quy định theo Nghị định 100/2019/NĐ-CP & 123/2021/NĐ-CP"
   },
   {
     "idx": 140,
@@ -1125,7 +1265,8 @@
     "name": "Nơi đỗ xe",
     "category": "CHỈ DẪN",
     "action": "Khu vực được phép đỗ xe ô tô",
-    "speed_limit": null
+    "speed_limit": null,
+    "penalty": "Đỗ xe sai ô quy định / không sát lề: Ô tô 400k - 600k"
   },
   {
     "idx": 141,
@@ -1133,7 +1274,8 @@
     "name": "Nơi đỗ xe một phần trên hè phố",
     "category": "CHỈ DẪN",
     "action": "Được phép đỗ một phần bánh xe trên hè",
-    "speed_limit": null
+    "speed_limit": null,
+    "penalty": "Tuân thủ quy định theo Nghị định 100/2019/NĐ-CP & 123/2021/NĐ-CP"
   },
   {
     "idx": 142,
@@ -1141,7 +1283,8 @@
     "name": "Chỗ quay xe",
     "category": "CHỈ DẪN",
     "action": "Vị trí được phép quay đầu xe an toàn",
-    "speed_limit": null
+    "speed_limit": null,
+    "penalty": "Tuân thủ quy định theo Nghị định 100/2019/NĐ-CP & 123/2021/NĐ-CP"
   },
   {
     "idx": 143,
@@ -1149,7 +1292,8 @@
     "name": "Khu vực quay xe",
     "category": "CHỈ DẪN",
     "action": "Khu vực rộng cho phép các xe quay đầu",
-    "speed_limit": null
+    "speed_limit": null,
+    "penalty": "Tuân thủ quy định theo Nghị định 100/2019/NĐ-CP & 123/2021/NĐ-CP"
   },
   {
     "idx": 144,
@@ -1157,7 +1301,8 @@
     "name": "Phạm vi tác dụng của biển",
     "category": "BIỂN PHỤ",
     "action": "Báo chiều dài đoạn đường biển chính có hiệu lực",
-    "speed_limit": null
+    "speed_limit": null,
+    "penalty": "Tuân thủ quy định theo Nghị định 100/2019/NĐ-CP & 123/2021/NĐ-CP"
   },
   {
     "idx": 145,
@@ -1165,7 +1310,8 @@
     "name": "Khoảng cách đến đối tượng báo hiệu",
     "category": "BIỂN PHỤ",
     "action": "Báo khoảng cách thực tế từ vị trí đặt biển đến nơi báo hiệu",
-    "speed_limit": null
+    "speed_limit": null,
+    "penalty": "Tuân thủ quy định theo Nghị định 100/2019/NĐ-CP & 123/2021/NĐ-CP"
   },
   {
     "idx": 146,
@@ -1173,7 +1319,8 @@
     "name": "Hướng tác dụng của biển",
     "category": "BIỂN PHỤ",
     "action": "Chỉ hướng tác dụng của biển chính (hai đầu mũi tên)",
-    "speed_limit": null
+    "speed_limit": null,
+    "penalty": "Tuân thủ quy định theo Nghị định 100/2019/NĐ-CP & 123/2021/NĐ-CP"
   },
   {
     "idx": 147,
@@ -1181,7 +1328,8 @@
     "name": "Làn đường áp dụng",
     "category": "BIỂN PHỤ",
     "action": "Chỉ làn đường chịu hiệu lực của biển chính hoặc đèn tín hiệu",
-    "speed_limit": null
+    "speed_limit": null,
+    "penalty": "Tuân thủ quy định theo Nghị định 100/2019/NĐ-CP & 123/2021/NĐ-CP"
   },
   {
     "idx": 148,
@@ -1189,7 +1337,8 @@
     "name": "Loại xe chịu hiệu lực của biển chính",
     "category": "BIỂN PHỤ",
     "action": "Chỉ loại xe chịu hiệu lực của biển báo chính",
-    "speed_limit": null
+    "speed_limit": null,
+    "penalty": "Tuân thủ quy định theo Nghị định 100/2019/NĐ-CP & 123/2021/NĐ-CP"
   },
   {
     "idx": 149,
@@ -1197,7 +1346,8 @@
     "name": "Hướng đường ưu tiên",
     "category": "BIỂN PHỤ",
     "action": "Chỉ hướng của đường ưu tiên tại nơi giao nhau",
-    "speed_limit": null
+    "speed_limit": null,
+    "penalty": "Tuân thủ quy định theo Nghị định 100/2019/NĐ-CP & 123/2021/NĐ-CP"
   },
   {
     "idx": 150,
@@ -1205,7 +1355,8 @@
     "name": "Hướng rẽ",
     "category": "BIỂN PHỤ",
     "action": "Báo trước chỗ rẽ nguy hiểm và chỉ hướng rẽ",
-    "speed_limit": null
+    "speed_limit": null,
+    "penalty": "Tuân thủ quy định theo Nghị định 100/2019/NĐ-CP & 123/2021/NĐ-CP"
   },
   {
     "idx": 151,
@@ -1213,7 +1364,8 @@
     "name": "Thời gian hiệu lực",
     "category": "BIỂN PHỤ",
     "action": "Thời gian biển chính có hiệu lực trong ngày hoặc trong tuần (ví dụ: 6:00 - 22:00)",
-    "speed_limit": null
+    "speed_limit": null,
+    "penalty": "Khung giờ hiệu lực: Vi phạm trong khung giờ bị xử phạt như biển chính"
   },
   {
     "idx": 152,
@@ -1221,7 +1373,8 @@
     "name": "Thuyết minh biển chính",
     "category": "BIỂN PHỤ",
     "action": "Bổ sung nội dung thuyết minh chỉ dẫn cho biển chính",
-    "speed_limit": null
+    "speed_limit": null,
+    "penalty": "Tuân thủ quy định theo Nghị định 100/2019/NĐ-CP & 123/2021/NĐ-CP"
   },
   {
     "idx": 153,
@@ -1229,6 +1382,7 @@
     "name": "Thuyết minh biển báo",
     "category": "BIỂN PHỤ",
     "action": "Giải thích bổ sung cho biển báo chính",
-    "speed_limit": null
+    "speed_limit": null,
+    "penalty": "Thuyết minh biển báo: Căn cứ bổ sung xác định lỗi vi phạm"
   }
 ]

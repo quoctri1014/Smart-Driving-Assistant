@@ -670,23 +670,33 @@ export default function LiveMonitorPage() {
     isPaused: sessionState === 'PAUSED',
     sourceMode,
     serverLineCrossings: detectionResult?.line_crossings,
+    currentSpeed: currentSpeed ?? undefined,
+    speedLimit: speedLimit ?? undefined,
   });
 
-  const safeDistance = detectionResult?.collision_warning?.distance_estimate ?? (trafficEngine?.zoneFront?.dist ?? null);
+  const safeDistance = trafficEngine.activeZones.F !== false
+    ? (detectionResult?.collision_warning?.distance_estimate ?? (trafficEngine?.zoneFront?.dist ?? null))
+    : null;
   const recommendedDistance = detectionResult?.collision_warning?.recommended_distance_m ?? 20;
   const recommendedSpeed = isImageMode ? null : (detectionResult?.speed_advice?.recommended_speed ?? null);
   const vehicleDensityCount = detectionResult?.vehicles?.length ?? 0;
 
   const trafficZoneLvl =
-    trafficEngine.zoneFront.lvl === 2 || trafficEngine.zoneLeft.lvl === 2 || trafficEngine.zoneRight.lvl === 2
+    (trafficEngine.activeZones.F !== false && trafficEngine.zoneFront.lvl === 2) ||
+    (trafficEngine.activeZones.L !== false && trafficEngine.zoneLeft.lvl === 2) ||
+    (trafficEngine.activeZones.R !== false && trafficEngine.zoneRight.lvl === 2)
       ? 'danger'
-      : trafficEngine.zoneFront.lvl === 1 || trafficEngine.zoneLeft.lvl === 1 || trafficEngine.zoneRight.lvl === 1
+      : (trafficEngine.activeZones.F !== false && trafficEngine.zoneFront.lvl === 1) ||
+        (trafficEngine.activeZones.L !== false && trafficEngine.zoneLeft.lvl === 1) ||
+        (trafficEngine.activeZones.R !== false && trafficEngine.zoneRight.lvl === 1)
       ? 'warning'
       : 'none';
 
   const collisionLevel = isImageMode
     ? 'none'
-    : (trafficZoneLvl !== 'none' ? trafficZoneLvl : (detectionResult?.collision_warning?.level || 'none'));
+    : (trafficZoneLvl !== 'none'
+        ? trafficZoneLvl
+        : (trafficEngine.activeZones.F !== false ? (detectionResult?.collision_warning?.level || 'none') : 'none'));
 
   // Đồng bộ trạng thái cảnh báo giao diện (UI State) chuẩn xác theo dữ liệu đã hợp nhất
   const activeUiState = useMemo(() => {
@@ -1247,6 +1257,8 @@ export default function LiveMonitorPage() {
             focalLength={trafficEngine.focalLength}
             showDistanceZones={trafficEngine.showZones}
             trackedVehicles={trafficEngine.trackedVehicles}
+            activeZones={trafficEngine.activeZones}
+            onToggleZone={trafficEngine.toggleZone}
             onUploadClick={() => roadFileInputRef.current?.click()}
             onUseWebcam={handleUseRoadWebcam}
             onSelectSample={handleSelectSample}
@@ -1338,6 +1350,8 @@ export default function LiveMonitorPage() {
                 focalLength={trafficEngine.focalLength}
                 showDistanceZones={trafficEngine.showZones}
                 trackedVehicles={trafficEngine.trackedVehicles}
+                activeZones={trafficEngine.activeZones}
+                onToggleZone={trafficEngine.toggleZone}
                 onUploadClick={() => roadFileInputRef.current?.click()}
                 onUseWebcam={handleUseRoadWebcam}
                 onSelectSample={handleSelectSample}
@@ -1418,6 +1432,8 @@ export default function LiveMonitorPage() {
               focalLength={trafficEngine.focalLength}
               showDistanceZones={trafficEngine.showZones}
               trackedVehicles={trafficEngine.trackedVehicles}
+              activeZones={trafficEngine.activeZones}
+              onToggleZone={trafficEngine.toggleZone}
               onUploadClick={() => roadFileInputRef.current?.click()}
               onUseWebcam={handleUseRoadWebcam}
               onSelectSample={handleSelectSample}

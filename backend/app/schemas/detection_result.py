@@ -42,6 +42,10 @@ class CollisionWarning(BaseModel):
 class TrafficSign(BaseModel):
     sign_type: Optional[str] = None
     speed_limit: Optional[float] = None
+    name: Optional[str] = None
+    category: Optional[str] = None
+    action_required: Optional[str] = None
+    penalty: Optional[str] = None
 
 class DetectionResult(BaseModel):
     frame_width: Optional[int] = None

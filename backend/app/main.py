@@ -52,6 +52,30 @@ async def lifespan(app: FastAPI):
     logger.info("Application startup: Loading AI models...")
     # Initialize shared models before accepting requests
     SharedAIModels()
+    try:
+        from backend.app.api.traffic_sign_routes import get_sign_onnx_session, get_qcvn_classifier, get_ocr_reader
+        from backend.app.api.helmet_routes import get_helmet_session
+        from backend.app.api.traffic_density_routes import get_vehicle_model
+        import numpy as np
+
+        from backend.app.services.sign_template_matcher import SignTemplateMatcher
+
+        get_sign_onnx_session()
+        get_qcvn_classifier()
+        SignTemplateMatcher.get_instance()
+        v_model = get_vehicle_model()
+        if v_model:
+            v_model(np.zeros((64, 64, 3), dtype=np.uint8), conf=0.35, imgsz=384, verbose=False)
+        shared_m = SharedAIModels()
+        if shared_m.plate_reader and shared_m.plate_reader.detector:
+            shared_m.plate_reader.detector(np.zeros((64, 64, 3), dtype=np.uint8), conf=0.35, imgsz=384, verbose=False)
+        reader = get_ocr_reader()
+        if reader:
+            dummy = np.zeros((32, 32), dtype=np.uint8)
+            reader.readtext(dummy, allowlist='0123456789', detail=0)
+        logger.info("All AI models, OCR, and QCVN template matcher pre-warmed successfully.")
+    except Exception as e:
+        logger.warning(f"Model pre-warm warning: {e}")
     yield
     logger.info("Application shutdown.")
 
